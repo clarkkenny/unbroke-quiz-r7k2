@@ -54,15 +54,15 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .btn{display:inline-flex;align-items:center;justify-content:center;height:64px;padding:0 28px;border-radius:12px;background:#0a3a26;color:#fff;
   font-weight:800;font-size:18px;text-transform:uppercase;text-decoration:none}
 .btn:hover{background:#11553a}
-</style></head><body>
+.wf-note{max-width:1040px;margin:0 auto 16px;padding:14px 18px;border:2px dashed #0a3a26;border-radius:14px;background:#fff;color:#0a3a26;font:500 14px/1.45 ui-monospace,Menlo,monospace}.wf-note strong{font-weight:700}.result .wf-note{margin-bottom:16px}</style></head><body>
 <nav class="nav"><a class="logo" href="../">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="../">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
-<main class="result"><div class="card">
+<main class="result"><div class="wf-note" role="note"><strong>Placeholder result page.</strong> The final result pages will be designed and built in Webflow. This one only shows where the quiz sends you and that your first name carries over.</div><div class="card">
 <p class="kick">Your result</p>
 <h1><span data-quiz-name></span><span class="comma">, you're</span> The Ostrich.</h1>
 <p class="d">You know there is a number out there. You have simply decided not to meet it. Placeholder copy: the real description comes from the book.</p>
 <a class="btn" href="../">Retake the quiz</a>
 </div></main>
-<p class="foot">Demo build for internal review. Result copy is placeholder.</p>
+<p class="foot">Demo build for internal review. Result pages will be built in Webflow.</p>
 <script>
 // tidy the comma when there is no first name
 document.addEventListener('DOMContentLoaded',function(){var n=document.querySelector('[data-quiz-name]');if(!n||!n.textContent.trim()){var c=document.querySelector('.comma');c.textContent="You're";}});

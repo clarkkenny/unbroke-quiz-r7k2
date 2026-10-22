@@ -189,7 +189,7 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 </div>
 </div></main>
 <section class="list"><h2>Feeling broke is temporary. What you learn in this book shouldn't be.</h2></section>
-<p class="foot">Demo build for internal review. Page shell is approximate; the quiz card is production code.</p>
+<p class="foot">Demo build for internal review. Page shell is approximate and the quiz card is production code. Result pages will be built in Webflow.</p>
 <div class="demo-badge">Demo</div>
 <script>
 // Demo-only: no backend on GitHub Pages, so submitting just unlocks the result
@@ -205,10 +205,10 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
 
   /* Result page for each outcome. Use your real Webflow page slugs. */
   var RESULT_PAGES = {
-    ostrich:   'quiz/ostrich',
-    tightrope: 'quiz/tightrope',
-    leaky:     'quiz/leaky-bucket',
-    builder:   'quiz/quiet-builder'
+    ostrich:   'quiz/ostrich.html',
+    tightrope: 'quiz/tightrope.html',
+    leaky:     'quiz/leaky-bucket.html',
+    builder:   'quiz/quiet-builder.html'
   };
 
   /* ---------- 2. QUESTIONS + SCORING ----------
@@ -294,7 +294,8 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
     floodOrigin: 'button', // 'button' | 'center' | 'top'
     floodSpread: 700,      // ms for the wave to cross the card
     dotGrow: 420,          // ms for a single dot to grow to full
-    floodJitter: 160       // ms of random offset per dot, 0 for a clean ring
+    floodJitter: 160,      // ms of random offset per dot, 0 for a clean ring
+    unlockHeight: 760      // ms, card height ease into the unlock screen
   };
 
   /* ---------- engine (no edits needed below) ---------- */
@@ -379,12 +380,13 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
     }));
   }
 
-  function morph(el, h0) {
+  function morph(el, h0, dur) {
     var h1 = el.offsetHeight;
-    if (!canAnimate() || !M.heightDuration || h0 === h1) return;
+    dur = dur == null ? M.heightDuration : dur;
+    if (!canAnimate() || !dur || h0 === h1) return;
     var prev = el.style.overflow;
     el.style.overflow = 'hidden';
-    var a = el.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: M.heightDuration, easing: M.ease });
+    var a = el.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: dur, easing: M.ease });
     a.finished.catch(function () {}).then(function () { el.style.overflow = prev; });
   }
 
@@ -568,11 +570,14 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
     var btn = stage.querySelector('.uq-next');
     if (!gate) { location.href = unlock(outcome); return; }
 
+    // Lock the card's height so nothing jumps while the content leaves and the dots flood
+    var lockH = root.offsetHeight;
+    root.style.height = lockH + 'px';
+
     leave(1, [countEl, head.querySelector('.uq-bar')]).then(function () {
       return flood(btn);
     }).then(function () {
       root.classList.add('is-unlock');
-      var h0 = root.offsetHeight;
       stage.innerHTML = '<span class="uq-kicker uq-a">' + GATE_COPY.kicker + '</span>' +
         '<h3 class="uq-q uq-a" tabindex="-1">' + GATE_COPY.headline + '</h3>' +
         '<p class="uq-gate-sub uq-a">' + GATE_COPY.sub + '</p><div class="uq-gate-slot"></div>';
@@ -583,7 +588,8 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
       prepFields(form);
       stage.querySelector('.uq-gate-slot').appendChild(gate);
       show(gate);
-      morph(root, h0);
+      root.style.height = '';
+      morph(root, lockH, M.unlockHeight);
       keepInView();
       return enter(0).then(function () { return form; });
     }).then(function (form) {
@@ -629,6 +635,7 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
     restart: function () {
       if (gate && gateHome) { hide(gate); gateHome.parent.insertBefore(gate, gateHome.next); }
       root.classList.remove('is-unlock');
+      root.style.height = '';
       [countEl, head.querySelector('.uq-bar')].forEach(function (el) { el.getAnimations().forEach(function (a) { a.cancel(); }); });
       step = 0; answers = {}; busy = false; render(); enter(0);
     },
@@ -694,7 +701,8 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
     ['selectDuration', 'Answer fill sweep', 0, 900, 10, 'ms'],
     ['floodSpread', 'Unlock: wave spread', 100, 2000, 10, 'ms'],
     ['dotGrow', 'Unlock: dot grow', 80, 1200, 10, 'ms'],
-    ['floodJitter', 'Unlock: dot jitter', 0, 600, 10, 'ms']
+    ['floodJitter', 'Unlock: dot jitter', 0, 600, 10, 'ms'],
+    ['unlockHeight', 'Unlock: card resize', 0, 1600, 10, 'ms']
   ];
   var box = document.getElementById('mp-fields'), html = '';
   SLIDERS.forEach(function (s) {
