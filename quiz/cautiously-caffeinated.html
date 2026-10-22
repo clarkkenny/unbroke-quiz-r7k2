@@ -63,15 +63,26 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .card li::before{content:"";position:absolute;left:16px;top:21px;width:12px;height:12px;border-radius:50%;background:#0a3a26}
 .card p.n{font-style:italic;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.5;max-width:60ch;margin:0 0 36px;color:#0a3a26}
 .dbg{display:block;margin-top:8px}
+</style><style>
+.preview-label{font:700 11px/1 "Inter Tight",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#0a3a26;margin:0 0 10px}
+.move{padding:16px 18px;border:2px solid #000;border-radius:14px;background:#fff;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.45;max-width:62ch;margin:0 0 12px}
+.locked{display:grid;gap:14px;padding:clamp(18px,3vw,26px);border:2px dashed #0a3a26;border-radius:14px;background:rgba(255,255,255,.45);max-width:62ch;margin:0 0 32px}
+.locked h2{margin:0;font-weight:800;font-size:clamp(20px,2.4vw,24px);letter-spacing:-.02em;line-height:1.15}
+.locked ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.locked li{padding:0 0 0 26px;border:0;background:none;position:relative;font-weight:600;font-size:16px;line-height:1.4}
+.locked li::before{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:3px;background:#0a3a26}
+.locked p{margin:0;font:13px/1.5 ui-monospace,Menlo,monospace;color:#0a3a26}
 </style></head><body>
 <nav class="nav"><a class="logo" href="../">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="../">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
-<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. The copy below is final, from the scoring spec. The layout is a placeholder.<span class="dbg" id="dbg"></span></div><div class="card">
+<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. This page shows the category and a preview; the full report goes out by email, which is not built yet.<span class="dbg" id="dbg"></span></div><div class="card">
 <p class="level"><span class="chip">Fragile</span><span>roughly one to three months of runway</span></p>
 <h1><span data-quiz-name></span><span class="comma">, you're</span> Cautiously Caffeinated.</h1>
 <p class="d">You can survive one bad thing. You can&#x27;t yet survive two in the same month, and disasters travel in packs. You&#x27;ve got a cushion and a plan that mostly holds, which puts you ahead of most people and squarely in the limbo where the dream still feels a few zeros off. You already did the ugly part. What matters now isn&#x27;t clipping coupons harder.</p>
-<h2>What changes it:</h2>
-<ul><li>Move your attention from pennies to the decisions that actually change the number: your career, where you live, what you pay for housing. A $15K raise beats a decade of grocery optimizing, and it isn&#x27;t close.</li><li>Run a Career Audit once a year. What&#x27;s your real market value today, not what you accepted three years ago? More than 15% under market is a gap worth a conversation.</li><li>If housing is the thing crushing you, there are five things to try before you relocate: downsize in-market, renegotiate mid-lease, add a roommate, audit the lease for costs your landlord owes, check assistance programs. Relocating is the last resort, not the first.</li><li>Before any decision that&#x27;s hard to undo, ask whether it&#x27;s a one-way door or a two-way door. Two-way doors get your gut. One-way doors get real analysis.</li></ul>
-<p class="n">Your zip did quiet work here. The same life costs wildly different amounts city to city, and that gap is a lever, not a sentence.</p>
+<p class="preview-label">Preview: move 1 of 4</p>
+<div class="move">Move your attention from pennies to the decisions that actually change the number: your career, where you live, what you pay for housing. A $15K raise beats a decade of grocery optimizing, and it isn&#x27;t close.</div>
+<div class="locked"><h2>Your full report is on its way to your inbox.</h2>
+<ul><li>The other 3 moves that change your number</li><li>How your salary and zip shaped this result</li></ul>
+<p>Not there in a few minutes? Check promotions or spam.</p></div>
 <a class="btn" href="../">Retake the quiz</a>
 </div></main>
 <p class="foot">Demo build for internal review. Result pages will be built in Webflow.</p>

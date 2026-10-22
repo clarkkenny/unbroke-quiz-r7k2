@@ -63,15 +63,26 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .card li::before{content:"";position:absolute;left:16px;top:21px;width:12px;height:12px;border-radius:50%;background:#0a3a26}
 .card p.n{font-style:italic;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.5;max-width:60ch;margin:0 0 36px;color:#0a3a26}
 .dbg{display:block;margin-top:8px}
+</style><style>
+.preview-label{font:700 11px/1 "Inter Tight",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#0a3a26;margin:0 0 10px}
+.move{padding:16px 18px;border:2px solid #000;border-radius:14px;background:#fff;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.45;max-width:62ch;margin:0 0 12px}
+.locked{display:grid;gap:14px;padding:clamp(18px,3vw,26px);border:2px dashed #0a3a26;border-radius:14px;background:rgba(255,255,255,.45);max-width:62ch;margin:0 0 32px}
+.locked h2{margin:0;font-weight:800;font-size:clamp(20px,2.4vw,24px);letter-spacing:-.02em;line-height:1.15}
+.locked ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.locked li{padding:0 0 0 26px;border:0;background:none;position:relative;font-weight:600;font-size:16px;line-height:1.4}
+.locked li::before{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:3px;background:#0a3a26}
+.locked p{margin:0;font:13px/1.5 ui-monospace,Menlo,monospace;color:#0a3a26}
 </style></head><body>
 <nav class="nav"><a class="logo" href="../">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="../">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
-<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. The copy below is final, from the scoring spec. The layout is a placeholder.<span class="dbg" id="dbg"></span></div><div class="card">
+<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. This page shows the category and a preview; the full report goes out by email, which is not built yet.<span class="dbg" id="dbg"></span></div><div class="card">
 <p class="level"><span class="chip">Crisis</span><span>less than a month of cushion</span></p>
 <h1><span data-quiz-name></span><span class="comma">, you're</span> One Flat Tire From a Full Spiral.</h1>
 <p class="d">You&#x27;re running on timing. It works right up until a $400 surprise lands on a Tuesday, and then it doesn&#x27;t. Here&#x27;s the truth most finance advice skips: this isn&#x27;t a discipline problem. Building your first cushion is the slowest, least rewarding stretch of the whole thing. It feels like nothing is happening because mathematically, almost nothing is. That&#x27;s the design. Not your failure.</p>
-<h2>What changes it:</h2>
-<ul><li>Stop canceling subscriptions to fix this. Trimming $12 lattes won&#x27;t save a situation like yours, and pretending it will is how you stay stuck. Small stuff is the lowest-stakes corner of your finances.</li><li>Run a Stability Sprint. A bounded 60 to 90 day push, with an end date, where every spare dollar goes to one target. Not a forever-diet. It ends.</li><li>Get to one month of runway. Then three. That&#x27;s the whole assignment. Boring, and the most useful thing on this list.</li><li>If cutting won&#x27;t close the gap alone, add income: sell what you don&#x27;t use, pick up a short gig, renegotiate one bill eating your cash flow.</li></ul>
-<p class="n">Your salary and zip nudged this. A modest income in an expensive city can land you here even when you&#x27;re doing everything right, which is more or less the entire point of the book.</p>
+<p class="preview-label">Preview: move 1 of 4</p>
+<div class="move">Stop canceling subscriptions to fix this. Trimming $12 lattes won&#x27;t save a situation like yours, and pretending it will is how you stay stuck. Small stuff is the lowest-stakes corner of your finances.</div>
+<div class="locked"><h2>Your full report is on its way to your inbox.</h2>
+<ul><li>The other 3 moves that change your number</li><li>How your salary and zip shaped this result</li></ul>
+<p>Not there in a few minutes? Check promotions or spam.</p></div>
 <a class="btn" href="../">Retake the quiz</a>
 </div></main>
 <p class="foot">Demo build for internal review. Result pages will be built in Webflow.</p>

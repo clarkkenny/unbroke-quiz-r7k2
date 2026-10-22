@@ -63,15 +63,26 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .card li::before{content:"";position:absolute;left:16px;top:21px;width:12px;height:12px;border-radius:50%;background:#0a3a26}
 .card p.n{font-style:italic;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.5;max-width:60ch;margin:0 0 36px;color:#0a3a26}
 .dbg{display:block;margin-top:8px}
+</style><style>
+.preview-label{font:700 11px/1 "Inter Tight",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#0a3a26;margin:0 0 10px}
+.move{padding:16px 18px;border:2px solid #000;border-radius:14px;background:#fff;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.45;max-width:62ch;margin:0 0 12px}
+.locked{display:grid;gap:14px;padding:clamp(18px,3vw,26px);border:2px dashed #0a3a26;border-radius:14px;background:rgba(255,255,255,.45);max-width:62ch;margin:0 0 32px}
+.locked h2{margin:0;font-weight:800;font-size:clamp(20px,2.4vw,24px);letter-spacing:-.02em;line-height:1.15}
+.locked ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.locked li{padding:0 0 0 26px;border:0;background:none;position:relative;font-weight:600;font-size:16px;line-height:1.4}
+.locked li::before{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:3px;background:#0a3a26}
+.locked p{margin:0;font:13px/1.5 ui-monospace,Menlo,monospace;color:#0a3a26}
 </style></head><body>
 <nav class="nav"><a class="logo" href="../">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="../">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
-<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. The copy below is final, from the scoring spec. The layout is a placeholder.<span class="dbg" id="dbg"></span></div><div class="card">
+<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. This page shows the category and a preview; the full report goes out by email, which is not built yet.<span class="dbg" id="dbg"></span></div><div class="card">
 <p class="level"><span class="chip">Stable</span><span>three-plus months of runway, but the pile is still small</span></p>
 <h1><span data-quiz-name></span><span class="comma">, you're</span> Solid, Still Building.</h1>
 <p class="d">A surprise expense doesn&#x27;t scare you anymore. That&#x27;s real, and most people never get here. But don&#x27;t mistake a solid cushion for being done. You&#x27;re in the hardest stretch of wealth-building: the climb toward your first $100K, where progress feels slow because it genuinely is slow. Below that line the math barely moves. The difference now is that your safety net finally lets you stop playing defense and start pulling the levers that actually compound.</p>
-<h2>What changes it:</h2>
-<ul><li>Your first $100K is the hardest money you&#x27;ll ever save and the most important. After it, compounding starts doing a bigger share of the work. You&#x27;re not there yet, so the job is to feed the machine.</li><li>Automate retirement. Get the full employer match (it&#x27;s free money), pick a target-date fund, and stop overthinking it. Below $100K, the act of contributing beats any clever strategy.</li><li>Raise your contribution 1% every six months. You&#x27;ll barely feel each step, and you&#x27;ll be at 10% in two years without a painful overhaul.</li><li>Point your attention at the big levers, not the grocery budget: career, location, housing. And when the next raise comes, don&#x27;t let lifestyle creep quietly eat it.</li></ul>
-<p class="n">Your salary and zip held this steady. You&#x27;ve got breathing room. The task is turning breathing room into momentum.</p>
+<p class="preview-label">Preview: move 1 of 4</p>
+<div class="move">Your first $100K is the hardest money you&#x27;ll ever save and the most important. After it, compounding starts doing a bigger share of the work. You&#x27;re not there yet, so the job is to feed the machine.</div>
+<div class="locked"><h2>Your full report is on its way to your inbox.</h2>
+<ul><li>The other 3 moves that change your number</li><li>How your salary and zip shaped this result</li></ul>
+<p>Not there in a few minutes? Check promotions or spam.</p></div>
 <a class="btn" href="../">Retake the quiz</a>
 </div></main>
 <p class="foot">Demo build for internal review. Result pages will be built in Webflow.</p>
