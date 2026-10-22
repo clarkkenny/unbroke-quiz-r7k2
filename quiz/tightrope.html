@@ -1,0 +1,70 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Tightrope Walker | Unbroke quiz demo</title><meta name="robots" content="noindex"><!-- UNBROKE RESULT PAGE GUARD
+     Paste into each result page: Page Settings > Custom Code > Inside <head> tag.
+     Set THIS_OUTCOME to match that page (ostrich / tightrope / leaky / builder). -->
+<script>
+(function () {
+  var THIS_OUTCOME = 'tightrope';
+  var QUIZ_PAGE = '../';
+
+  var unlocked = null;
+  try { unlocked = sessionStorage.getItem('uq_unlocked'); } catch (e) {}
+
+  // No unlock in this tab, or unlocked a different result: send them to take the quiz
+  if (unlocked !== THIS_OUTCOME) {
+    document.documentElement.style.visibility = 'hidden';
+    location.replace(QUIZ_PAGE);
+    return;
+  }
+
+  // Personalize: any element with data-quiz-name gets the first name
+  document.addEventListener('DOMContentLoaded', function () {
+    var name = null;
+    try { name = sessionStorage.getItem('uq_name'); } catch (e) {}
+    document.querySelectorAll('[data-quiz-name]').forEach(function (el) {
+      if (name) el.textContent = name; else el.style.display = 'none';
+    });
+  });
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-webkit-font-smoothing:antialiased}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:20px clamp(16px,3vw,32px);gap:16px}
+.logo{font-weight:800;font-size:26px;letter-spacing:-.04em;text-transform:uppercase;transform:scaleY(1.15);text-decoration:none;color:#000}
+.links{display:flex;border:2px solid #000;border-radius:6px;overflow:hidden}
+.links a{padding:6px 10px;font-weight:800;font-size:13px;text-transform:uppercase;color:#000;text-decoration:none;border-left:2px solid #000}
+.links a:first-child{border-left:0}.links a.on{background:#000;color:#fff;border-radius:6px}
+@media (max-width:640px){.links a:not(.on){display:none}}
+.hero{text-align:center;padding:clamp(40px,8vw,90px) 16px clamp(32px,5vw,64px)}
+.hero h1{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(56px,11vw,120px);line-height:.95;letter-spacing:-.03em;margin:0 0 18px}
+.hero p{font-weight:500;font-size:clamp(18px,2.4vw,26px);line-height:1.25;letter-spacing:-.02em;max-width:34ch;margin:0 auto}
+.quiz{padding:0 16px clamp(60px,10vw,120px)}
+.list{background:#94fcae;padding:clamp(48px,8vw,96px) clamp(16px,3vw,40px)}
+.list h2{font-weight:800;font-size:clamp(32px,5vw,56px);line-height:1;letter-spacing:-.04em;margin:0;max-width:22ch}
+.foot{padding:24px 16px 40px;text-align:center;font:12px/1.5 ui-monospace,Menlo,monospace;color:#3f4743}
+.demo-badge{position:fixed;left:16px;bottom:16px;z-index:40;background:#000;color:#fff;font:700 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.06em;padding:8px 10px;border-radius:6px;text-transform:uppercase}
+</style>
+<style>
+.result{max-width:1040px;margin:0 auto 96px;padding:0 16px}
+.card{border:2px solid #000;border-radius:28px;background:#94fcae;padding:clamp(28px,6vw,64px)}
+.kick{font:14px ui-monospace,Menlo,monospace;color:#0a3a26;margin:0 0 24px}
+.card h1{font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1;letter-spacing:-.04em;margin:0 0 20px}
+.card p.d{font-weight:600;font-size:clamp(17px,2vw,21px);line-height:1.45;max-width:52ch;margin:0 0 36px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:64px;padding:0 28px;border-radius:12px;background:#0a3a26;color:#fff;
+  font-weight:800;font-size:18px;text-transform:uppercase;text-decoration:none}
+.btn:hover{background:#11553a}
+</style></head><body>
+<nav class="nav"><a class="logo" href="../">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="../">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
+<main class="result"><div class="card">
+<p class="kick">Your result</p>
+<h1><span data-quiz-name></span><span class="comma">, you're</span> The Tightrope Walker.</h1>
+<p class="d">Balanced, technically. One surprise bill and the act gets a lot less graceful. Placeholder copy: the real description comes from the book.</p>
+<a class="btn" href="../">Retake the quiz</a>
+</div></main>
+<p class="foot">Demo build for internal review. Result copy is placeholder.</p>
+<script>
+// tidy the comma when there is no first name
+document.addEventListener('DOMContentLoaded',function(){var n=document.querySelector('[data-quiz-name]');if(!n||!n.textContent.trim()){var c=document.querySelector('.comma');c.textContent="You're";}});
+</script>
+</body></html>

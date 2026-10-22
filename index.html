@@ -1,0 +1,747 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How broke are you? | Unbroke quiz demo</title><meta name="robots" content="noindex"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-webkit-font-smoothing:antialiased}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:20px clamp(16px,3vw,32px);gap:16px}
+.logo{font-weight:800;font-size:26px;letter-spacing:-.04em;text-transform:uppercase;transform:scaleY(1.15);text-decoration:none;color:#000}
+.links{display:flex;border:2px solid #000;border-radius:6px;overflow:hidden}
+.links a{padding:6px 10px;font-weight:800;font-size:13px;text-transform:uppercase;color:#000;text-decoration:none;border-left:2px solid #000}
+.links a:first-child{border-left:0}.links a.on{background:#000;color:#fff;border-radius:6px}
+@media (max-width:640px){.links a:not(.on){display:none}}
+.hero{text-align:center;padding:clamp(40px,8vw,90px) 16px clamp(32px,5vw,64px)}
+.hero h1{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(56px,11vw,120px);line-height:.95;letter-spacing:-.03em;margin:0 0 18px}
+.hero p{font-weight:500;font-size:clamp(18px,2.4vw,26px);line-height:1.25;letter-spacing:-.02em;max-width:34ch;margin:0 auto}
+.quiz{padding:0 16px clamp(60px,10vw,120px)}
+.list{background:#94fcae;padding:clamp(48px,8vw,96px) clamp(16px,3vw,40px)}
+.list h2{font-weight:800;font-size:clamp(32px,5vw,56px);line-height:1;letter-spacing:-.04em;margin:0;max-width:22ch}
+.foot{padding:24px 16px 40px;text-align:center;font:12px/1.5 ui-monospace,Menlo,monospace;color:#3f4743}
+.demo-badge{position:fixed;left:16px;bottom:16px;z-index:40;background:#000;color:#fff;font:700 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.06em;padding:8px 10px;border-radius:6px;text-transform:uppercase}
+</style></head><body>
+<nav class="nav"><a class="logo" href="./">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="./">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
+<header class="hero"><h1>How broke are you?</h1><p>A quiz that knows more about you than your banking app does. Take the next 2 minutes to discover your status.</p></header>
+<main class="quiz"><div class="demo-frame">
+<!-- UNBROKE QUIZ — paste into a Code Embed where the quiz card goes -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+.uq-wrap{container-type:inline-size;width:100%}
+.uq{
+  /* Theme */
+  --uq-ink:#000;
+  --uq-btn:#0a3a26;
+  --uq-btn-hover:#11553a;
+  --uq-opt:#edfdf0;
+  --uq-opt-on:#a9f5bf;
+  --uq-accent:#1b7a46;
+  --uq-dot:#c4f2d1;
+  --uq-off-bg:#d7dcd9;      /* disabled CTA fill */
+  --uq-off-ink:#3f4743;     /* disabled CTA text, 6.8:1 on the fill */
+  --uq-err:#9b1c13;
+  --uq-font:"Inter Tight",system-ui,-apple-system,sans-serif;
+  --uq-font-letter:Georgia,"Times New Roman",serif;
+  --uq-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  /* Motion (overwritten by the script config) */
+  --uq-ease:cubic-bezier(.16,1,.3,1);
+  --uq-sel-dur:320ms;
+
+  position:relative;max-width:1040px;margin:0 auto;
+  padding:clamp(24px,6cqi,64px);
+  border:2px solid var(--uq-ink);border-radius:28px;
+  background:#fff;color:var(--uq-ink);overflow:hidden;box-sizing:border-box;
+  font-family:var(--uq-font);-webkit-font-smoothing:antialiased;scroll-margin-top:24px;
+}
+.uq *,.uq *::before,.uq *::after{box-sizing:border-box}
+.uq::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,var(--uq-dot) 1.3px,transparent 1.8px);
+  background-size:11px 11px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 70% at 50% 50%,#000 35%,transparent 100%);
+          mask-image:radial-gradient(ellipse 75% 70% at 50% 50%,#000 35%,transparent 100%);
+}
+.uq>*{position:relative}
+
+/* Header: counter + progress */
+.uq-head{margin-bottom:clamp(28px,6cqi,60px)}
+.uq-count{font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);display:block}
+.uq-bar{margin-top:12px;height:3px;border-radius:3px;background:rgba(10,58,38,.12);overflow:hidden}
+.uq-bar>span{display:block;height:100%;background:var(--uq-btn);transform-origin:left;transform:scaleX(0);
+  transition:transform 700ms var(--uq-ease)}
+
+/* Stage: negative margin keeps focus rings visible when clipped during height morph */
+.uq-stage{margin:-6px;padding:6px}
+
+.uq-q{font-family:var(--uq-font);font-weight:700;font-size:clamp(23px,3cqi,34px);line-height:1.15;
+  letter-spacing:-.025em;margin:0 0 clamp(20px,3cqi,28px);outline:none;text-wrap:balance}
+
+/* Options */
+.uq-opts{display:grid;gap:clamp(10px,1.6cqi,16px)}
+.uq-opt{all:unset;box-sizing:border-box;position:relative;isolation:isolate;overflow:hidden;
+  display:flex;align-items:center;gap:14px;width:100%;min-height:56px;
+  padding:clamp(14px,2cqi,20px) clamp(18px,2.6cqi,26px);
+  border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-opt);cursor:pointer;
+  font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,1.8cqi,18px);line-height:1.3;letter-spacing:-.01em;
+  -webkit-tap-highlight-color:transparent;
+  transition:color .2s ease,transform .25s var(--uq-ease),box-shadow .25s var(--uq-ease)}
+.uq-opt::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--uq-opt-on);
+  transform:scaleX(0);transform-origin:left center;transition:transform var(--uq-sel-dur) var(--uq-ease)}
+.uq-opt[aria-pressed="true"]::before{transform:scaleX(1)}
+.uq-opt:focus-visible{outline:3px solid var(--uq-accent);outline-offset:3px}
+.uq-opt:active{transform:scale(.985)}
+@media (hover:hover){
+  .uq-opt:hover{color:var(--uq-accent);transform:translateY(-2px);box-shadow:0 4px 0 0 var(--uq-ink)}
+  .uq-opt[aria-pressed="true"]:hover{color:var(--uq-ink)}
+  .uq-opt:active{transform:translateY(0) scale(.985);box-shadow:0 0 0 0 var(--uq-ink)}
+}
+.uq-letter{font-family:var(--uq-font-letter);font-weight:400;font-size:clamp(24px,3cqi,28px);line-height:1;flex:none;
+  display:inline-block;min-width:.9em}
+
+/* ZIP */
+.uq-zip{display:block;width:100%;height:clamp(96px,17cqi,200px);padding:0 clamp(20px,3cqi,32px);
+  border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-opt);color:var(--uq-ink);
+  font-family:var(--uq-font);font-weight:600;font-size:clamp(22px,3cqi,32px);letter-spacing:.04em;
+  transition:box-shadow .25s var(--uq-ease)}
+.uq-zip::placeholder{color:#5f6b65;letter-spacing:0;font-weight:500}
+.uq-zip:focus{outline:none;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--uq-accent)}
+.uq-note{font-family:var(--uq-font);font-weight:700;font-size:clamp(18px,2.5cqi,26px);line-height:1.22;
+  letter-spacing:-.02em;margin:clamp(18px,3cqi,28px) 0 0;text-wrap:pretty}
+
+/* Actions */
+.uq-actions{display:flex;gap:12px;margin-top:clamp(28px,4cqi,40px)}
+.uq-next,.uq-back{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  height:clamp(60px,8cqi,84px);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  font-family:var(--uq-font);text-transform:uppercase}
+.uq-next{flex:1;background:var(--uq-btn);color:#fff;font-weight:800;font-size:clamp(18px,2.6cqi,26px);letter-spacing:.01em;
+  transition:background-color .25s ease,color .25s ease,transform .15s ease}
+.uq-next svg,.uq-back svg{width:1em;height:1em;flex:none;transition:transform .3s var(--uq-ease)}
+.uq-next[aria-disabled="true"]{background:var(--uq-off-bg);color:var(--uq-off-ink);cursor:not-allowed}
+.uq-back{flex:none;padding:0 clamp(18px,3cqi,28px);background:#fff;color:var(--uq-ink);border:2px solid var(--uq-ink);
+  font-weight:700;font-size:clamp(15px,1.8cqi,18px);letter-spacing:.02em;
+  transition:background-color .2s ease,transform .15s ease}
+.uq-next:focus-visible,.uq-back:focus-visible{outline:3px solid var(--uq-accent);outline-offset:3px}
+@media (hover:hover){
+  .uq-next:not([aria-disabled="true"]):hover{background:var(--uq-btn-hover)}
+  .uq-next:not([aria-disabled="true"]):hover svg{transform:translateX(4px)}
+  .uq-back:hover{background:var(--uq-opt)}
+  .uq-back:hover svg{transform:translateX(-3px)}
+}
+.uq-next:not([aria-disabled="true"]):active,.uq-back:active{transform:scale(.98)}
+.uq-hint{font-family:var(--uq-font-mono);font-size:13px;color:var(--uq-err);text-align:center;margin:12px 0 0;min-height:1.3em}
+.uq-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Unlock state (card turns into the email gate) ---------- */
+.uq>.uq-flood{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.uq.is-unlock{background:var(--uq-unlock-bg,#94fcae)}
+.uq.is-unlock::before{display:none}
+.uq.is-unlock .uq-head{display:none}
+.uq-kicker{display:block;font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);margin-bottom:clamp(20px,4cqi,36px)}
+.uq-gate-sub{font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,2cqi,19px);line-height:1.4;letter-spacing:-.01em;
+  margin:0 0 clamp(24px,4cqi,36px);max-width:46ch}
+.uq .uq-gate-slot form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0}
+.uq .uq-gate-slot .uq-field{position:relative;grid-column:1/-1;margin:0}
+.uq .uq-gate-slot .uq-field.uq-half{grid-column:auto}
+.uq .uq-gate-slot .uq-field label{position:absolute;top:12px;left:14px;z-index:1;margin:0;padding:3px 7px;border-radius:4px;
+  background:var(--uq-ink);color:#fff;font:700 10px/1.25 var(--uq-font);letter-spacing:.07em;text-transform:uppercase;pointer-events:none}
+.uq .uq-gate-slot .uq-field input{display:block;width:100%;height:clamp(72px,9cqi,84px);margin:0;padding:30px 16px 10px;
+  border:2px solid var(--uq-ink);border-radius:16px;background:#fff;color:var(--uq-ink);box-shadow:none;
+  font:600 clamp(17px,2cqi,20px)/1.2 var(--uq-font);letter-spacing:-.01em;-webkit-appearance:none;appearance:none;
+  transition:box-shadow .25s var(--uq-ease),transform .25s var(--uq-ease)}
+.uq .uq-gate-slot .uq-field input::placeholder{color:#5f6b65;font-weight:500}
+.uq .uq-gate-slot .uq-field input:focus{outline:none;box-shadow:0 0 0 2px #fff,0 0 0 5px var(--uq-btn)}
+.uq .uq-gate-slot .uq-submit{grid-column:1/-1;display:block;width:100%;height:clamp(60px,8cqi,84px);margin:8px 0 0;padding:0 16px;
+  border:0;border-radius:12px;background:var(--uq-btn);color:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;
+  font:800 clamp(18px,2.6cqi,26px)/1 var(--uq-font);text-transform:uppercase;letter-spacing:.01em;
+  transition:background-color .25s ease,transform .15s ease}
+.uq .uq-gate-slot .uq-submit:focus-visible{outline:3px solid var(--uq-btn);outline-offset:3px}
+@media (hover:hover){.uq .uq-gate-slot .uq-submit:hover{background:var(--uq-btn-hover)}}
+.uq .uq-gate-slot .uq-submit:active{transform:scale(.98)}
+.uq .uq-gate-slot .w-form-done,.uq .uq-gate-slot .w-form-fail{background:none;padding:0;margin:14px 0 0;text-align:center;
+  font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn)}
+.uq .uq-gate-slot .w-form-fail{color:var(--uq-err)}
+
+/* Mobile (container-based, so it also works inside narrow columns) */
+@container (max-width:520px){
+  .uq{border-radius:22px}
+  .uq-opt{gap:12px;border-radius:14px}
+  .uq-back{width:60px;padding:0}
+  .uq-back-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .uq-back svg{width:22px;height:22px}
+  .uq .uq-gate-slot .uq-field.uq-half{grid-column:1/-1}
+}
+@media (prefers-reduced-motion:reduce){
+  .uq *,.uq *::before{transition-duration:.01ms!important}
+}
+</style>
+<div class="uq-wrap"><div class="uq" data-quiz><noscript>This quiz needs JavaScript.</noscript></div></div>
+
+<div class="w-form" data-quiz-gate>
+  <form name="quiz-unlock" method="POST" data-name="Quiz Unlock">
+    <input type="hidden" name="quiz_outcome" value="">
+    <input type="hidden" name="quiz_zip" value="">
+    <input type="hidden" name="quiz_answers" value="">
+    <label for="First-Name">First name</label><input maxlength="256" name="First-Name" placeholder="Sam" type="text" id="First-Name" required data-quiz-firstname autocomplete="given-name">
+    <label for="Last-Name">Last name</label><input maxlength="256" name="Last-Name" placeholder="Rivera" type="text" id="Last-Name" required autocomplete="family-name">
+    <label for="Email">Email address</label><input maxlength="256" name="Email" placeholder="you@email.com" type="email" id="Email" required autocomplete="email">
+    <input type="submit" value="Unlock my results" data-wait="Unlocking…">
+  </form>
+  <div class="w-form-done" style="display:none"><div>Unlocking your results…</div></div>
+  <div class="w-form-fail" style="display:none"><div>That didn't go through. Try again?</div></div>
+</div>
+</div></main>
+<section class="list"><h2>Feeling broke is temporary. What you learn in this book shouldn't be.</h2></section>
+<p class="foot">Demo build for internal review. Page shell is approximate; the quiz card is production code.</p>
+<div class="demo-badge">Demo</div>
+<script>
+// Demo-only: no backend on GitHub Pages, so submitting just unlocks the result
+window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages demo: nothing is recorded
+</script>
+<!-- UNBROKE QUIZ LOGIC — paste into Page Settings > Custom Code > Before </body> tag -->
+<script>
+(function () {
+  /* ---------- 1. OUTCOMES ----------
+     Keys must match the data-quiz-result attributes on your 4 result blocks.
+     Order = tie-break priority (earlier wins a tie). Rename to the book's real tropes. */
+  var OUTCOMES = ['ostrich', 'tightrope', 'leaky', 'builder'];
+
+  /* Result page for each outcome. Use your real Webflow page slugs. */
+  var RESULT_PAGES = {
+    ostrich:   'quiz/ostrich',
+    tightrope: 'quiz/tightrope',
+    leaky:     'quiz/leaky-bucket',
+    builder:   'quiz/quiet-builder'
+  };
+
+  /* ---------- 2. QUESTIONS + SCORING ----------
+     Each option adds points to one or more outcomes. Tune freely. */
+  var QUESTIONS = [
+    { id: 'declined', text: "It's the 14th of the month. Your card gets declined buying a $6 coffee. Your first thought:", options: [
+      { key: 'a', text: '"Weird, the machine must be broken." (It is not the machine.)', score: { ostrich: 2, leaky: 1 } },
+      { key: 'b', text: '"Right, I moved money into savings. Let me shuffle it back." Mild logistics, no panic.', score: { builder: 2, tightrope: 1 } },
+      { key: 'c', text: '"Huh." You tap a different card. You genuinely didn\'t notice.', score: { leaky: 2 } }
+    ]},
+    { id: 'salary', text: "Let's talk numbers. What's the household salary situation?", options: [
+      { key: 'a', text: 'Under $50K, and the group chat thinks I make more', score: { tightrope: 1 } },
+      { key: 'b', text: '$50K–$100K, comfortable-ish, one bad month from un-comfortable', score: { tightrope: 1 } },
+      { key: 'c', text: '$100K–$200K and still somehow broke, which is its own genre of pain', score: { leaky: 2 } },
+      { key: 'd', text: "$200K+ (we'll allow it, show-off)", score: { leaky: 1, builder: 1 } }
+    ]},
+    { id: 'zip', type: 'zip', text: "Drop your zip code. We're not stalking you, we're doing math.",
+      placeholder: 'Five digit ZIP code',
+      note: 'Because $70K in Des Moines and $70K in Brooklyn are two completely different personalities, and one of them owns a couch.' },
+    { id: 'dream', text: 'The dream. When you picture "made it," what\'s the actual image?', options: [
+      { key: 'a', text: "Not flinching at the grocery total. That's it. That's the dream.", score: { tightrope: 2 } },
+      { key: 'b', text: 'A house, a dog, and the ability to book the flight without a spreadsheet summit', score: { builder: 1, tightrope: 1 } },
+      { key: 'c', text: "Quitting the job that's fine but slowly killing me", score: { leaky: 1, ostrich: 1 } },
+      { key: 'd', text: 'A beach, a laptop, and geographic smugness', score: { leaky: 2 } }
+    ]},
+    { id: 'windfall', text: 'Someone hands you an unexpected $2,000. Be honest. It:', options: [
+      { key: 'a', text: 'Is already spent. It was spent before it arrived. RIP.', score: { leaky: 2, ostrich: 1 } },
+      { key: 'b', text: "Kills a credit card balance that's been following me like a stray cat", score: { tightrope: 2 } },
+      { key: 'c', text: 'Goes straight to savings, and I feel a small, weird thrill about it', score: { builder: 2 } },
+      { key: 'd', text: 'Gets invested, and I have Opinions about where', score: { builder: 2 } }
+    ]},
+    { id: 'risk', text: 'Your relationship with risk, described as a dating profile:', options: [
+      { key: 'a', text: 'Avoidant. One surprise expense and I ghost my own budget.', score: { ostrich: 3 } },
+      { key: 'b', text: '"Looking for something stable." Index funds. A high-yield savings account. Nothing that texts back weird.', score: { builder: 2 } },
+      { key: 'c', text: "Down to gamble a little if the upside is real. I've read one Reddit thread and feel prepared.", score: { leaky: 1 } },
+      { key: 'd', text: 'I have crypto opinions at dinner parties. People have stopped inviting me.', score: { leaky: 2 } }
+    ]},
+    { id: 'sunday', text: 'Sunday night. Bed. Lights off. When money crosses your mind, you feel:', options: [
+      { key: 'a', text: "A low hum of dread I've learned to sleep through", score: { ostrich: 2, tightrope: 1 } },
+      { key: 'b', text: 'Fine, mostly. Until I remember one specific thing. Then less fine.', score: { tightrope: 2 } },
+      { key: 'c', text: 'Genuinely calm. If something broke tomorrow, I could handle it.', score: { builder: 3 } }
+    ]}
+  ];
+
+  /* ---------- 3. ZIP × SALARY ----------
+     Rough high-cost-of-living list by 3-digit ZIP prefix. A heuristic, not data. */
+  var HIGH_COST_ZIP3 = [[21,24],[68,69],[70,76],[100,104],[110,114],[200,205],[220,223],
+    [331,331],[802,802],[900,908],[910,921],[926,927],[940,951],[967,968],[980,981]];
+  function isHighCost(zip) {
+    var p = parseInt(String(zip).slice(0, 3), 10);
+    return HIGH_COST_ZIP3.some(function (r) { return p >= r[0] && p <= r[1]; });
+  }
+  function applyZipModifier(s, a) {
+    var hc = isHighCost(a.zip || ''), sal = a.salary;
+    if (hc && (sal === 'a' || sal === 'b')) s.tightrope += 2;
+    else if (hc && sal === 'c') { s.leaky += 1; s.tightrope += 1; }
+    else if (!hc && (sal === 'b' || sal === 'c')) s.builder += 1;
+  }
+
+  /* ---------- 4. UNLOCK SCREEN COPY ----------
+     Shown inside the card above your Webflow form fields. Placeholder copy: rewrite it. */
+  var GATE_COPY = {
+    kicker: 'Results ready',
+    headline: "You're one step from your verdict.",
+    sub: "Drop your name and email to unlock your results. You'll also get book updates, and you can unsubscribe anytime."
+  };
+
+  /* ---------- 5. MOTION ----------
+     Tune in quiz-motion-demo.html, then paste the copied config over this object. */
+  var MOTION = {
+    inDuration: 560,       // ms, each element entering
+    outDuration: 200,      // ms, each element leaving
+    stagger: 55,           // ms between elements
+    distance: 32,          // px horizontal travel (back slides the other way)
+    rise: 14,              // px vertical travel on first load and on the unlock screen
+    blur: 6,               // px blur on enter, 0 to disable
+    heightDuration: 460,   // ms, card height morph, 0 to disable
+    selectDuration: 340,   // ms, answer fill sweep
+    ease: 'cubic-bezier(.16,1,.3,1)',
+    easeOut: 'cubic-bezier(.55,0,1,.45)',
+    // Unlock flood: background dots grow until the card is solid
+    unlockColor: '#94fcae',
+    floodOrigin: 'button', // 'button' | 'center' | 'top'
+    floodSpread: 700,      // ms for the wave to cross the card
+    dotGrow: 420,          // ms for a single dot to grow to full
+    floodJitter: 160       // ms of random offset per dot, 0 for a clean ring
+  };
+
+  /* ---------- engine (no edits needed below) ---------- */
+  var M = MOTION;
+  var root = document.querySelector('[data-quiz]');
+  if (!root) return;
+  var gate = document.querySelector('[data-quiz-gate]');
+  var gateHome = gate ? { parent: gate.parentNode, next: gate.nextSibling } : null;
+  var debug = /quizdebug/.test(location.search);
+  var reduced = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  function hide(el) { if (el) el.style.display = 'none'; }
+  function show(el) { if (el) el.style.display = ''; }
+  function canAnimate() { return !reduced.matches && typeof Element.prototype.animate === 'function'; }
+  function done(anims) { return Promise.all(anims.map(function (a) { return a.finished.catch(function () {}); })); }
+  hide(gate);
+
+  var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+
+  var step = 0, answers = {}, N = QUESTIONS.length, busy = false;
+
+  root.innerHTML = '<div class="uq-head"><span class="uq-count"></span><div class="uq-bar" aria-hidden="true"><span></span></div></div>' +
+                   '<div class="uq-stage"></div>';
+  var head = root.querySelector('.uq-head');
+  var stage = root.querySelector('.uq-stage');
+  var countEl = root.querySelector('.uq-count');
+  var barEl = root.querySelector('.uq-bar > span');
+
+  function applyVars() {
+    root.style.setProperty('--uq-ease', M.ease);
+    root.style.setProperty('--uq-sel-dur', M.selectDuration + 'ms');
+    root.style.setProperty('--uq-unlock-bg', M.unlockColor);
+  }
+
+  function valid(q) {
+    return q.type === 'zip' ? /^\d{5}$/.test(answers[q.id] || '') : !!answers[q.id];
+  }
+
+  function render() {
+    applyVars();
+    var q = QUESTIONS[step], last = step === N - 1, body;
+    if (q.type === 'zip') {
+      body = '<input class="uq-zip uq-a" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="postal-code" maxlength="5" aria-labelledby="uq-q" aria-describedby="uq-hint" placeholder="' + q.placeholder + '" value="' + (answers[q.id] || '') + '">' +
+             '<p class="uq-note uq-a">' + q.note + '</p>';
+    } else {
+      body = '<div class="uq-opts" role="group" aria-labelledby="uq-q">' + q.options.map(function (o) {
+        return '<button type="button" class="uq-opt uq-a" aria-pressed="' + (answers[q.id] === o.key) + '" data-key="' + o.key + '">' +
+               '<span class="uq-letter" aria-hidden="true">' + o.key + '.</span><span>' + o.text + '</span></button>';
+      }).join('') + '</div>';
+    }
+    stage.innerHTML = '<h3 class="uq-q uq-a" id="uq-q" tabindex="-1">' + q.text + '</h3>' + body +
+      '<div class="uq-actions uq-a">' +
+        (step > 0 ? '<button type="button" class="uq-back">' + CHEV + '<span class="uq-back-label">Back</span></button>' : '') +
+        '<button type="button" class="uq-next" aria-disabled="' + !valid(q) + '" aria-describedby="uq-hint"><span>' + (last ? 'Get my results' : 'Next question') + '</span>' + ARROW + '</button>' +
+      '</div><p class="uq-hint" id="uq-hint" role="status"></p>';
+    countEl.textContent = 'Question ' + (step + 1) + ' of ' + N;
+    barEl.style.transform = 'scaleX(' + ((step + 1) / N) + ')';
+  }
+
+  function targets() { return Array.prototype.slice.call(stage.querySelectorAll('.uq-a')); }
+
+  function enter(dir) {
+    if (!canAnimate()) return Promise.resolve();
+    var x = M.distance * dir, y = dir ? 0 : M.rise;
+    return done(targets().map(function (el, i) {
+      return el.animate([
+        { opacity: 0, transform: 'translate3d(' + x + 'px,' + y + 'px,0)', filter: 'blur(' + M.blur + 'px)' },
+        { opacity: 1, transform: 'none', filter: 'blur(0px)' }
+      ], { duration: M.inDuration, delay: i * M.stagger, easing: M.ease, fill: 'backwards' });
+    }));
+  }
+
+  function leave(dir, extra) {
+    if (!canAnimate()) return Promise.resolve();
+    var x = -M.distance * 0.6 * (dir || 1);
+    var els = (extra || []).concat(targets());
+    return done(els.map(function (el, i) {
+      return el.animate([
+        { opacity: 1, transform: 'none' },
+        { opacity: 0, transform: 'translate3d(' + x + 'px,0,0)' }
+      ], { duration: M.outDuration, delay: i * Math.round(M.stagger * 0.35), easing: M.easeOut, fill: 'forwards' });
+    }));
+  }
+
+  function morph(el, h0) {
+    var h1 = el.offsetHeight;
+    if (!canAnimate() || !M.heightDuration || h0 === h1) return;
+    var prev = el.style.overflow;
+    el.style.overflow = 'hidden';
+    var a = el.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: M.heightDuration, easing: M.ease });
+    a.finished.catch(function () {}).then(function () { el.style.overflow = prev; });
+  }
+
+  function keepInView() {
+    var top = root.getBoundingClientRect().top;
+    if (top < 0) root.scrollIntoView({ behavior: canAnimate() ? 'smooth' : 'auto', block: 'start' });
+  }
+
+  function go(dir) {
+    if (busy) return;
+    busy = true;
+    var h0 = stage.offsetHeight;
+    leave(dir).then(function () {
+      step += dir;
+      render();
+      morph(stage, h0);
+      keepInView();
+      return enter(dir);
+    }).then(function () {
+      busy = false;
+      var q = stage.querySelector('.uq-q');
+      if (q) q.focus({ preventScroll: true });
+    });
+  }
+
+  function nudge(msg) {
+    var hint = stage.querySelector('.uq-hint'), next = stage.querySelector('.uq-next');
+    hint.textContent = msg;
+    if (canAnimate()) next.animate([
+      { transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(5px)' },
+      { transform: 'translateX(-3px)' }, { transform: 'translateX(0)' }
+    ], { duration: 360, easing: 'ease-out' });
+  }
+
+  function syncNext() {
+    stage.querySelector('.uq-next').setAttribute('aria-disabled', !valid(QUESTIONS[step]));
+  }
+
+  root.addEventListener('click', function (e) {
+    if (busy || root.classList.contains('is-unlock')) return;
+    var q = QUESTIONS[step], t;
+    if ((t = e.target.closest('.uq-opt'))) {
+      answers[q.id] = t.dataset.key;
+      stage.querySelectorAll('.uq-opt').forEach(function (b) { b.setAttribute('aria-pressed', b === t); });
+      stage.querySelector('.uq-hint').textContent = '';
+      if (canAnimate()) t.querySelector('.uq-letter').animate(
+        [{ transform: 'scale(1) rotate(0)' }, { transform: 'scale(1.3) rotate(-8deg)' }, { transform: 'scale(1) rotate(0)' }],
+        { duration: 420, easing: M.ease });
+      syncNext();
+    } else if (e.target.closest('.uq-back')) {
+      go(-1);
+    } else if (e.target.closest('.uq-next')) {
+      if (!valid(q)) return nudge(q.type === 'zip' ? 'Five digits, US ZIP only.' : 'Pick an answer to keep going.');
+      if (step === N - 1) finish(); else go(1);
+    }
+  });
+  root.addEventListener('input', function (e) {
+    if (!e.target.classList.contains('uq-zip')) return;
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
+    answers[QUESTIONS[step].id] = e.target.value;
+    stage.querySelector('.uq-hint').textContent = '';
+    syncNext();
+  });
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.classList.contains('uq-zip')) { e.preventDefault(); stage.querySelector('.uq-next').click(); }
+  });
+
+  function score() {
+    var s = {}; OUTCOMES.forEach(function (k) { s[k] = 0; });
+    QUESTIONS.forEach(function (q) {
+      if (q.type === 'zip') return;
+      var o = q.options.filter(function (o) { return o.key === answers[q.id]; })[0];
+      for (var k in o.score) s[k] += o.score[k];
+    });
+    applyZipModifier(s, answers);
+    if (debug) console.log('[quiz] scores', s, 'answers', answers);
+    return OUTCOMES.reduce(function (best, k) { return s[k] > s[best] ? k : best; }, OUTCOMES[0]);
+  }
+
+  /* ---------- dot flood ---------- */
+  function hexRgb(h) {
+    h = String(h).trim().replace('#', '');
+    if (h.length === 3) h = h.replace(/./g, '$&$&');
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  }
+  function flood(originEl) {
+    return new Promise(function (resolve) {
+      if (!canAnimate()) return resolve();
+      var rect = root.getBoundingClientRect(), bw = 2;            // card border
+      var W = rect.width - bw * 2, H = rect.height - bw * 2;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var c = document.createElement('canvas');
+      c.className = 'uq-flood';
+      c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+      root.insertBefore(c, root.firstChild);
+      var ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
+
+      var ox = W / 2, oy = H / 2;
+      if (M.floodOrigin === 'top') { ox = W / 2; oy = 0; }
+      if (M.floodOrigin === 'button' && originEl) {
+        var b = originEl.getBoundingClientRect();
+        ox = b.left + b.width / 2 - rect.left - bw; oy = b.top + b.height / 2 - rect.top - bw;
+      }
+      var g = 11, rMax = g * 0.75, dots = [], maxD = 1;          // 11px grid = the background pattern
+      for (var y = g / 2; y < H + g; y += g) for (var x = g / 2; x < W + g; x += g) {
+        var d = Math.sqrt((x - ox) * (x - ox) + (y - oy) * (y - oy));
+        if (d > maxD) maxD = d;
+        dots.push([x, y, d, Math.random()]);
+      }
+      var from = hexRgb(getComputedStyle(root).getPropertyValue('--uq-dot') || '#c4f2d1');
+      var to = hexRgb(M.unlockColor);
+      var STEPS = 12, fills = [];
+      for (var s = 0; s <= STEPS; s++) {
+        var k = s / STEPS;
+        fills.push('rgb(' + [0, 1, 2].map(function (i) { return Math.round(from[i] + (to[i] - from[i]) * k); }).join(',') + ')');
+      }
+      function ease(p) { return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+      var t0 = performance.now();
+      (function frame(now) {
+        var t = now - t0, finished = true;
+        ctx.clearRect(0, 0, W, H);
+        var buckets = [];
+        for (var i = 0; i < dots.length; i++) {
+          var dt = dots[i], start = (dt[2] / maxD) * M.floodSpread + dt[3] * M.floodJitter;
+          var p = (t - start) / M.dotGrow;
+          if (p < 1) finished = false;
+          if (p <= 0) continue;
+          var e = ease(Math.min(p, 1)), bi = Math.round(e * STEPS);
+          (buckets[bi] || (buckets[bi] = [])).push(dt[0], dt[1], e * rMax);
+        }
+        for (var bk = 0; bk < buckets.length; bk++) {
+          var list = buckets[bk]; if (!list) continue;
+          ctx.fillStyle = fills[bk]; ctx.beginPath();
+          for (var j = 0; j < list.length; j += 3) { ctx.moveTo(list[j] + list[j + 2], list[j + 1]); ctx.arc(list[j], list[j + 1], list[j + 2], 0, 6.2832); }
+          ctx.fill();
+        }
+        if (!finished) return requestAnimationFrame(frame);
+        root.classList.add('is-unlock');
+        resolve();
+        requestAnimationFrame(function () { c.remove(); });
+      })(t0);
+    });
+  }
+
+  /* ---------- unlock screen ---------- */
+  function setHidden(form, name, value) {
+    var el = form.querySelector('input[name="' + name + '"]');
+    if (!el) { el = document.createElement('input'); el.type = 'hidden'; el.name = name; form.appendChild(el); }
+    el.value = value;
+  }
+
+  function prepFields(form) {
+    var inputs = form.querySelectorAll('input:not([type=hidden]):not([type=submit]), select, textarea');
+    Array.prototype.forEach.call(inputs, function (inp, i) {
+      if (inp.closest('.uq-field')) return;
+      var lab = inp.id ? form.querySelector('label[for="' + inp.id + '"]') : null;
+      if (!lab && inp.previousElementSibling && inp.previousElementSibling.tagName === 'LABEL') lab = inp.previousElementSibling;
+      var wrap = document.createElement('div');
+      wrap.className = 'uq-field uq-a' + (inputs.length >= 3 && i < 2 ? ' uq-half' : '');
+      inp.parentNode.insertBefore(wrap, inp);
+      if (lab) wrap.appendChild(lab);
+      wrap.appendChild(inp);
+    });
+    var submit = form.querySelector('[type=submit]');
+    if (submit) submit.classList.add('uq-submit', 'uq-a');
+  }
+
+  function unlock(outcome) {
+    var first = gate && gate.querySelector('[data-quiz-firstname]');
+    try {
+      sessionStorage.setItem('uq_unlocked', outcome);
+      if (first && first.value) sessionStorage.setItem('uq_name', first.value.trim());
+    } catch (e) {}
+    document.dispatchEvent(new CustomEvent('quiz:result', { detail: { outcome: outcome, answers: answers } }));
+    return RESULT_PAGES[outcome];
+  }
+
+  function finish() {
+    busy = true;
+    var outcome = score();
+    var btn = stage.querySelector('.uq-next');
+    if (!gate) { location.href = unlock(outcome); return; }
+
+    leave(1, [countEl, head.querySelector('.uq-bar')]).then(function () {
+      return flood(btn);
+    }).then(function () {
+      root.classList.add('is-unlock');
+      var h0 = root.offsetHeight;
+      stage.innerHTML = '<span class="uq-kicker uq-a">' + GATE_COPY.kicker + '</span>' +
+        '<h3 class="uq-q uq-a" tabindex="-1">' + GATE_COPY.headline + '</h3>' +
+        '<p class="uq-gate-sub uq-a">' + GATE_COPY.sub + '</p><div class="uq-gate-slot"></div>';
+      var form = gate.querySelector('form');
+      setHidden(form, 'quiz_outcome', outcome);
+      setHidden(form, 'quiz_zip', answers.zip || '');
+      setHidden(form, 'quiz_answers', QUESTIONS.map(function (q) { return q.id + ':' + (answers[q.id] || ''); }).join(', '));
+      prepFields(form);
+      stage.querySelector('.uq-gate-slot').appendChild(gate);
+      show(gate);
+      morph(root, h0);
+      keepInView();
+      return enter(0).then(function () { return form; });
+    }).then(function (form) {
+      busy = false;
+      var h = stage.querySelector('.uq-q'); if (h) h.focus({ preventScroll: true });
+      var doneEl = gate.querySelector('.w-form-done');
+      if (window.Webflow && doneEl) {
+        // Unlock only after Webflow confirms a successful submission
+        new MutationObserver(function (m, obs) {
+          if (getComputedStyle(doneEl).display !== 'none') { obs.disconnect(); location.href = unlock(outcome); }
+        }).observe(doneEl, { attributes: true, attributeFilter: ['style'] });
+      } else {
+        // Outside Webflow: use a custom submit hook if the page defines one (e.g. Netlify demo),
+        // otherwise show where it would go instead of navigating
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var btn = form.querySelector('[type=submit]');
+          if (typeof window.UQ_SUBMIT === 'function') {
+            if (btn) { btn.disabled = true; btn.value = btn.getAttribute('data-wait') || 'Unlocking…'; }
+            Promise.resolve(window.UQ_SUBMIT(form)).then(function () {
+              location.href = unlock(outcome);
+            }, function () {
+              if (btn) { btn.disabled = false; btn.value = 'Try again'; }
+              var fail = gate.querySelector('.w-form-fail'); if (fail) fail.style.display = 'block';
+            });
+            return;
+          }
+          form.style.display = 'none';
+          var msg = document.createElement('p');
+          msg.className = 'uq-kicker';
+          msg.textContent = 'Preview: would redirect to ' + unlock(outcome);
+          gate.appendChild(msg);
+        });
+      }
+    });
+  }
+
+  // Hooks for the motion demo (harmless in production)
+  window.UQ = {
+    motion: M,
+    apply: applyVars,
+    replay: function () { if (!busy) { busy = true; enter(1).then(function () { busy = false; }); } },
+    restart: function () {
+      if (gate && gateHome) { hide(gate); gateHome.parent.insertBefore(gate, gateHome.next); }
+      root.classList.remove('is-unlock');
+      [countEl, head.querySelector('.uq-bar')].forEach(function (el) { el.getAnimations().forEach(function (a) { a.cancel(); }); });
+      step = 0; answers = {}; busy = false; render(); enter(0);
+    },
+    skipToUnlock: function () {
+      if (busy) return;
+      QUESTIONS.forEach(function (q) { answers[q.id] = q.type === 'zip' ? '10001' : q.options[1].key; });
+      step = N - 1; render(); finish();
+    }
+  };
+
+  render();
+  enter(0);
+})();
+</script>
+
+<style>
+.mp{position:fixed;right:16px;bottom:16px;z-index:50;width:300px;max-height:calc(100vh - 32px);overflow:auto;
+  background:#111;color:#eee;border-radius:14px;font:12px/1.4 ui-monospace,Menlo,monospace;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.mp header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;font-weight:700;letter-spacing:.04em}
+.mp.closed .mp-body{display:none}
+.mp-body{padding:0 14px 14px}
+.mp label{display:block;margin:10px 0 0}
+.mp label span{display:flex;justify-content:space-between;color:#aaa}
+.mp label b{color:#9ff5b7;font-weight:600}
+.mp input[type=range]{width:100%;accent-color:#9ff5b7}
+.mp select{width:100%;margin-top:4px;background:#222;color:#eee;border:1px solid #333;border-radius:6px;padding:6px;font:inherit}
+.mp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.mp button{all:unset;text-align:center;padding:9px 6px;border-radius:8px;background:#222;cursor:pointer}
+.mp button:hover{background:#333}
+.mp .mp-copy{grid-column:1/-1;background:#9ff5b7;color:#0a3a26;font-weight:700}
+.mp .mp-copy:hover{background:#c4fbd3}
+.demo-frame{margin:0 auto;transition:max-width .4s cubic-bezier(.16,1,.3,1);max-width:1100px}
+.demo-frame.mobile{max-width:390px}
+</style>
+<div class="mp" id="mp" style="display:none">
+  <header id="mp-toggle"><span>MOTION</span><span id="mp-caret">–</span></header>
+  <div class="mp-body" id="mp-fields"></div>
+</div>
+<script>
+(function () {
+  if (!/[?&]tune/.test(location.search)) return;
+  document.getElementById('mp').style.display = '';
+  var M = window.UQ.motion;
+  var EASES = {
+    'Expo out': 'cubic-bezier(.16,1,.3,1)',
+    'Quart out': 'cubic-bezier(.25,1,.5,1)',
+    'Soft back': 'cubic-bezier(.34,1.4,.64,1)',
+    'Standard': 'cubic-bezier(.4,0,.2,1)'
+  };
+  var EASES_OUT = {
+    'Quad in': 'cubic-bezier(.55,0,1,.45)',
+    'Expo in': 'cubic-bezier(.7,0,.84,0)',
+    'Standard': 'cubic-bezier(.4,0,.2,1)'
+  };
+  var SLIDERS = [
+    ['inDuration', 'Enter duration', 150, 1200, 10, 'ms'],
+    ['outDuration', 'Exit duration', 60, 600, 10, 'ms'],
+    ['stagger', 'Stagger', 0, 160, 5, 'ms'],
+    ['distance', 'Slide distance', 0, 100, 1, 'px'],
+    ['rise', 'First-load rise', 0, 40, 1, 'px'],
+    ['blur', 'Enter blur', 0, 16, 1, 'px'],
+    ['heightDuration', 'Height morph', 0, 900, 10, 'ms'],
+    ['selectDuration', 'Answer fill sweep', 0, 900, 10, 'ms'],
+    ['floodSpread', 'Unlock: wave spread', 100, 2000, 10, 'ms'],
+    ['dotGrow', 'Unlock: dot grow', 80, 1200, 10, 'ms'],
+    ['floodJitter', 'Unlock: dot jitter', 0, 600, 10, 'ms']
+  ];
+  var box = document.getElementById('mp-fields'), html = '';
+  SLIDERS.forEach(function (s) {
+    html += '<label><span>' + s[1] + ' <b id="v-' + s[0] + '">' + M[s[0]] + s[5] + '</b></span>' +
+      '<input type="range" data-k="' + s[0] + '" data-u="' + s[5] + '" min="' + s[2] + '" max="' + s[3] + '" step="' + s[4] + '" value="' + M[s[0]] + '"></label>';
+  });
+  function sel(k, label, map) {
+    var o = Object.keys(map).map(function (n) { return '<option value="' + map[n] + '"' + (map[n] === M[k] ? ' selected' : '') + '>' + n + '</option>'; }).join('');
+    return '<label><span>' + label + '</span><select data-k="' + k + '">' + o + '</select></label>';
+  }
+  html += sel('ease', 'Enter easing', EASES) + sel('easeOut', 'Exit easing', EASES_OUT);
+  html += sel('floodOrigin', 'Unlock: wave origin', { 'From the button': 'button', 'From center': 'center', 'From top': 'top' });
+  html += '<label><span>Unlock: fill color <b id="v-unlockColor">' + M.unlockColor + '</b></span><input type="color" data-k="unlockColor" data-u="" value="' + M.unlockColor + '" style="width:100%;height:30px;background:none;border:0"></label>';
+  html += '<div class="mp-row"><button id="mp-replay">Replay step</button><button id="mp-restart">Restart quiz</button>' +
+          '<button id="mp-unlock" style="grid-column:1/-1">Jump to unlock transition</button>' +
+          '<button id="mp-mobile" style="grid-column:1/-1">Toggle mobile width</button>' +
+          '<button class="mp-copy" id="mp-copy">Copy config</button></div>';
+  box.innerHTML = html;
+
+  box.addEventListener('input', function (e) {
+    var k = e.target.dataset.k; if (!k) return;
+    M[k] = (e.target.tagName === 'SELECT' || e.target.type === 'color') ? e.target.value : Number(e.target.value);
+    var v = document.getElementById('v-' + k); if (v) v.textContent = e.target.value + e.target.dataset.u;
+    window.UQ.apply();
+  });
+  var GATE_HTML = document.querySelector('[data-quiz-gate]').innerHTML;
+  document.getElementById('mp-replay').onclick = function () { window.UQ.replay(); };
+  document.getElementById('mp-restart').onclick = function () {
+    document.querySelector('[data-quiz-gate]').innerHTML = GATE_HTML; window.UQ.restart();
+  };
+  document.getElementById('mp-unlock').onclick = function () {
+    document.querySelector('[data-quiz-gate]').innerHTML = GATE_HTML; window.UQ.restart();
+    setTimeout(function () { window.UQ.skipToUnlock(); }, 700);
+  };
+  document.getElementById('mp-mobile').onclick = function () { document.querySelector('.demo-frame').classList.toggle('mobile'); };
+  document.getElementById('mp-copy').onclick = function () {
+    var text = 'var MOTION = ' + JSON.stringify(M, null, 2) + ';';
+    var btn = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () {
+      btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy config'; }, 1400);
+    }, function () { window.prompt('Copy this config:', text); });
+  };
+  document.getElementById('mp-toggle').onclick = function () {
+    var p = document.getElementById('mp'); p.classList.toggle('closed');
+    document.getElementById('mp-caret').textContent = p.classList.contains('closed') ? '+' : '–';
+  };
+})();
+</script>
+
+</body></html>
