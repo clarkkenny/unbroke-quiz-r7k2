@@ -136,7 +136,9 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .uq.is-unlock .uq-head{display:none}
 .uq-kicker{display:block;font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);margin-bottom:clamp(20px,4cqi,36px)}
 .uq-gate-sub{font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,2cqi,19px);line-height:1.4;letter-spacing:-.01em;
-  margin:0 0 clamp(24px,4cqi,36px);max-width:46ch}
+  margin:0 0 12px;max-width:52ch}
+.uq-gate-slot{margin-top:clamp(14px,2.6cqi,26px)}
+.uq-gate-fine{font-family:var(--uq-font-mono);font-size:13px;line-height:1.5;color:var(--uq-btn);margin:16px 0 0;max-width:60ch}
 .uq .uq-gate-slot form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0}
 .uq .uq-gate-slot .uq-field{position:relative;grid-column:1/-1;margin:0}
 .uq .uq-gate-slot .uq-field.uq-half{grid-column:auto}
@@ -176,13 +178,10 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 
 <div class="w-form" data-quiz-gate>
   <form name="quiz-unlock" method="POST" data-name="Quiz Unlock">
-    <input type="hidden" name="quiz_outcome" value="">
-    <input type="hidden" name="quiz_zip" value="">
-    <input type="hidden" name="quiz_answers" value="">
     <label for="First-Name">First name</label><input maxlength="256" name="First-Name" placeholder="Sam" type="text" id="First-Name" required data-quiz-firstname autocomplete="given-name">
     <label for="Last-Name">Last name</label><input maxlength="256" name="Last-Name" placeholder="Rivera" type="text" id="Last-Name" required autocomplete="family-name">
     <label for="Email">Email address</label><input maxlength="256" name="Email" placeholder="you@email.com" type="email" id="Email" required autocomplete="email">
-    <input type="submit" value="Unlock my results" data-wait="Unlocking…">
+    <input type="submit" value="Read my results" data-wait="Unlocking…">
   </form>
   <div class="w-form-done" style="display:none"><div>Unlocking your results…</div></div>
   <div class="w-form-fail" style="display:none"><div>That didn't go through. Try again?</div></div>
@@ -194,89 +193,136 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 <script>
 // Demo-only: no backend on GitHub Pages, so submitting just unlocks the result
 window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages demo: nothing is recorded
+// Demo only: carry the score to the result page so reviewers can check the math
+document.addEventListener('quiz:result', function (e) {
+  try { sessionStorage.setItem('uq_demo', JSON.stringify(e.detail.result)); } catch (err) {}
+});
 </script>
 <!-- UNBROKE QUIZ LOGIC — paste into Page Settings > Custom Code > Before </body> tag -->
 <script>
 (function () {
-  /* ---------- 1. OUTCOMES ----------
-     Keys must match the data-quiz-result attributes on your 4 result blocks.
-     Order = tie-break priority (earlier wins a tie). Rename to the book's real tropes. */
-  var OUTCOMES = ['ostrich', 'tightrope', 'leaky', 'builder'];
+  /* Scoring follows "How Broke Are You — Scoring & Results Spec". Section numbers below refer to it. */
 
-  /* Result page for each outcome. Use your real Webflow page slugs. */
-  var RESULT_PAGES = {
-    ostrich:   'quiz/ostrich.html',
-    tightrope: 'quiz/tightrope.html',
-    leaky:     'quiz/leaky-bucket.html',
-    builder:   'quiz/quiet-builder.html'
+  /* ---------- 1. RESULT BUCKETS (spec §4) ----------
+     page = the Webflow result page each bucket redirects to. Use your real slugs. */
+  var BUCKETS = {
+    bucket_1: { level: 'Crisis',  name: 'One Flat Tire From a Full Spiral', page: 'quiz/one-flat-tire.html' },
+    bucket_2: { level: 'Fragile', name: 'Cautiously Caffeinated',           page: 'quiz/cautiously-caffeinated.html' },
+    bucket_3: { level: 'Stable',  name: 'Solid, Still Building',            page: 'quiz/solid-still-building.html' },
+    bucket_4: { level: 'Durable', name: 'Quietly Unbothered',               page: 'quiz/quietly-unbothered.html' }
   };
 
-  /* ---------- 2. QUESTIONS + SCORING ----------
-     Each option adds points to one or more outcomes. Tune freely. */
+  /* ---------- 2. QUESTIONS (spec §2) ----------
+     Answer ID = question id + '_' + key, e.g. q5_d. Points live in SCORING, not here. */
   var QUESTIONS = [
-    { id: 'declined', text: "It's the 14th of the month. Your card gets declined buying a $6 coffee. Your first thought:", options: [
-      { key: 'a', text: '"Weird, the machine must be broken." (It is not the machine.)', score: { ostrich: 2, leaky: 1 } },
-      { key: 'b', text: '"Right, I moved money into savings. Let me shuffle it back." Mild logistics, no panic.', score: { builder: 2, tightrope: 1 } },
-      { key: 'c', text: '"Huh." You tap a different card. You genuinely didn\'t notice.', score: { leaky: 2 } }
+    { id: 'q1', text: "It's the 14th of the month. Your card gets declined buying a $6 coffee. Your first thought:", options: [
+      { key: 'a', text: '"Weird, the machine must be broken." (It is not the machine.)' },
+      { key: 'b', text: '"Right, I moved money into savings. Let me shuffle it back." Mild logistics, no panic.' },
+      { key: 'c', text: '"Huh." You tap a different card. You genuinely didn\'t notice.' }
     ]},
-    { id: 'salary', text: "Let's talk numbers. What's the household salary situation?", options: [
-      { key: 'a', text: 'Under $50K, and the group chat thinks I make more', score: { tightrope: 1 } },
-      { key: 'b', text: '$50K–$100K, comfortable-ish, one bad month from un-comfortable', score: { tightrope: 1 } },
-      { key: 'c', text: '$100K–$200K and still somehow broke, which is its own genre of pain', score: { leaky: 2 } },
-      { key: 'd', text: "$200K+ (we'll allow it, show-off)", score: { leaky: 1, builder: 1 } }
+    { id: 'q2', text: "Let's talk numbers. What's the household salary situation?", options: [
+      { key: 'a', text: 'Under $50K, and the group chat thinks I make more' },
+      { key: 'b', text: '$50K–$100K, comfortable-ish, one bad month from un-comfortable' },
+      { key: 'c', text: '$100K–$200K and still somehow broke, which is its own genre of pain' },
+      { key: 'd', text: "$200K+ (we'll allow it, show-off)" }
     ]},
-    { id: 'zip', type: 'zip', text: "Drop your zip code. We're not stalking you, we're doing math.",
+    { id: 'q3', type: 'zip', text: "Drop your zip code. We're not stalking you, we're doing math.",
       placeholder: 'Five digit ZIP code',
       note: 'Because $70K in Des Moines and $70K in Brooklyn are two completely different personalities, and one of them owns a couch.' },
-    { id: 'dream', text: 'The dream. When you picture "made it," what\'s the actual image?', options: [
-      { key: 'a', text: "Not flinching at the grocery total. That's it. That's the dream.", score: { tightrope: 2 } },
-      { key: 'b', text: 'A house, a dog, and the ability to book the flight without a spreadsheet summit', score: { builder: 1, tightrope: 1 } },
-      { key: 'c', text: "Quitting the job that's fine but slowly killing me", score: { leaky: 1, ostrich: 1 } },
-      { key: 'd', text: 'A beach, a laptop, and geographic smugness', score: { leaky: 2 } }
+    { id: 'q4', text: 'The dream. When you picture "made it," what\'s the actual image?', options: [
+      { key: 'a', text: "Not flinching at the grocery total. That's it. That's the dream." },
+      { key: 'b', text: 'A house, a dog, and the ability to book the flight without a spreadsheet summit' },
+      { key: 'c', text: "Quitting the job that's fine but slowly killing me" },
+      { key: 'd', text: 'A beach, a laptop, and geographic smugness' }
     ]},
-    { id: 'windfall', text: 'Someone hands you an unexpected $2,000. Be honest. It:', options: [
-      { key: 'a', text: 'Is already spent. It was spent before it arrived. RIP.', score: { leaky: 2, ostrich: 1 } },
-      { key: 'b', text: "Kills a credit card balance that's been following me like a stray cat", score: { tightrope: 2 } },
-      { key: 'c', text: 'Goes straight to savings, and I feel a small, weird thrill about it', score: { builder: 2 } },
-      { key: 'd', text: 'Gets invested, and I have Opinions about where', score: { builder: 2 } }
+    { id: 'q5', text: 'Someone hands you an unexpected $2,000. Be honest. It:', options: [
+      { key: 'a', text: 'Is already spent. It was spent before it arrived. RIP.' },
+      { key: 'b', text: "Kills a credit card balance that's been following me like a stray cat" },
+      { key: 'c', text: 'Goes straight to savings, and I feel a small, weird thrill about it' },
+      { key: 'd', text: 'Gets invested, and I have Opinions about where' }
     ]},
-    { id: 'risk', text: 'Your relationship with risk, described as a dating profile:', options: [
-      { key: 'a', text: 'Avoidant. One surprise expense and I ghost my own budget.', score: { ostrich: 3 } },
-      { key: 'b', text: '"Looking for something stable." Index funds. A high-yield savings account. Nothing that texts back weird.', score: { builder: 2 } },
-      { key: 'c', text: "Down to gamble a little if the upside is real. I've read one Reddit thread and feel prepared.", score: { leaky: 1 } },
-      { key: 'd', text: 'I have crypto opinions at dinner parties. People have stopped inviting me.', score: { leaky: 2 } }
+    { id: 'q6', text: 'Your relationship with risk, described as a dating profile:', options: [
+      { key: 'a', text: 'Avoidant. One surprise expense and I ghost my own budget.' },
+      { key: 'b', text: '"Looking for something stable." Index funds. A high-yield savings account. Nothing that texts back weird.' },
+      { key: 'c', text: "Down to gamble a little if the upside is real. I've read one Reddit thread and feel prepared." },
+      { key: 'd', text: 'I have crypto opinions at dinner parties. People have stopped inviting me.' }
     ]},
-    { id: 'sunday', text: 'Sunday night. Bed. Lights off. When money crosses your mind, you feel:', options: [
-      { key: 'a', text: "A low hum of dread I've learned to sleep through", score: { ostrich: 2, tightrope: 1 } },
-      { key: 'b', text: 'Fine, mostly. Until I remember one specific thing. Then less fine.', score: { tightrope: 2 } },
-      { key: 'c', text: 'Genuinely calm. If something broke tomorrow, I could handle it.', score: { builder: 3 } }
+    { id: 'q7', text: 'Sunday night. Bed. Lights off. When money crosses your mind, you feel:', options: [
+      { key: 'a', text: "A low hum of dread I've learned to sleep through" },
+      { key: 'b', text: 'Fine, mostly. Until I remember one specific thing. Then less fine.' },
+      { key: 'c', text: 'Genuinely calm. If something broke tomorrow, I could handle it.' }
     ]}
   ];
 
-  /* ---------- 3. ZIP × SALARY ----------
-     Rough high-cost-of-living list by 3-digit ZIP prefix. A heuristic, not data. */
-  var HIGH_COST_ZIP3 = [[21,24],[68,69],[70,76],[100,104],[110,114],[200,205],[220,223],
-    [331,331],[802,802],[900,908],[910,921],[926,927],[940,951],[967,968],[980,981]];
-  function isHighCost(zip) {
-    var p = parseInt(String(zip).slice(0, 3), 10);
-    return HIGH_COST_ZIP3.some(function (r) { return p >= r[0] && p <= r[1]; });
-  }
-  function applyZipModifier(s, a) {
-    var hc = isHighCost(a.zip || ''), sal = a.salary;
-    if (hc && (sal === 'a' || sal === 'b')) s.tightrope += 2;
-    else if (hc && sal === 'c') { s.leaky += 1; s.tightrope += 1; }
-    else if (!hc && (sal === 'b' || sal === 'c')) s.builder += 1;
+  /* ---------- 3. POINTS (spec §3, already weighted) ----------
+     Q4 is not scored (segmentation only). Q2 + Q3 feed the edge adjuster below. */
+  var SCORING = {
+    q7: { a: 0, b: 3, c: 6 },          // Sunday-night feeling, raw 0-2 x3
+    q1: { a: 0, b: 2, c: 4 },          // card declined, raw 0-2 x2
+    q5: { a: 0, b: 2, c: 4, d: 4 },    // surprise $2,000, raw 0-2 x2
+    q6: { a: 0, b: 1, c: 2, d: 2 }     // risk, lean x1
+  };
+  var SALARY_INDEX = { a: 0, b: 1, c: 2, d: 3 };
+
+  /* ---------- 4. ZIP -> COST-OF-LIVING TIER (spec §6) ----------
+     v1 static table by 3-digit ZIP prefix: [first, last, tier]. First match wins, so metro
+     overrides sit above state defaults. Tiers: 0 low, 1 mid, 2 high, 3 very_high.
+     Unknown or unmatched ZIP -> mid. Swap in a real COL index here when you have one. */
+  var COL_TIER_NAMES = ['low', 'mid', 'high', 'very_high'];
+  var COL_TABLE = [
+    // Metro overrides
+    [100,102,3],[112,112,3],                       // Manhattan, Brooklyn
+    [940,941,3],[943,951,3],                       // San Francisco, Peninsula, East Bay, Marin, San Jose
+    [103,111,2],[113,119,2],                       // other NYC boroughs, Westchester, Long Island
+    [206,209,2],[220,223,2],                       // DC suburbs (MD, VA)
+    [19,24,2],[68,69,2],                           // Boston area, Fairfield County CT
+    [330,331,2],[606,606,2],[800,803,2],           // Miami, Chicago, Denver
+    // State defaults
+    [10,27,1],[28,29,1],[30,38,1],[39,49,1],[50,59,1],[60,69,1],   // MA RI NH ME VT CT
+    [70,79,2],[80,89,1],[120,149,1],[150,196,1],[197,199,1],        // N. NJ, S. NJ, upstate NY, PA, DE
+    [200,205,2],[206,219,1],[220,246,1],[247,268,0],                // DC, MD, VA, WV
+    [270,289,1],[290,299,1],[300,319,0],[320,349,1],                // NC, SC, GA, FL
+    [350,369,0],[370,385,0],[386,397,0],[398,399,0],                // AL, TN, MS, GA
+    [400,427,0],[430,459,0],[460,479,0],[480,499,0],                // KY, OH, IN, MI
+    [500,528,0],[530,549,1],[550,567,1],[570,577,0],[580,588,0],    // IA, WI, MN, SD, ND
+    [590,599,1],[600,629,1],[630,658,0],[660,679,0],[680,693,0],    // MT, IL, MO, KS, NE
+    [700,714,0],[716,729,0],[730,749,0],[750,799,1],[885,885,1],    // LA, AR, OK, TX
+    [800,816,1],[820,831,1],[832,838,1],[840,847,1],                // CO, WY, ID, UT
+    [850,865,1],[870,884,1],[889,898,1],                            // AZ, NM, NV
+    [900,961,2],[967,968,3],[970,979,2],[980,994,2],[995,999,2]     // CA, HI, OR, WA, AK
+  ];
+  function colTier(zip) {
+    var p = /^\d{5}$/.test(zip || '') ? parseInt(zip.slice(0, 3), 10) : -1;
+    for (var i = 0; i < COL_TABLE.length; i++) {
+      if (p >= COL_TABLE[i][0] && p <= COL_TABLE[i][1]) return COL_TABLE[i][2];
+    }
+    return 1;
   }
 
-  /* ---------- 4. UNLOCK SCREEN COPY ----------
-     Shown inside the card above your Webflow form fields. Placeholder copy: rewrite it. */
+  /* ---------- 5. FINAL SCORE -> BUCKET (spec §4) ---------- */
+  function computeResult(a, tier) {
+    var adjustment = Math.max(-2, Math.min(2, SALARY_INDEX[a.q2] - tier));
+    var final = SCORING.q7[a.q7] + SCORING.q1[a.q1] + SCORING.q5[a.q5] + SCORING.q6[a.q6] + adjustment;
+    var bucket = final <= 3 ? 'bucket_1'
+               : final <= 9 ? 'bucket_2'
+               : final <= 14 ? 'bucket_3'
+               : (a.q5 === 'd' ? 'bucket_4' : 'bucket_3');   // Durable needs the q5_d gate
+    return { final: final, bucket: bucket, tier: tier, adjustment: adjustment };
+  }
+
+  /* ---------- 6. UNLOCK SCREEN COPY (spec §8) ----------
+     Shown inside the card around your Webflow form fields. The button label comes from the Webflow form. */
   var GATE_COPY = {
     kicker: 'Results ready',
-    headline: "You're one step from your verdict.",
-    sub: "Drop your name and email to unlock your results. You'll also get book updates, and you can unsubscribe anytime."
+    headline: 'We know how broke you are. You should probably sit down for this.',
+    sub: [
+      "Your results are weirdly specific, so we're sending them by email instead of flashing them at you in a checkout line.",
+      "Drop your email. You'll get your reading, the one uncomfortable truth, and the exact thing to do about it."
+    ],
+    fine: 'No spam. No "one weird trick." Occasionally a genuinely useful email about being less broke.'
   };
 
-  /* ---------- 5. MOTION ----------
+  /* ---------- 7. MOTION ----------
      Tune in quiz-motion-demo.html, then paste the copied config over this object. */
   var MOTION = {
     inDuration: 560,       // ms, each element entering
@@ -315,7 +361,7 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
   var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
 
-  var step = 0, answers = {}, N = QUESTIONS.length, busy = false;
+  var step = 0, answers = {}, N = QUESTIONS.length, busy = false, lastResult = null;
 
   root.innerHTML = '<div class="uq-head"><span class="uq-count"></span><div class="uq-bar" aria-hidden="true"><span></span></div></div>' +
                    '<div class="uq-stage"></div>';
@@ -455,15 +501,9 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
   });
 
   function score() {
-    var s = {}; OUTCOMES.forEach(function (k) { s[k] = 0; });
-    QUESTIONS.forEach(function (q) {
-      if (q.type === 'zip') return;
-      var o = q.options.filter(function (o) { return o.key === answers[q.id]; })[0];
-      for (var k in o.score) s[k] += o.score[k];
-    });
-    applyZipModifier(s, answers);
-    if (debug) console.log('[quiz] scores', s, 'answers', answers);
-    return OUTCOMES.reduce(function (best, k) { return s[k] > s[best] ? k : best; }, OUTCOMES[0]);
+    var r = computeResult(answers, colTier(answers.q3));
+    if (debug) console.log('[quiz] result', r, 'answers', answers);
+    return r;
   }
 
   /* ---------- dot flood ---------- */
@@ -560,13 +600,14 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
       sessionStorage.setItem('uq_unlocked', outcome);
       if (first && first.value) sessionStorage.setItem('uq_name', first.value.trim());
     } catch (e) {}
-    document.dispatchEvent(new CustomEvent('quiz:result', { detail: { outcome: outcome, answers: answers } }));
-    return RESULT_PAGES[outcome];
+    document.dispatchEvent(new CustomEvent('quiz:result', { detail: { bucket: outcome, result: lastResult } }));
+    return BUCKETS[outcome].page;
   }
 
   function finish() {
     busy = true;
-    var outcome = score();
+    var res = score(), outcome = res.bucket;
+    lastResult = res;
     var btn = stage.querySelector('.uq-next');
     if (!gate) { location.href = unlock(outcome); return; }
 
@@ -580,11 +621,19 @@ window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages de
       root.classList.add('is-unlock');
       stage.innerHTML = '<span class="uq-kicker uq-a">' + GATE_COPY.kicker + '</span>' +
         '<h3 class="uq-q uq-a" tabindex="-1">' + GATE_COPY.headline + '</h3>' +
-        '<p class="uq-gate-sub uq-a">' + GATE_COPY.sub + '</p><div class="uq-gate-slot"></div>';
+        GATE_COPY.sub.map(function (s) { return '<p class="uq-gate-sub uq-a">' + s + '</p>'; }).join('') +
+        '<div class="uq-gate-slot"></div>' +
+        (GATE_COPY.fine ? '<p class="uq-gate-fine uq-a">' + GATE_COPY.fine + '</p>' : '');
       var form = gate.querySelector('form');
-      setHidden(form, 'quiz_outcome', outcome);
-      setHidden(form, 'quiz_zip', answers.zip || '');
-      setHidden(form, 'quiz_answers', QUESTIONS.map(function (q) { return q.id + ':' + (answers[q.id] || ''); }).join(', '));
+      // Stored with the submission (spec §8). The raw ZIP is never sent, only its tier (spec §6).
+      setHidden(form, 'quiz_bucket', outcome);
+      setHidden(form, 'quiz_result', BUCKETS[outcome].level + ': ' + BUCKETS[outcome].name);
+      setHidden(form, 'quiz_score', String(res.final));
+      setHidden(form, 'quiz_dream', 'q4_' + answers.q4);
+      setHidden(form, 'quiz_col_tier', COL_TIER_NAMES[res.tier]);
+      setHidden(form, 'quiz_answers', QUESTIONS.filter(function (q) { return q.type !== 'zip'; })
+        .map(function (q) { return q.id + '_' + answers[q.id]; }).join(','));
+      setHidden(form, 'quiz_timestamp', new Date().toISOString());
       prepFields(form);
       stage.querySelector('.uq-gate-slot').appendChild(gate);
       show(gate);

@@ -1,10 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Ostrich | Unbroke quiz demo</title><meta name="robots" content="noindex"><!-- UNBROKE RESULT PAGE GUARD
+<title>One Flat Tire From a Full Spiral | Unbroke quiz demo</title><meta name="robots" content="noindex"><!-- UNBROKE RESULT PAGE GUARD
      Paste into each result page: Page Settings > Custom Code > Inside <head> tag.
-     Set THIS_OUTCOME to match that page (ostrich / tightrope / leaky / builder). -->
+     Set THIS_OUTCOME to match that page (bucket_1 / bucket_2 / bucket_3 / bucket_4). -->
 <script>
 (function () {
-  var THIS_OUTCOME = 'ostrich';
+  var THIS_OUTCOME = 'bucket_1';
   var QUIZ_PAGE = '../';
 
   var unlocked = null;
@@ -54,17 +54,33 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .btn{display:inline-flex;align-items:center;justify-content:center;height:64px;padding:0 28px;border-radius:12px;background:#0a3a26;color:#fff;
   font-weight:800;font-size:18px;text-transform:uppercase;text-decoration:none}
 .btn:hover{background:#11553a}
-.wf-note{max-width:1040px;margin:0 auto 16px;padding:14px 18px;border:2px dashed #0a3a26;border-radius:14px;background:#fff;color:#0a3a26;font:500 14px/1.45 ui-monospace,Menlo,monospace}.wf-note strong{font-weight:700}.result .wf-note{margin-bottom:16px}</style></head><body>
+.wf-note{max-width:1040px;margin:0 auto 16px;padding:14px 18px;border:2px dashed #0a3a26;border-radius:14px;background:#fff;color:#0a3a26;font:500 14px/1.45 ui-monospace,Menlo,monospace}.wf-note strong{font-weight:700}.result .wf-note{margin-bottom:16px}</style><style>
+.level{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 22px;font:14px/1.3 ui-monospace,Menlo,monospace;color:#0a3a26}
+.chip{display:inline-block;padding:4px 9px;border-radius:5px;background:#000;color:#fff;font:700 11px/1.25 "Inter Tight",system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase}
+.card h2{font-weight:800;font-size:clamp(20px,2.4vw,24px);letter-spacing:-.02em;margin:0 0 14px}
+.card ul{margin:0 0 32px;padding:0;list-style:none;display:grid;gap:12px;max-width:62ch}
+.card li{position:relative;padding:14px 16px 14px 44px;border:2px solid #000;border-radius:14px;background:#fff;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.45}
+.card li::before{content:"";position:absolute;left:16px;top:21px;width:12px;height:12px;border-radius:50%;background:#0a3a26}
+.card p.n{font-style:italic;font-weight:500;font-size:clamp(16px,1.8vw,18px);line-height:1.5;max-width:60ch;margin:0 0 36px;color:#0a3a26}
+.dbg{display:block;margin-top:8px}
+</style></head><body>
 <nav class="nav"><a class="logo" href="../">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="../">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
-<main class="result"><div class="wf-note" role="note"><strong>Placeholder result page.</strong> The final result pages will be designed and built in Webflow. This one only shows where the quiz sends you and that your first name carries over.</div><div class="card">
-<p class="kick">Your result</p>
-<h1><span data-quiz-name></span><span class="comma">, you're</span> The Ostrich.</h1>
-<p class="d">You know there is a number out there. You have simply decided not to meet it. Placeholder copy: the real description comes from the book.</p>
+<main class="result"><div class="wf-note" role="note"><strong>Stand-in result page.</strong> The final result pages will be designed and built in Webflow. The copy below is final, from the scoring spec. The layout is a placeholder.<span class="dbg" id="dbg"></span></div><div class="card">
+<p class="level"><span class="chip">Crisis</span><span>less than a month of cushion</span></p>
+<h1><span data-quiz-name></span><span class="comma">, you're</span> One Flat Tire From a Full Spiral.</h1>
+<p class="d">You&#x27;re running on timing. It works right up until a $400 surprise lands on a Tuesday, and then it doesn&#x27;t. Here&#x27;s the truth most finance advice skips: this isn&#x27;t a discipline problem. Building your first cushion is the slowest, least rewarding stretch of the whole thing. It feels like nothing is happening because mathematically, almost nothing is. That&#x27;s the design. Not your failure.</p>
+<h2>What changes it:</h2>
+<ul><li>Stop canceling subscriptions to fix this. Trimming $12 lattes won&#x27;t save a situation like yours, and pretending it will is how you stay stuck. Small stuff is the lowest-stakes corner of your finances.</li><li>Run a Stability Sprint. A bounded 60 to 90 day push, with an end date, where every spare dollar goes to one target. Not a forever-diet. It ends.</li><li>Get to one month of runway. Then three. That&#x27;s the whole assignment. Boring, and the most useful thing on this list.</li><li>If cutting won&#x27;t close the gap alone, add income: sell what you don&#x27;t use, pick up a short gig, renegotiate one bill eating your cash flow.</li></ul>
+<p class="n">Your salary and zip nudged this. A modest income in an expensive city can land you here even when you&#x27;re doing everything right, which is more or less the entire point of the book.</p>
 <a class="btn" href="../">Retake the quiz</a>
 </div></main>
 <p class="foot">Demo build for internal review. Result pages will be built in Webflow.</p>
 <script>
-// tidy the comma when there is no first name
-document.addEventListener('DOMContentLoaded',function(){var n=document.querySelector('[data-quiz-name]');if(!n||!n.textContent.trim()){var c=document.querySelector('.comma');c.textContent="You're";}});
+// tidy the comma when there is no first name, and show the demo score check
+document.addEventListener('DOMContentLoaded',function(){
+  var n=document.querySelector('[data-quiz-name]');if(!n||!n.textContent.trim()){document.querySelector('.comma').textContent="You're";}
+  try{var r=JSON.parse(sessionStorage.getItem('uq_demo')||'null');if(r){var t=['low','mid','high','very high'][r.tier];
+    document.getElementById('dbg').textContent='Demo check: score '+r.final+' (scale \u22122 to 18), cost-of-living tier '+t+', salary/zip adjustment '+(r.adjustment>0?'+':'')+r.adjustment+'.';}}catch(e){}
+});
 </script>
 </body></html>
