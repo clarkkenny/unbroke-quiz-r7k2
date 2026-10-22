@@ -1,0 +1,54 @@
+{
+  "bucket_1": {
+    "level": "Crisis",
+    "name": "One Flat Tire From a Full Spiral",
+    "desc": "less than a month of cushion",
+    "reading": "You're running on timing. It works right up until a $400 surprise lands on a Tuesday, and then it doesn't. Here's the truth most finance advice skips: this isn't a discipline problem. Building your first cushion is the slowest, least rewarding stretch of the whole thing. It feels like nothing is happening because mathematically, almost nothing is. That's the design. Not your failure.",
+    "moves": [
+      "Stop canceling subscriptions to fix this. Trimming $12 lattes won't save a situation like yours, and pretending it will is how you stay stuck. Small stuff is the lowest-stakes corner of your finances.",
+      "Run a Stability Sprint. A bounded 60 to 90 day push, with an end date, where every spare dollar goes to one target. Not a forever-diet. It ends.",
+      "Get to one month of runway. Then three. That's the whole assignment. Boring, and the most useful thing on this list.",
+      "If cutting won't close the gap alone, add income: sell what you don't use, pick up a short gig, renegotiate one bill eating your cash flow."
+    ],
+    "note": "Your salary and zip nudged this. A modest income in an expensive city can land you here even when you're doing everything right, which is more or less the entire point of the book."
+  },
+  "bucket_2": {
+    "level": "Fragile",
+    "name": "Cautiously Caffeinated",
+    "desc": "roughly one to three months of runway",
+    "reading": "You can survive one bad thing. You can't yet survive two in the same month, and disasters travel in packs. You've got a cushion and a plan that mostly holds, which puts you ahead of most people and squarely in the limbo where the dream still feels a few zeros off. You already did the ugly part. What matters now isn't clipping coupons harder.",
+    "moves": [
+      "Move your attention from pennies to the decisions that actually change the number: your career, where you live, what you pay for housing. A $15K raise beats a decade of grocery optimizing, and it isn't close.",
+      "Run a Career Audit once a year. What's your real market value today, not what you accepted three years ago? More than 15% under market is a gap worth a conversation.",
+      "If housing is the thing crushing you, there are five things to try before you relocate: downsize in-market, renegotiate mid-lease, add a roommate, audit the lease for costs your landlord owes, check assistance programs. Relocating is the last resort, not the first.",
+      "Before any decision that's hard to undo, ask whether it's a one-way door or a two-way door. Two-way doors get your gut. One-way doors get real analysis."
+    ],
+    "note": "Your zip did quiet work here. The same life costs wildly different amounts city to city, and that gap is a lever, not a sentence."
+  },
+  "bucket_3": {
+    "level": "Stable",
+    "name": "Solid, Still Building",
+    "desc": "three-plus months of runway, but the pile is still small",
+    "reading": "A surprise expense doesn't scare you anymore. That's real, and most people never get here. But don't mistake a solid cushion for being done. You're in the hardest stretch of wealth-building: the climb toward your first $100K, where progress feels slow because it genuinely is slow. Below that line the math barely moves. The difference now is that your safety net finally lets you stop playing defense and start pulling the levers that actually compound.",
+    "moves": [
+      "Your first $100K is the hardest money you'll ever save and the most important. After it, compounding starts doing a bigger share of the work. You're not there yet, so the job is to feed the machine.",
+      "Automate retirement. Get the full employer match (it's free money), pick a target-date fund, and stop overthinking it. Below $100K, the act of contributing beats any clever strategy.",
+      "Raise your contribution 1% every six months. You'll barely feel each step, and you'll be at 10% in two years without a painful overhaul.",
+      "Point your attention at the big levers, not the grocery budget: career, location, housing. And when the next raise comes, don't let lifestyle creep quietly eat it."
+    ],
+    "note": "Your salary and zip held this steady. You've got breathing room. The task is turning breathing room into momentum."
+  },
+  "bucket_4": {
+    "level": "Durable",
+    "name": "Quietly Unbothered",
+    "desc": "deep runway, and the invested assets to match",
+    "reading": "An unexpected expense doesn't wreck your week. It mildly annoys you, and you should know how rare that is. You're past the hardest, most important money you'll ever save, and compounding is quietly doing the work now. Your risk isn't being broke anymore. It's being quietly, expensively stuck while your net worth looks great on paper.",
+    "moves": [
+      "Watch for paper wealth. A strong balance sheet trapped in home equity and retirement accounts you can't touch isn't freedom. If you can't spend it without a penalty or selling the roof over your head, it's a number on a screen.",
+      "Check you're not house-poor in disguise: the beautiful home that quietly ate your 401(k) contribution and your Friday nights.",
+      "Ask the question the whole book builds to. Money is one score. Are your Work, Time, and Life freedoms keeping up, or is the money growing while the life shrinks?",
+      "Past a certain point, a few hours a year with a fee-only planner pays for itself. This is the one stage where good advice is worth the fee."
+    ],
+    "note": "The number says you're winning. The only thing left to confirm is whether you're winning the game you meant to play."
+  }
+}

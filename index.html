@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>How broke are you? | Unbroke quiz demo</title><meta name="robots" content="noindex"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet"><style>
+<title>How Broke Are You? Quiz</title><meta name="robots" content="noindex"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet"><style>
 *{box-sizing:border-box}html,body{margin:0}
 body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-webkit-font-smoothing:antialiased}
 .nav{display:flex;justify-content:space-between;align-items:center;padding:20px clamp(16px,3vw,32px);gap:16px}
@@ -16,690 +16,45 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .list h2{font-weight:800;font-size:clamp(32px,5vw,56px);line-height:1;letter-spacing:-.04em;margin:0;max-width:22ch}
 .foot{padding:24px 16px 40px;text-align:center;font:12px/1.5 ui-monospace,Menlo,monospace;color:#3f4743}
 .demo-badge{position:fixed;left:16px;bottom:16px;z-index:40;background:#000;color:#fff;font:700 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.06em;padding:8px 10px;border-radius:6px;text-transform:uppercase}
+
+.note{max-width:1040px;margin:0 auto clamp(20px,3vw,28px);padding:16px 18px;border:2px dashed #0a3a26;border-radius:14px;background:#fff;color:#0a3a26;
+  font:500 14px/1.5 ui-monospace,Menlo,monospace}
+.note strong{font-weight:700}
+.embed{max-width:1040px;margin:0 auto;padding:clamp(48px,8vw,88px) 16px}
+.embed h2{font-weight:800;font-size:clamp(26px,3.6vw,38px);letter-spacing:-.03em;line-height:1.05;margin:0 0 12px}
+.embed p{font-weight:500;font-size:17px;line-height:1.5;max-width:60ch;margin:0 0 20px}
+.code{position:relative;border:2px solid #000;border-radius:14px;background:#0a3a26;color:#e9fdef;overflow-x:auto}
+.code pre{margin:0;padding:20px 18px;font:13.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+.copy{position:absolute;top:10px;right:10px;border:0;border-radius:8px;background:#94fcae;color:#000;font:700 13px/1 "Inter Tight",system-ui,sans-serif;padding:9px 12px;cursor:pointer}
+.copy:focus-visible{outline:3px solid #fff;outline-offset:2px}
 </style></head><body>
 <nav class="nav"><a class="logo" href="./">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="./">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
 <header class="hero"><h1>How broke are you?</h1><p>A quiz that knows more about you than your banking app does. Take the next 2 minutes to discover your status.</p></header>
-<main class="quiz"><div class="demo-frame">
-<!-- UNBROKE QUIZ — paste into a Code Embed where the quiz card goes -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet">
-<style>
-.uq-wrap{container-type:inline-size;width:100%}
-.uq{
-  /* Theme */
-  --uq-ink:#000;
-  --uq-btn:#0a3a26;
-  --uq-btn-hover:#11553a;
-  --uq-opt:#edfdf0;
-  --uq-opt-on:#a9f5bf;
-  --uq-accent:#1b7a46;
-  --uq-dot:#c4f2d1;
-  --uq-off-bg:#d7dcd9;      /* disabled CTA fill */
-  --uq-off-ink:#3f4743;     /* disabled CTA text, 6.8:1 on the fill */
-  --uq-err:#9b1c13;
-  --uq-font:"Inter Tight",system-ui,-apple-system,sans-serif;
-  --uq-font-letter:Georgia,"Times New Roman",serif;
-  --uq-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
-  /* Motion (overwritten by the script config) */
-  --uq-ease:cubic-bezier(.16,1,.3,1);
-  --uq-sel-dur:320ms;
-
-  position:relative;max-width:1040px;margin:0 auto;
-  padding:clamp(24px,6cqi,64px);
-  border:2px solid var(--uq-ink);border-radius:28px;
-  background:#fff;color:var(--uq-ink);overflow:hidden;box-sizing:border-box;
-  font-family:var(--uq-font);-webkit-font-smoothing:antialiased;scroll-margin-top:24px;
-}
-.uq *,.uq *::before,.uq *::after{box-sizing:border-box}
-.uq::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(circle,var(--uq-dot) 1.3px,transparent 1.8px);
-  background-size:11px 11px;
-  -webkit-mask-image:radial-gradient(ellipse 75% 70% at 50% 50%,#000 35%,transparent 100%);
-          mask-image:radial-gradient(ellipse 75% 70% at 50% 50%,#000 35%,transparent 100%);
-}
-.uq>*{position:relative}
-
-/* Header: counter + progress */
-.uq-head{margin-bottom:clamp(28px,6cqi,60px)}
-.uq-count{font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);display:block}
-.uq-bar{margin-top:12px;height:3px;border-radius:3px;background:rgba(10,58,38,.12);overflow:hidden}
-.uq-bar>span{display:block;height:100%;background:var(--uq-btn);transform-origin:left;transform:scaleX(0);
-  transition:transform 700ms var(--uq-ease)}
-
-/* Stage: negative margin keeps focus rings visible when clipped during height morph */
-.uq-stage{margin:-6px;padding:6px}
-
-.uq-q{font-family:var(--uq-font);font-weight:700;font-size:clamp(23px,3cqi,34px);line-height:1.15;
-  letter-spacing:-.025em;margin:0 0 clamp(20px,3cqi,28px);outline:none;text-wrap:balance}
-
-/* Options */
-.uq-opts{display:grid;gap:clamp(10px,1.6cqi,16px)}
-.uq-opt{all:unset;box-sizing:border-box;position:relative;isolation:isolate;overflow:hidden;
-  display:flex;align-items:center;gap:14px;width:100%;min-height:56px;
-  padding:clamp(14px,2cqi,20px) clamp(18px,2.6cqi,26px);
-  border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-opt);cursor:pointer;
-  font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,1.8cqi,18px);line-height:1.3;letter-spacing:-.01em;
-  -webkit-tap-highlight-color:transparent;
-  transition:color .2s ease,transform .25s var(--uq-ease),box-shadow .25s var(--uq-ease)}
-.uq-opt::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--uq-opt-on);
-  transform:scaleX(0);transform-origin:left center;transition:transform var(--uq-sel-dur) var(--uq-ease)}
-.uq-opt[aria-pressed="true"]::before{transform:scaleX(1)}
-.uq-opt:focus-visible{outline:3px solid var(--uq-accent);outline-offset:3px}
-.uq-opt:active{transform:scale(.985)}
-@media (hover:hover){
-  .uq-opt:hover{color:var(--uq-accent);transform:translateY(-2px);box-shadow:0 4px 0 0 var(--uq-ink)}
-  .uq-opt[aria-pressed="true"]:hover{color:var(--uq-ink)}
-  .uq-opt:active{transform:translateY(0) scale(.985);box-shadow:0 0 0 0 var(--uq-ink)}
-}
-.uq-letter{font-family:var(--uq-font-letter);font-weight:400;font-size:clamp(24px,3cqi,28px);line-height:1;flex:none;
-  display:inline-block;min-width:.9em}
-
-/* ZIP */
-.uq-zip{display:block;width:100%;height:clamp(96px,17cqi,200px);padding:0 clamp(20px,3cqi,32px);
-  border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-opt);color:var(--uq-ink);
-  font-family:var(--uq-font);font-weight:600;font-size:clamp(22px,3cqi,32px);letter-spacing:.04em;
-  transition:box-shadow .25s var(--uq-ease)}
-.uq-zip::placeholder{color:#5f6b65;letter-spacing:0;font-weight:500}
-.uq-zip:focus{outline:none;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--uq-accent)}
-.uq-note{font-family:var(--uq-font);font-weight:700;font-size:clamp(18px,2.5cqi,26px);line-height:1.22;
-  letter-spacing:-.02em;margin:clamp(18px,3cqi,28px) 0 0;text-wrap:pretty}
-
-/* Actions */
-.uq-actions{display:flex;gap:12px;margin-top:clamp(28px,4cqi,40px)}
-.uq-next,.uq-back{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  height:clamp(60px,8cqi,84px);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;
-  font-family:var(--uq-font);text-transform:uppercase}
-.uq-next{flex:1;background:var(--uq-btn);color:#fff;font-weight:800;font-size:clamp(18px,2.6cqi,26px);letter-spacing:.01em;
-  transition:background-color .25s ease,color .25s ease,transform .15s ease}
-.uq-next svg,.uq-back svg{width:1em;height:1em;flex:none;transition:transform .3s var(--uq-ease)}
-.uq-next[aria-disabled="true"]{background:var(--uq-off-bg);color:var(--uq-off-ink);cursor:not-allowed}
-.uq-back{flex:none;padding:0 clamp(18px,3cqi,28px);background:#fff;color:var(--uq-ink);border:2px solid var(--uq-ink);
-  font-weight:700;font-size:clamp(15px,1.8cqi,18px);letter-spacing:.02em;
-  transition:background-color .2s ease,transform .15s ease}
-.uq-next:focus-visible,.uq-back:focus-visible{outline:3px solid var(--uq-accent);outline-offset:3px}
-@media (hover:hover){
-  .uq-next:not([aria-disabled="true"]):hover{background:var(--uq-btn-hover)}
-  .uq-next:not([aria-disabled="true"]):hover svg{transform:translateX(4px)}
-  .uq-back:hover{background:var(--uq-opt)}
-  .uq-back:hover svg{transform:translateX(-3px)}
-}
-.uq-next:not([aria-disabled="true"]):active,.uq-back:active{transform:scale(.98)}
-.uq-hint{font-family:var(--uq-font-mono);font-size:13px;color:var(--uq-err);text-align:center;margin:12px 0 0;min-height:1.3em}
-.uq-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-
-/* ---------- Unlock state (card turns into the email gate) ---------- */
-.uq>.uq-flood{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.uq.is-unlock{background:var(--uq-unlock-bg,#94fcae)}
-.uq.is-unlock::before{display:none}
-.uq.is-unlock .uq-head{display:none}
-.uq-kicker{display:block;font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);margin-bottom:clamp(20px,4cqi,36px)}
-.uq-gate-sub{font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,2cqi,19px);line-height:1.4;letter-spacing:-.01em;
-  margin:0 0 12px;max-width:52ch}
-.uq-gate-slot{margin-top:clamp(14px,2.6cqi,26px)}
-.uq-gate-fine{font-family:var(--uq-font-mono);font-size:13px;line-height:1.5;color:var(--uq-btn);margin:16px 0 0;max-width:60ch}
-.uq .uq-gate-slot form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0}
-.uq .uq-gate-slot .uq-field{position:relative;grid-column:1/-1;margin:0}
-.uq .uq-gate-slot .uq-field.uq-half{grid-column:auto}
-.uq .uq-gate-slot .uq-field label{position:absolute;top:12px;left:14px;z-index:1;margin:0;padding:3px 7px;border-radius:4px;
-  background:var(--uq-ink);color:#fff;font:700 10px/1.25 var(--uq-font);letter-spacing:.07em;text-transform:uppercase;pointer-events:none}
-.uq .uq-gate-slot .uq-field input{display:block;width:100%;height:clamp(72px,9cqi,84px);margin:0;padding:30px 16px 10px;
-  border:2px solid var(--uq-ink);border-radius:16px;background:#fff;color:var(--uq-ink);box-shadow:none;
-  font:600 clamp(17px,2cqi,20px)/1.2 var(--uq-font);letter-spacing:-.01em;-webkit-appearance:none;appearance:none;
-  transition:box-shadow .25s var(--uq-ease),transform .25s var(--uq-ease)}
-.uq .uq-gate-slot .uq-field input::placeholder{color:#5f6b65;font-weight:500}
-.uq .uq-gate-slot .uq-field input:focus{outline:none;box-shadow:0 0 0 2px #fff,0 0 0 5px var(--uq-btn)}
-.uq .uq-gate-slot .uq-submit{grid-column:1/-1;display:block;width:100%;height:clamp(60px,8cqi,84px);margin:8px 0 0;padding:0 16px;
-  border:0;border-radius:12px;background:var(--uq-btn);color:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;
-  font:800 clamp(18px,2.6cqi,26px)/1 var(--uq-font);text-transform:uppercase;letter-spacing:.01em;
-  transition:background-color .25s ease,transform .15s ease}
-.uq .uq-gate-slot .uq-submit:focus-visible{outline:3px solid var(--uq-btn);outline-offset:3px}
-@media (hover:hover){.uq .uq-gate-slot .uq-submit:hover{background:var(--uq-btn-hover)}}
-.uq .uq-gate-slot .uq-submit:active{transform:scale(.98)}
-.uq .uq-gate-slot .w-form-done,.uq .uq-gate-slot .w-form-fail{background:none;padding:0;margin:14px 0 0;text-align:center;
-  font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn)}
-.uq .uq-gate-slot .w-form-fail{color:var(--uq-err)}
-
-/* Mobile (container-based, so it also works inside narrow columns) */
-@container (max-width:520px){
-  .uq{border-radius:22px}
-  .uq-opt{gap:12px;border-radius:14px}
-  .uq-back{width:60px;padding:0}
-  .uq-back-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .uq-back svg{width:22px;height:22px}
-  .uq .uq-gate-slot .uq-field.uq-half{grid-column:1/-1}
-}
-@media (prefers-reduced-motion:reduce){
-  .uq *,.uq *::before{transition-duration:.01ms!important}
-}
-</style>
-<div class="uq-wrap"><div class="uq" data-quiz><noscript>This quiz needs JavaScript.</noscript></div></div>
-
-<div class="w-form" data-quiz-gate>
-  <form name="quiz-unlock" method="POST" data-name="Quiz Unlock">
-    <label for="First-Name">First name</label><input maxlength="256" name="First-Name" placeholder="Sam" type="text" id="First-Name" required data-quiz-firstname autocomplete="given-name">
-    <label for="Last-Name">Last name</label><input maxlength="256" name="Last-Name" placeholder="Rivera" type="text" id="Last-Name" required autocomplete="family-name">
-    <label for="Email">Email address</label><input maxlength="256" name="Email" placeholder="you@email.com" type="email" id="Email" required autocomplete="email">
-    <input type="submit" value="Read my results" data-wait="Unlocking…">
-  </form>
-  <div class="w-form-done" style="display:none"><div>Unlocking your results…</div></div>
-  <div class="w-form-fail" style="display:none"><div>That didn't go through. Try again?</div></div>
+<main class="quiz">
+<div class="note" role="note"><strong>Test build.</strong> The quiz is a self-contained widget hosted separately from Webflow. You add it with one Code Embed element. It brings its own questions, email pop-up, results page, PDF download, sharing and fonts. Nothing else on the site needs to change.</div>
+<div class="demo-frame">
+<!-- The two lines below are the whole Webflow embed -->
+<div data-unbroke-quiz></div>
+<script src="widget/unbroke-quiz.js" defer></script>
 </div>
-</div></main>
+</main>
 <section class="list"><h2>Feeling broke is temporary. What you learn in this book shouldn't be.</h2></section>
-<p class="foot">Demo build for internal review. Page shell is approximate and the quiz card is production code. Result pages will be built in Webflow.</p>
+<section class="embed" id="embed">
+<h2>Add it to Webflow</h2>
+<p>Paste these two lines into one Code Embed element where the quiz should sit. In this test build, signups are not stored anywhere.</p>
+<div class="code"><button type="button" class="copy" id="copy">Copy</button><pre id="snippet">&lt;div data-unbroke-quiz&gt;&lt;/div&gt;
+&lt;script src=&quot;https://clarkkenny.github.io/unbroke-quiz-r7k2/widget/unbroke-quiz.js&quot; defer&gt;&lt;/script&gt;</pre></div>
+</section>
+<p class="foot">Demo build for internal review. Page shell is approximate.</p>
 <div class="demo-badge">Demo</div>
 <script>
-// Demo-only: no backend on GitHub Pages, so submitting just unlocks the result
-window.UQ_SUBMIT = function () { return Promise.resolve(); }; // GitHub Pages demo: nothing is recorded
-// Demo only: carry the score to the result page so reviewers can check the math
-document.addEventListener('quiz:result', function (e) {
-  try { sessionStorage.setItem('uq_demo', JSON.stringify(e.detail.result)); } catch (err) {}
+document.getElementById('copy').addEventListener('click', function () {
+  var b = this, t = document.getElementById('snippet').textContent;
+  var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1400); };
+  var sel = function () { var r = document.createRange(); r.selectNodeContents(document.getElementById('snippet')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Press Cmd+C'; };
+  navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t).then(done, sel) : sel();
 });
 </script>
-<!-- UNBROKE QUIZ LOGIC — paste into Page Settings > Custom Code > Before </body> tag -->
-<script>
-(function () {
-  /* Scoring follows "How Broke Are You — Scoring & Results Spec". Section numbers below refer to it. */
-
-  /* ---------- 1. RESULT BUCKETS (spec §4) ----------
-     page = the Webflow result page each bucket redirects to. Use your real slugs. */
-  var BUCKETS = {
-    bucket_1: { level: 'Crisis',  name: 'One Flat Tire From a Full Spiral', page: 'quiz/one-flat-tire.html' },
-    bucket_2: { level: 'Fragile', name: 'Cautiously Caffeinated',           page: 'quiz/cautiously-caffeinated.html' },
-    bucket_3: { level: 'Stable',  name: 'Solid, Still Building',            page: 'quiz/solid-still-building.html' },
-    bucket_4: { level: 'Durable', name: 'Quietly Unbothered',               page: 'quiz/quietly-unbothered.html' }
-  };
-
-  /* ---------- 2. QUESTIONS (spec §2) ----------
-     Answer ID = question id + '_' + key, e.g. q5_d. Points live in SCORING, not here. */
-  var QUESTIONS = [
-    { id: 'q1', text: "It's the 14th of the month. Your card gets declined buying a $6 coffee. Your first thought:", options: [
-      { key: 'a', text: '"Weird, the machine must be broken." (It is not the machine.)' },
-      { key: 'b', text: '"Right, I moved money into savings. Let me shuffle it back." Mild logistics, no panic.' },
-      { key: 'c', text: '"Huh." You tap a different card. You genuinely didn\'t notice.' }
-    ]},
-    { id: 'q2', text: "Let's talk numbers. What's the household salary situation?", options: [
-      { key: 'a', text: 'Under $50K, and the group chat thinks I make more' },
-      { key: 'b', text: '$50K–$100K, comfortable-ish, one bad month from un-comfortable' },
-      { key: 'c', text: '$100K–$200K and still somehow broke, which is its own genre of pain' },
-      { key: 'd', text: "$200K+ (we'll allow it, show-off)" }
-    ]},
-    { id: 'q3', type: 'zip', text: "Drop your zip code. We're not stalking you, we're doing math.",
-      placeholder: 'Five digit ZIP code',
-      note: 'Because $70K in Des Moines and $70K in Brooklyn are two completely different personalities, and one of them owns a couch.' },
-    { id: 'q4', text: 'The dream. When you picture "made it," what\'s the actual image?', options: [
-      { key: 'a', text: "Not flinching at the grocery total. That's it. That's the dream." },
-      { key: 'b', text: 'A house, a dog, and the ability to book the flight without a spreadsheet summit' },
-      { key: 'c', text: "Quitting the job that's fine but slowly killing me" },
-      { key: 'd', text: 'A beach, a laptop, and geographic smugness' }
-    ]},
-    { id: 'q5', text: 'Someone hands you an unexpected $2,000. Be honest. It:', options: [
-      { key: 'a', text: 'Is already spent. It was spent before it arrived. RIP.' },
-      { key: 'b', text: "Kills a credit card balance that's been following me like a stray cat" },
-      { key: 'c', text: 'Goes straight to savings, and I feel a small, weird thrill about it' },
-      { key: 'd', text: 'Gets invested, and I have Opinions about where' }
-    ]},
-    { id: 'q6', text: 'Your relationship with risk, described as a dating profile:', options: [
-      { key: 'a', text: 'Avoidant. One surprise expense and I ghost my own budget.' },
-      { key: 'b', text: '"Looking for something stable." Index funds. A high-yield savings account. Nothing that texts back weird.' },
-      { key: 'c', text: "Down to gamble a little if the upside is real. I've read one Reddit thread and feel prepared." },
-      { key: 'd', text: 'I have crypto opinions at dinner parties. People have stopped inviting me.' }
-    ]},
-    { id: 'q7', text: 'Sunday night. Bed. Lights off. When money crosses your mind, you feel:', options: [
-      { key: 'a', text: "A low hum of dread I've learned to sleep through" },
-      { key: 'b', text: 'Fine, mostly. Until I remember one specific thing. Then less fine.' },
-      { key: 'c', text: 'Genuinely calm. If something broke tomorrow, I could handle it.' }
-    ]}
-  ];
-
-  /* ---------- 3. POINTS (spec §3, already weighted) ----------
-     Q4 is not scored (segmentation only). Q2 + Q3 feed the edge adjuster below. */
-  var SCORING = {
-    q7: { a: 0, b: 3, c: 6 },          // Sunday-night feeling, raw 0-2 x3
-    q1: { a: 0, b: 2, c: 4 },          // card declined, raw 0-2 x2
-    q5: { a: 0, b: 2, c: 4, d: 4 },    // surprise $2,000, raw 0-2 x2
-    q6: { a: 0, b: 1, c: 2, d: 2 }     // risk, lean x1
-  };
-  var SALARY_INDEX = { a: 0, b: 1, c: 2, d: 3 };
-
-  /* ---------- 4. ZIP -> COST-OF-LIVING TIER (spec §6) ----------
-     v1 static table by 3-digit ZIP prefix: [first, last, tier]. First match wins, so metro
-     overrides sit above state defaults. Tiers: 0 low, 1 mid, 2 high, 3 very_high.
-     Unknown or unmatched ZIP -> mid. Swap in a real COL index here when you have one. */
-  var COL_TIER_NAMES = ['low', 'mid', 'high', 'very_high'];
-  var COL_TABLE = [
-    // Metro overrides
-    [100,102,3],[112,112,3],                       // Manhattan, Brooklyn
-    [940,941,3],[943,951,3],                       // San Francisco, Peninsula, East Bay, Marin, San Jose
-    [103,111,2],[113,119,2],                       // other NYC boroughs, Westchester, Long Island
-    [206,209,2],[220,223,2],                       // DC suburbs (MD, VA)
-    [19,24,2],[68,69,2],                           // Boston area, Fairfield County CT
-    [330,331,2],[606,606,2],[800,803,2],           // Miami, Chicago, Denver
-    // State defaults
-    [10,27,1],[28,29,1],[30,38,1],[39,49,1],[50,59,1],[60,69,1],   // MA RI NH ME VT CT
-    [70,79,2],[80,89,1],[120,149,1],[150,196,1],[197,199,1],        // N. NJ, S. NJ, upstate NY, PA, DE
-    [200,205,2],[206,219,1],[220,246,1],[247,268,0],                // DC, MD, VA, WV
-    [270,289,1],[290,299,1],[300,319,0],[320,349,1],                // NC, SC, GA, FL
-    [350,369,0],[370,385,0],[386,397,0],[398,399,0],                // AL, TN, MS, GA
-    [400,427,0],[430,459,0],[460,479,0],[480,499,0],                // KY, OH, IN, MI
-    [500,528,0],[530,549,1],[550,567,1],[570,577,0],[580,588,0],    // IA, WI, MN, SD, ND
-    [590,599,1],[600,629,1],[630,658,0],[660,679,0],[680,693,0],    // MT, IL, MO, KS, NE
-    [700,714,0],[716,729,0],[730,749,0],[750,799,1],[885,885,1],    // LA, AR, OK, TX
-    [800,816,1],[820,831,1],[832,838,1],[840,847,1],                // CO, WY, ID, UT
-    [850,865,1],[870,884,1],[889,898,1],                            // AZ, NM, NV
-    [900,961,2],[967,968,3],[970,979,2],[980,994,2],[995,999,2]     // CA, HI, OR, WA, AK
-  ];
-  function colTier(zip) {
-    var p = /^\d{5}$/.test(zip || '') ? parseInt(zip.slice(0, 3), 10) : -1;
-    for (var i = 0; i < COL_TABLE.length; i++) {
-      if (p >= COL_TABLE[i][0] && p <= COL_TABLE[i][1]) return COL_TABLE[i][2];
-    }
-    return 1;
-  }
-
-  /* ---------- 5. FINAL SCORE -> BUCKET (spec §4) ---------- */
-  function computeResult(a, tier) {
-    var adjustment = Math.max(-2, Math.min(2, SALARY_INDEX[a.q2] - tier));
-    var final = SCORING.q7[a.q7] + SCORING.q1[a.q1] + SCORING.q5[a.q5] + SCORING.q6[a.q6] + adjustment;
-    var bucket = final <= 3 ? 'bucket_1'
-               : final <= 9 ? 'bucket_2'
-               : final <= 14 ? 'bucket_3'
-               : (a.q5 === 'd' ? 'bucket_4' : 'bucket_3');   // Durable needs the q5_d gate
-    return { final: final, bucket: bucket, tier: tier, adjustment: adjustment };
-  }
-
-  /* ---------- 6. UNLOCK SCREEN COPY (spec §8) ----------
-     Shown inside the card around your Webflow form fields. The button label comes from the Webflow form. */
-  var GATE_COPY = {
-    kicker: 'Results ready',
-    headline: 'We know how broke you are. You should probably sit down for this.',
-    sub: [
-      "Your results are weirdly specific. We'll show you where you landed, then email you the full report.",
-      "Drop your name and email. You'll get your reading, the one uncomfortable truth, and the exact thing to do about it."
-    ],
-    fine: 'No spam. No "one weird trick." Occasionally a genuinely useful email about being less broke.'
-  };
-
-  /* ---------- 7. MOTION ----------
-     Tune in quiz-motion-demo.html, then paste the copied config over this object. */
-  var MOTION = {
-    inDuration: 560,       // ms, each element entering
-    outDuration: 200,      // ms, each element leaving
-    stagger: 55,           // ms between elements
-    distance: 32,          // px horizontal travel (back slides the other way)
-    rise: 14,              // px vertical travel on first load and on the unlock screen
-    blur: 6,               // px blur on enter, 0 to disable
-    heightDuration: 460,   // ms, card height morph, 0 to disable
-    selectDuration: 340,   // ms, answer fill sweep
-    ease: 'cubic-bezier(.16,1,.3,1)',
-    easeOut: 'cubic-bezier(.55,0,1,.45)',
-    // Unlock flood: background dots grow until the card is solid
-    unlockColor: '#94fcae',
-    floodOrigin: 'button', // 'button' | 'center' | 'top'
-    floodSpread: 700,      // ms for the wave to cross the card
-    dotGrow: 420,          // ms for a single dot to grow to full
-    floodJitter: 160,      // ms of random offset per dot, 0 for a clean ring
-    unlockHeight: 760      // ms, card height ease into the unlock screen
-  };
-
-  /* ---------- engine (no edits needed below) ---------- */
-  var M = MOTION;
-  var root = document.querySelector('[data-quiz]');
-  if (!root) return;
-  var gate = document.querySelector('[data-quiz-gate]');
-  var gateHome = gate ? { parent: gate.parentNode, next: gate.nextSibling } : null;
-  var debug = /quizdebug/.test(location.search);
-  var reduced = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-  function hide(el) { if (el) el.style.display = 'none'; }
-  function show(el) { if (el) el.style.display = ''; }
-  function canAnimate() { return !reduced.matches && typeof Element.prototype.animate === 'function'; }
-  function done(anims) { return Promise.all(anims.map(function (a) { return a.finished.catch(function () {}); })); }
-  hide(gate);
-
-  var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
-
-  var step = 0, answers = {}, N = QUESTIONS.length, busy = false, lastResult = null;
-
-  root.innerHTML = '<div class="uq-head"><span class="uq-count"></span><div class="uq-bar" aria-hidden="true"><span></span></div></div>' +
-                   '<div class="uq-stage"></div>';
-  var head = root.querySelector('.uq-head');
-  var stage = root.querySelector('.uq-stage');
-  var countEl = root.querySelector('.uq-count');
-  var barEl = root.querySelector('.uq-bar > span');
-
-  function applyVars() {
-    root.style.setProperty('--uq-ease', M.ease);
-    root.style.setProperty('--uq-sel-dur', M.selectDuration + 'ms');
-    root.style.setProperty('--uq-unlock-bg', M.unlockColor);
-  }
-
-  function valid(q) {
-    return q.type === 'zip' ? /^\d{5}$/.test(answers[q.id] || '') : !!answers[q.id];
-  }
-
-  function render() {
-    applyVars();
-    var q = QUESTIONS[step], last = step === N - 1, body;
-    if (q.type === 'zip') {
-      body = '<input class="uq-zip uq-a" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="postal-code" maxlength="5" aria-labelledby="uq-q" aria-describedby="uq-hint" placeholder="' + q.placeholder + '" value="' + (answers[q.id] || '') + '">' +
-             '<p class="uq-note uq-a">' + q.note + '</p>';
-    } else {
-      body = '<div class="uq-opts" role="group" aria-labelledby="uq-q">' + q.options.map(function (o) {
-        return '<button type="button" class="uq-opt uq-a" aria-pressed="' + (answers[q.id] === o.key) + '" data-key="' + o.key + '">' +
-               '<span class="uq-letter" aria-hidden="true">' + o.key + '.</span><span>' + o.text + '</span></button>';
-      }).join('') + '</div>';
-    }
-    stage.innerHTML = '<h3 class="uq-q uq-a" id="uq-q" tabindex="-1">' + q.text + '</h3>' + body +
-      '<div class="uq-actions uq-a">' +
-        (step > 0 ? '<button type="button" class="uq-back">' + CHEV + '<span class="uq-back-label">Back</span></button>' : '') +
-        '<button type="button" class="uq-next" aria-disabled="' + !valid(q) + '" aria-describedby="uq-hint"><span>' + (last ? 'Get my results' : 'Next question') + '</span>' + ARROW + '</button>' +
-      '</div><p class="uq-hint" id="uq-hint" role="status"></p>';
-    countEl.textContent = 'Question ' + (step + 1) + ' of ' + N;
-    barEl.style.transform = 'scaleX(' + ((step + 1) / N) + ')';
-  }
-
-  function targets() { return Array.prototype.slice.call(stage.querySelectorAll('.uq-a')); }
-
-  function enter(dir) {
-    if (!canAnimate()) return Promise.resolve();
-    var x = M.distance * dir, y = dir ? 0 : M.rise;
-    return done(targets().map(function (el, i) {
-      return el.animate([
-        { opacity: 0, transform: 'translate3d(' + x + 'px,' + y + 'px,0)', filter: 'blur(' + M.blur + 'px)' },
-        { opacity: 1, transform: 'none', filter: 'blur(0px)' }
-      ], { duration: M.inDuration, delay: i * M.stagger, easing: M.ease, fill: 'backwards' });
-    }));
-  }
-
-  function leave(dir, extra) {
-    if (!canAnimate()) return Promise.resolve();
-    var x = -M.distance * 0.6 * (dir || 1);
-    var els = (extra || []).concat(targets());
-    return done(els.map(function (el, i) {
-      return el.animate([
-        { opacity: 1, transform: 'none' },
-        { opacity: 0, transform: 'translate3d(' + x + 'px,0,0)' }
-      ], { duration: M.outDuration, delay: i * Math.round(M.stagger * 0.35), easing: M.easeOut, fill: 'forwards' });
-    }));
-  }
-
-  function morph(el, h0, dur) {
-    var h1 = el.offsetHeight;
-    dur = dur == null ? M.heightDuration : dur;
-    if (!canAnimate() || !dur || h0 === h1) return;
-    var prev = el.style.overflow;
-    el.style.overflow = 'hidden';
-    var a = el.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: dur, easing: M.ease });
-    a.finished.catch(function () {}).then(function () { el.style.overflow = prev; });
-  }
-
-  function keepInView() {
-    var top = root.getBoundingClientRect().top;
-    if (top < 0) root.scrollIntoView({ behavior: canAnimate() ? 'smooth' : 'auto', block: 'start' });
-  }
-
-  function go(dir) {
-    if (busy) return;
-    busy = true;
-    var h0 = stage.offsetHeight;
-    leave(dir).then(function () {
-      step += dir;
-      render();
-      morph(stage, h0);
-      keepInView();
-      return enter(dir);
-    }).then(function () {
-      busy = false;
-      var q = stage.querySelector('.uq-q');
-      if (q) q.focus({ preventScroll: true });
-    });
-  }
-
-  function nudge(msg) {
-    var hint = stage.querySelector('.uq-hint'), next = stage.querySelector('.uq-next');
-    hint.textContent = msg;
-    if (canAnimate()) next.animate([
-      { transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(5px)' },
-      { transform: 'translateX(-3px)' }, { transform: 'translateX(0)' }
-    ], { duration: 360, easing: 'ease-out' });
-  }
-
-  function syncNext() {
-    stage.querySelector('.uq-next').setAttribute('aria-disabled', !valid(QUESTIONS[step]));
-  }
-
-  root.addEventListener('click', function (e) {
-    if (busy || root.classList.contains('is-unlock')) return;
-    var q = QUESTIONS[step], t;
-    if ((t = e.target.closest('.uq-opt'))) {
-      answers[q.id] = t.dataset.key;
-      stage.querySelectorAll('.uq-opt').forEach(function (b) { b.setAttribute('aria-pressed', b === t); });
-      stage.querySelector('.uq-hint').textContent = '';
-      if (canAnimate()) t.querySelector('.uq-letter').animate(
-        [{ transform: 'scale(1) rotate(0)' }, { transform: 'scale(1.3) rotate(-8deg)' }, { transform: 'scale(1) rotate(0)' }],
-        { duration: 420, easing: M.ease });
-      syncNext();
-    } else if (e.target.closest('.uq-back')) {
-      go(-1);
-    } else if (e.target.closest('.uq-next')) {
-      if (!valid(q)) return nudge(q.type === 'zip' ? 'Five digits, US ZIP only.' : 'Pick an answer to keep going.');
-      if (step === N - 1) finish(); else go(1);
-    }
-  });
-  root.addEventListener('input', function (e) {
-    if (!e.target.classList.contains('uq-zip')) return;
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
-    answers[QUESTIONS[step].id] = e.target.value;
-    stage.querySelector('.uq-hint').textContent = '';
-    syncNext();
-  });
-  root.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && e.target.classList.contains('uq-zip')) { e.preventDefault(); stage.querySelector('.uq-next').click(); }
-  });
-
-  function score() {
-    var r = computeResult(answers, colTier(answers.q3));
-    if (debug) console.log('[quiz] result', r, 'answers', answers);
-    return r;
-  }
-
-  /* ---------- dot flood ---------- */
-  function hexRgb(h) {
-    h = String(h).trim().replace('#', '');
-    if (h.length === 3) h = h.replace(/./g, '$&$&');
-    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
-  }
-  function flood(originEl) {
-    return new Promise(function (resolve) {
-      if (!canAnimate()) return resolve();
-      var rect = root.getBoundingClientRect(), bw = 2;            // card border
-      var W = rect.width - bw * 2, H = rect.height - bw * 2;
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var c = document.createElement('canvas');
-      c.className = 'uq-flood';
-      c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
-      root.insertBefore(c, root.firstChild);
-      var ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
-
-      var ox = W / 2, oy = H / 2;
-      if (M.floodOrigin === 'top') { ox = W / 2; oy = 0; }
-      if (M.floodOrigin === 'button' && originEl) {
-        var b = originEl.getBoundingClientRect();
-        ox = b.left + b.width / 2 - rect.left - bw; oy = b.top + b.height / 2 - rect.top - bw;
-      }
-      var g = 11, rMax = g * 0.75, dots = [], maxD = 1;          // 11px grid = the background pattern
-      for (var y = g / 2; y < H + g; y += g) for (var x = g / 2; x < W + g; x += g) {
-        var d = Math.sqrt((x - ox) * (x - ox) + (y - oy) * (y - oy));
-        if (d > maxD) maxD = d;
-        dots.push([x, y, d, Math.random()]);
-      }
-      var from = hexRgb(getComputedStyle(root).getPropertyValue('--uq-dot') || '#c4f2d1');
-      var to = hexRgb(M.unlockColor);
-      var STEPS = 12, fills = [];
-      for (var s = 0; s <= STEPS; s++) {
-        var k = s / STEPS;
-        fills.push('rgb(' + [0, 1, 2].map(function (i) { return Math.round(from[i] + (to[i] - from[i]) * k); }).join(',') + ')');
-      }
-      function ease(p) { return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
-      var t0 = performance.now();
-      (function frame(now) {
-        var t = now - t0, finished = true;
-        ctx.clearRect(0, 0, W, H);
-        var buckets = [];
-        for (var i = 0; i < dots.length; i++) {
-          var dt = dots[i], start = (dt[2] / maxD) * M.floodSpread + dt[3] * M.floodJitter;
-          var p = (t - start) / M.dotGrow;
-          if (p < 1) finished = false;
-          if (p <= 0) continue;
-          var e = ease(Math.min(p, 1)), bi = Math.round(e * STEPS);
-          (buckets[bi] || (buckets[bi] = [])).push(dt[0], dt[1], e * rMax);
-        }
-        for (var bk = 0; bk < buckets.length; bk++) {
-          var list = buckets[bk]; if (!list) continue;
-          ctx.fillStyle = fills[bk]; ctx.beginPath();
-          for (var j = 0; j < list.length; j += 3) { ctx.moveTo(list[j] + list[j + 2], list[j + 1]); ctx.arc(list[j], list[j + 1], list[j + 2], 0, 6.2832); }
-          ctx.fill();
-        }
-        if (!finished) return requestAnimationFrame(frame);
-        root.classList.add('is-unlock');
-        resolve();
-        requestAnimationFrame(function () { c.remove(); });
-      })(t0);
-    });
-  }
-
-  /* ---------- unlock screen ---------- */
-  function setHidden(form, name, value) {
-    var el = form.querySelector('input[name="' + name + '"]');
-    if (!el) { el = document.createElement('input'); el.type = 'hidden'; el.name = name; form.appendChild(el); }
-    el.value = value;
-  }
-
-  function prepFields(form) {
-    var inputs = form.querySelectorAll('input:not([type=hidden]):not([type=submit]), select, textarea');
-    Array.prototype.forEach.call(inputs, function (inp, i) {
-      if (inp.closest('.uq-field')) return;
-      var lab = inp.id ? form.querySelector('label[for="' + inp.id + '"]') : null;
-      if (!lab && inp.previousElementSibling && inp.previousElementSibling.tagName === 'LABEL') lab = inp.previousElementSibling;
-      var wrap = document.createElement('div');
-      wrap.className = 'uq-field uq-a' + (inputs.length >= 3 && i < 2 ? ' uq-half' : '');
-      inp.parentNode.insertBefore(wrap, inp);
-      if (lab) wrap.appendChild(lab);
-      wrap.appendChild(inp);
-    });
-    var submit = form.querySelector('[type=submit]');
-    if (submit) submit.classList.add('uq-submit', 'uq-a');
-  }
-
-  function unlock(outcome) {
-    var first = gate && gate.querySelector('[data-quiz-firstname]');
-    try {
-      sessionStorage.setItem('uq_unlocked', outcome);
-      if (first && first.value) sessionStorage.setItem('uq_name', first.value.trim());
-    } catch (e) {}
-    document.dispatchEvent(new CustomEvent('quiz:result', { detail: { bucket: outcome, result: lastResult } }));
-    return BUCKETS[outcome].page;
-  }
-
-  function finish() {
-    busy = true;
-    var res = score(), outcome = res.bucket;
-    lastResult = res;
-    var btn = stage.querySelector('.uq-next');
-    if (!gate) { location.href = unlock(outcome); return; }
-
-    // Lock the card's height so nothing jumps while the content leaves and the dots flood
-    var lockH = root.offsetHeight;
-    root.style.height = lockH + 'px';
-
-    leave(1, [countEl, head.querySelector('.uq-bar')]).then(function () {
-      return flood(btn);
-    }).then(function () {
-      root.classList.add('is-unlock');
-      stage.innerHTML = '<span class="uq-kicker uq-a">' + GATE_COPY.kicker + '</span>' +
-        '<h3 class="uq-q uq-a" tabindex="-1">' + GATE_COPY.headline + '</h3>' +
-        GATE_COPY.sub.map(function (s) { return '<p class="uq-gate-sub uq-a">' + s + '</p>'; }).join('') +
-        '<div class="uq-gate-slot"></div>' +
-        (GATE_COPY.fine ? '<p class="uq-gate-fine uq-a">' + GATE_COPY.fine + '</p>' : '');
-      var form = gate.querySelector('form');
-      // Stored with the submission (spec §8). The raw ZIP is never sent, only its tier (spec §6).
-      setHidden(form, 'quiz_bucket', outcome);
-      setHidden(form, 'quiz_result', BUCKETS[outcome].level + ': ' + BUCKETS[outcome].name);
-      setHidden(form, 'quiz_score', String(res.final));
-      setHidden(form, 'quiz_dream', 'q4_' + answers.q4);
-      setHidden(form, 'quiz_col_tier', COL_TIER_NAMES[res.tier]);
-      setHidden(form, 'quiz_answers', QUESTIONS.filter(function (q) { return q.type !== 'zip'; })
-        .map(function (q) { return q.id + '_' + answers[q.id]; }).join(','));
-      setHidden(form, 'quiz_timestamp', new Date().toISOString());
-      prepFields(form);
-      stage.querySelector('.uq-gate-slot').appendChild(gate);
-      show(gate);
-      root.style.height = '';
-      morph(root, lockH, M.unlockHeight);
-      keepInView();
-      return enter(0).then(function () { return form; });
-    }).then(function (form) {
-      busy = false;
-      var h = stage.querySelector('.uq-q'); if (h) h.focus({ preventScroll: true });
-      var doneEl = gate.querySelector('.w-form-done');
-      if (window.Webflow && doneEl) {
-        // Unlock only after Webflow confirms a successful submission
-        new MutationObserver(function (m, obs) {
-          if (getComputedStyle(doneEl).display !== 'none') { obs.disconnect(); location.href = unlock(outcome); }
-        }).observe(doneEl, { attributes: true, attributeFilter: ['style'] });
-      } else {
-        // Outside Webflow: use a custom submit hook if the page defines one (e.g. Netlify demo),
-        // otherwise show where it would go instead of navigating
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-          var btn = form.querySelector('[type=submit]');
-          if (typeof window.UQ_SUBMIT === 'function') {
-            if (btn) { btn.disabled = true; btn.value = btn.getAttribute('data-wait') || 'Unlocking…'; }
-            Promise.resolve(window.UQ_SUBMIT(form)).then(function () {
-              location.href = unlock(outcome);
-            }, function () {
-              if (btn) { btn.disabled = false; btn.value = 'Try again'; }
-              var fail = gate.querySelector('.w-form-fail'); if (fail) fail.style.display = 'block';
-            });
-            return;
-          }
-          form.style.display = 'none';
-          var msg = document.createElement('p');
-          msg.className = 'uq-kicker';
-          msg.textContent = 'Preview: would redirect to ' + unlock(outcome);
-          gate.appendChild(msg);
-        });
-      }
-    });
-  }
-
-  // Hooks for the motion demo (harmless in production)
-  window.UQ = {
-    motion: M,
-    apply: applyVars,
-    replay: function () { if (!busy) { busy = true; enter(1).then(function () { busy = false; }); } },
-    restart: function () {
-      if (gate && gateHome) { hide(gate); gateHome.parent.insertBefore(gate, gateHome.next); }
-      root.classList.remove('is-unlock');
-      root.style.height = '';
-      [countEl, head.querySelector('.uq-bar')].forEach(function (el) { el.getAnimations().forEach(function (a) { a.cancel(); }); });
-      step = 0; answers = {}; busy = false; render(); enter(0);
-    },
-    skipToUnlock: function () {
-      if (busy) return;
-      QUESTIONS.forEach(function (q) { answers[q.id] = q.type === 'zip' ? '10001' : q.options[1].key; });
-      step = N - 1; render(); finish();
-    }
-  };
-
-  render();
-  enter(0);
-})();
-</script>
-
 <style>
 .mp{position:fixed;right:16px;bottom:16px;z-index:50;width:300px;max-height:calc(100vh - 32px);overflow:auto;
   background:#111;color:#eee;border-radius:14px;font:12px/1.4 ui-monospace,Menlo,monospace;box-shadow:0 12px 40px rgba(0,0,0,.35)}
@@ -724,7 +79,7 @@ document.addEventListener('quiz:result', function (e) {
   <div class="mp-body" id="mp-fields"></div>
 </div>
 <script>
-(function () {
+document.addEventListener("DOMContentLoaded", function () {
   if (!/[?&]tune/.test(location.search)) return;
   document.getElementById('mp').style.display = '';
   var M = window.UQ.motion;
@@ -777,13 +132,12 @@ document.addEventListener('quiz:result', function (e) {
     var v = document.getElementById('v-' + k); if (v) v.textContent = e.target.value + e.target.dataset.u;
     window.UQ.apply();
   });
-  var GATE_HTML = document.querySelector('[data-quiz-gate]').innerHTML;
   document.getElementById('mp-replay').onclick = function () { window.UQ.replay(); };
   document.getElementById('mp-restart').onclick = function () {
-    document.querySelector('[data-quiz-gate]').innerHTML = GATE_HTML; window.UQ.restart();
+    window.UQ.restart();
   };
   document.getElementById('mp-unlock').onclick = function () {
-    document.querySelector('[data-quiz-gate]').innerHTML = GATE_HTML; window.UQ.restart();
+    window.UQ.restart();
     setTimeout(function () { window.UQ.skipToUnlock(); }, 700);
   };
   document.getElementById('mp-mobile').onclick = function () { document.querySelector('.demo-frame').classList.toggle('mobile'); };
@@ -798,7 +152,7 @@ document.addEventListener('quiz:result', function (e) {
     var p = document.getElementById('mp'); p.classList.toggle('closed');
     document.getElementById('mp-caret').textContent = p.classList.contains('closed') ? '+' : '–';
   };
-})();
+});
 </script>
 
 </body></html>
