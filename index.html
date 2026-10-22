@@ -31,7 +31,7 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 <nav class="nav"><a class="logo" href="./">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="./">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
 <header class="hero"><h1>How broke are you?</h1><p>A quiz that knows more about you than your banking app does. Take the next 2 minutes to discover your status.</p></header>
 <main class="quiz">
-<div class="note" role="note"><strong>Test build.</strong> The quiz is a self-contained widget hosted separately from Webflow. You add it with one Code Embed element. It brings its own questions, email pop-up, results page, PDF download, sharing and fonts. Nothing else on the site needs to change.</div>
+<div class="note" role="note"><strong>Test build.</strong> The quiz is a self-contained widget hosted separately from Webflow. You add it with one Code Embed element, plus a hidden Webflow form that receives the signups. It brings its own questions, email pop-up, results page, PDF download, sharing and fonts. Nothing else on the site needs to change.</div>
 <div class="demo-frame">
 <!-- The two lines below are the whole Webflow embed -->
 <div data-unbroke-quiz></div>
@@ -41,9 +41,28 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 <section class="list"><h2>Feeling broke is temporary. What you learn in this book shouldn't be.</h2></section>
 <section class="embed" id="embed">
 <h2>Add it to Webflow</h2>
-<p>Paste these two lines into one Code Embed element where the quiz should sit. In this test build, signups are not stored anywhere.</p>
+<p>Paste these two lines into one Code Embed element where the quiz should sit. Then add a Form Block to the same page, name it <strong>Quiz Signup</strong>, give it First Name, Last Name and Email fields, and hide it. The widget fills that form in and submits it, so every signup lands in Webflow form submissions.</p>
 <div class="code"><button type="button" class="copy" id="copy">Copy</button><pre id="snippet">&lt;div data-unbroke-quiz&gt;&lt;/div&gt;
 &lt;script src=&quot;https://clarkkenny.github.io/unbroke-quiz-r7k2/widget/unbroke-quiz.js&quot; defer&gt;&lt;/script&gt;</pre></div>
+<h2 style="margin-top:clamp(36px,6vw,56px)">What Webflow receives</h2>
+<p>This page has a stand-in for the hidden Webflow form. Finish the quiz above and the fields it would send to Webflow show up here.</p>
+<div class="code"><pre id="wf-log">Waiting for a signup…</pre></div>
+<div class="w-form" style="display:none"><form name="wf-form-Quiz-Signup" data-name="Quiz Signup" method="get">
+<input type="text" name="First-Name" maxlength="256"><input type="text" name="Last-Name" maxlength="256"><input type="email" name="Email" maxlength="256">
+<input type="submit" value="Submit"></form>
+<div class="w-form-done" style="display:none"><div>Thank you!</div></div><div class="w-form-fail" style="display:none"><div>Oops!</div></div></div>
+<script>
+// Demo stand-in for webflow.js: show what the hidden Quiz Signup form would submit
+(function () {
+  var f = document.querySelector('form[data-name="Quiz Signup"]');
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var rows = Array.prototype.map.call(f.querySelectorAll('input:not([type=submit])'), function (i) { return i.name + ': ' + i.value; });
+    document.getElementById('wf-log').textContent = rows.join('\n');
+    setTimeout(function () { f.style.display = 'none'; f.parentNode.querySelector('.w-form-done').style.display = 'block'; }, 500);
+  });
+})();
+</script>
 </section>
 <p class="foot">Demo build for internal review. Page shell is approximate.</p>
 <div class="demo-badge">Demo</div>

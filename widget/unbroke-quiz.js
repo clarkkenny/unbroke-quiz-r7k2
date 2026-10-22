@@ -2,9 +2,13 @@
  *  Add to any page with:
  *    <div data-unbroke-quiz></div>
  *    <script src="https://clarkkenny.github.io/unbroke-quiz-r7k2/widget/unbroke-quiz.js" defer></script>
+ *  Signups: put a native Webflow Form Block on the same page, named "Quiz Signup", and hide it.
+ *  The widget fills and submits it, so entries land in Webflow form submissions.
  *  Optional attributes on the div:
- *    data-endpoint="https://..."  POST URL that receives each signup as JSON. Leave out to run in test mode.
- *    data-share-url="https://..." Link people share. Defaults to the page the quiz is on.
+ *    data-webflow-form="Quiz Signup"  Webflow form name to use, if you named it something else.
+ *    data-endpoint="https://..."      POST URL for signups as JSON, only used when no Webflow form is found.
+ *    data-share-url="https://..."     Link people share. Defaults to the page the quiz is on.
+ *  With neither a Webflow form nor an endpoint, the quiz runs in test mode and stores nothing.
  *  Built from widget/src. Edit there, then run: python3 widget/build.py
  */
 (function () {
@@ -487,7 +491,9 @@
       busy = true;
       btn.disabled = true;
       btn.textContent = COPY.gateWait;
-      var send = endpoint
+      var wf = findWebflowForm();
+      var send = wf ? sendViaWebflow(wf, payload)
+        : endpoint
         ? fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
         : Promise.resolve(debug && console.log('[unbroke-quiz] test mode, not sent:', payload));
@@ -499,6 +505,57 @@
         btn.disabled = false;
         btn.textContent = COPY.gateButton;
         err.textContent = COPY.gateError;
+      });
+    }
+
+    /* ---------- Webflow form hand-off ----------
+       Looks for a native Webflow Form Block on the page whose form name is "Quiz Signup"
+       (or whatever data-webflow-form says). Fills it, submits it through Webflow's own
+       form handler, and waits for Webflow's success or error message. */
+    function findWebflowForm() {
+      var name = host.getAttribute('data-webflow-form') || 'Quiz Signup';
+      var forms = document.querySelectorAll('form[data-name]');
+      for (var i = 0; i < forms.length; i++) if (forms[i].getAttribute('data-name') === name) return forms[i];
+      return null;
+    }
+
+    function sendViaWebflow(form, p) {
+      var norm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); };
+      var inputs = Array.prototype.filter.call(form.querySelectorAll('input, textarea, select'), function (i) { return i.type !== 'submit'; });
+      function find(keys) { for (var i = 0; i < inputs.length; i++) if (keys.indexOf(norm(inputs[i].name)) > -1) return inputs[i]; return null; }
+      function put(keys, value, name) {
+        var el = find(keys);
+        if (!el) { el = document.createElement('input'); el.type = 'hidden'; el.name = name; form.appendChild(el); inputs.push(el); }
+        el.value = value;
+      }
+      put(['firstname', 'first'], p.firstName, 'First-Name');
+      put(['lastname', 'last', 'surname'], p.lastName, 'Last-Name');
+      var full = find(['name', 'fullname']);
+      if (full) full.value = p.firstName + ' ' + p.lastName;
+      put(['email', 'emailaddress'], p.email, 'Email');
+      put(['quizbucket'], p.bucket, 'quiz_bucket');
+      put(['quizresult'], p.result, 'quiz_result');
+      put(['quizscore'], String(p.score), 'quiz_score');
+      put(['quizdream'], p.dream, 'quiz_dream');
+      put(['quizcoltier'], p.colTier, 'quiz_col_tier');
+      put(['quizanswers'], p.answers, 'quiz_answers');
+      put(['quiztimestamp'], p.timestamp, 'quiz_timestamp');
+
+      var wrap = form.closest('.w-form') || form.parentNode;
+      var ok = wrap.querySelector('.w-form-done'), fail = wrap.querySelector('.w-form-fail');
+      function shown(el) { return el && (el.style.display === 'block' || getComputedStyle(el).display !== 'none'); }
+      var okBefore = shown(ok);
+
+      return new Promise(function (resolve, reject) {
+        var t0 = Date.now();
+        (function poll() {
+          if (ok && !okBefore && shown(ok)) return resolve();
+          if (fail && shown(fail)) return reject(new Error('Webflow form error'));
+          if (Date.now() - t0 > 15000) return reject(new Error('Webflow form timeout'));
+          setTimeout(poll, 150);
+        })();
+        if (form.requestSubmit) form.requestSubmit();
+        else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       });
     }
 
