@@ -100,6 +100,10 @@
     var debug = /quizdebug/.test(location.search);
 
     var shadow = host.attachShadow({ mode: 'open' });
+    // Cloudflare's check renders into this light-DOM box, shown inside the email step through a <slot>
+    var tsBox = document.createElement('div');
+    tsBox.setAttribute('slot', 'turnstile');
+    host.appendChild(tsBox);
     shadow.innerHTML = '<style>' + CSS + '</style>' +
       '<div class="uq-wrap"><section class="uq" aria-label="How broke are you? quiz">' +
       '<div class="uq-head"><span class="uq-count"></span><div class="uq-bar" aria-hidden="true"><span></span></div></div>' +
@@ -300,6 +304,7 @@
             field('uq-first', 'First name', 'text', 'given-name', 'Sam', true) +
             field('uq-last', 'Last name', 'text', 'family-name', 'Rivera', true) +
             field('uq-email', 'Email address', 'email', 'email', 'you@email.com', false) +
+            '<div class="uq-ts"><slot name="turnstile"></slot></div>' +
             '<button type="submit" class="uq-submit uq-a">' + esc(COPY.gateButton) + '</button>' +
             '<p class="uq-form-err" role="alert"></p>' +
           '</form>' +
@@ -307,8 +312,62 @@
         root.style.height = '';
         morph(root, lockH, M.unlockHeight);
         keepInView();
+        startTurnstile();
         return enter(0);
       }).then(function () { busy = false; focusHeading(); });
+    }
+
+    /* ---------- Cloudflare Turnstile ----------
+       Webflow's server refuses form submissions without a Turnstile token (422), and Webflow only
+       runs the check on forms that scroll into view. So the quiz runs the check itself, in the email
+       step, with the site's own key, and hands the token to the hidden Webflow form. */
+    var ts = { needed: false, id: null, token: null, err: null, waiters: [] };
+    function tsFlush() {
+      var w = ts.waiters; ts.waiters = [];
+      w.forEach(function (x) { ts.token ? x.res(ts.token) : x.rej(new Error('Spam check failed (' + ts.err + ')')); });
+    }
+    function loadTurnstile() {
+      return new Promise(function (res, rej) {
+        var t0 = Date.now();
+        (function poll() {
+          if (window.turnstile && window.turnstile.render) return res();
+          if (Date.now() - t0 > 3000 && !document.querySelector('script[data-uq-turnstile]')) {
+            var s = document.createElement('script');
+            s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            s.async = true; s.setAttribute('data-uq-turnstile', '');
+            document.head.appendChild(s);
+          }
+          if (Date.now() - t0 > 15000) return rej(new Error('Turnstile did not load'));
+          setTimeout(poll, 200);
+        })();
+      });
+    }
+    function startTurnstile() {
+      var wf = findWebflowForm();
+      var key = wf && wf.getAttribute('data-turnstile-sitekey');
+      if (!key || ts.needed) return;
+      ts.needed = true;
+      loadTurnstile().then(function () {
+        ts.id = window.turnstile.render(tsBox, {
+          sitekey: key, appearance: 'interaction-only',
+          callback: function (tok) { ts.token = tok; ts.err = null; tsFlush(); },
+          'expired-callback': function () { ts.token = null; },
+          'error-callback': function (code) { ts.err = code || 'error'; tsFlush(); }
+        });
+      }, function (e) { ts.err = e.message; tsFlush(); });
+    }
+    function getToken(ms) {
+      return new Promise(function (res, rej) {
+        if (!ts.needed) return res(null);
+        if (ts.token) return res(ts.token);
+        if (ts.err) return rej(new Error('Spam check failed (' + ts.err + ')'));
+        ts.waiters.push({ res: res, rej: rej });
+        setTimeout(function () { rej(new Error('Spam check timed out')); }, ms);
+      });
+    }
+    function resetTurnstile() {
+      ts.token = null; ts.err = null;
+      try { if (ts.id != null) window.turnstile.reset(ts.id); } catch (e) {}
     }
 
     function field(id, label, type, ac, ph, half) {
@@ -341,7 +400,7 @@
       var wf = findWebflowForm();
       var testMode = host.hasAttribute('data-test-mode');
       if (debug) console.log('[unbroke-quiz] signup form:', wf || 'NOT FOUND', '| payload:', payload);
-      var send = wf ? sendViaWebflow(wf, payload)
+      var send = wf ? getToken(20000).then(function (token) { payload.turnstile = token; return sendViaWebflow(wf, payload); })
         : endpoint
         ? fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
@@ -354,6 +413,7 @@
         goToResult();
       }, function (e) {
         console.error('[unbroke-quiz] Signup was not saved:', e && e.message);
+        resetTurnstile();
         busy = false;
         btn.disabled = false;
         btn.textContent = COPY.gateButton;
@@ -393,6 +453,7 @@
       put(['quizcoltier'], p.colTier, 'quiz_col_tier');
       put(['quizanswers'], p.answers, 'quiz_answers');
       put(['quiztimestamp'], p.timestamp, 'quiz_timestamp');
+      if (p.turnstile) put(['cfturnstileresponse'], p.turnstile, 'cf-turnstile-response');
 
       // Webflow's spam check (Cloudflare Turnstile) only runs on forms that scroll into view, so it
       // never clears on a hidden form and Webflow keeps the submit button locked.
@@ -409,7 +470,10 @@
       var wrap = form.closest('.w-form') || form.parentNode;
       var ok = wrap.querySelector('.w-form-done'), fail = wrap.querySelector('.w-form-fail');
       function shown(el) { return el && (el.style.display === 'block' || getComputedStyle(el).display !== 'none'); }
-      var okBefore = shown(ok);
+      if (fail) fail.style.display = 'none';
+      if (ok) ok.style.display = 'none';
+      form.style.display = '';
+      var okBefore = false;
 
       return new Promise(function (resolve, reject) {
         var t0 = Date.now();

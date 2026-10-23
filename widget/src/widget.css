@@ -153,6 +153,8 @@
 /* ---------- Widget-owned form ---------- */
 .uq-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:clamp(14px,2.6cqi,26px) 0 0}
 .uq-form .uq-submit:disabled{background:var(--uq-off-bg);color:var(--uq-off-ink);cursor:progress}
+.uq-ts{grid-column:1/-1;display:flex;justify-content:flex-start}
+.uq-ts:empty{display:none}
 .uq-form-err{grid-column:1/-1;margin:4px 0 0;font-family:var(--uq-font-mono);font-size:13px;color:var(--uq-err);min-height:0}
 .uq-form-err:empty{display:none}
 
