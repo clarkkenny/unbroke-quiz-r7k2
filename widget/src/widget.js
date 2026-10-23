@@ -2,8 +2,9 @@
  *  Lives entirely in Webflow:
  *   1. Code Embed where the card sits: <div data-unbroke-quiz></div> plus the content JSON (all copy).
  *   2. Page settings > Custom code > Before </body>: this script.
- *   3. A hidden Form Block named "Quiz Signup" on the same page. The quiz fills and submits it.
- *  Fonts come from the site (Inter Tight in Site settings > Fonts). jsPDF loads from cdnjs on first PDF download.
+ *   3. A hidden Form Block named "Quiz Signup" on the same page. The quiz fills and submits it,
+ *      then sends the person to their Webflow result page (paths in the content JSON "pages").
+ *  Fonts come from the site (Inter Tight in Site settings > Fonts). Result pages use result-page.js.
  *  Edit widget/src, then run: python3 widget/build.py
  */
 (function () {
@@ -15,7 +16,7 @@
      ===================================================================== */
 
   // Copy, questions and results come from the content JSON in the Code Embed (see boot()).
-  var REPORT, QUESTIONS, COPY;
+  var REPORT, QUESTIONS, COPY, PAGES;
   function fill(s, vars) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; }); }
 
   // Spec §3 points, already weighted. Q4 is not scored.
@@ -80,13 +81,7 @@
 
   var ICON = {
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-    chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
-    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
-    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
-    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>',
-    x: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.8 8 10.2h-6.3l-4.9-6.4L5.3 21H2.2l7.3-8.3L1.8 3h6.4l4.4 5.9L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg>',
-    in: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4v11H3v-11zm7 0h3.8v1.6h.1c.5-1 1.8-2 3.8-2 4 0 4.8 2.6 4.8 6.1v5.3h-4v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-4v-11z"/></svg>',
-    fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.8v3h2.6V21h3.1z"/></svg>'
+    chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>'
   };
 
   function esc(s) {
@@ -108,14 +103,13 @@
     shadow.innerHTML = '<style>' + CSS + '</style>' +
       '<div class="uq-wrap"><section class="uq" aria-label="How broke are you? quiz">' +
       '<div class="uq-head"><span class="uq-count"></span><div class="uq-bar" aria-hidden="true"><span></span></div></div>' +
-      '<div class="uq-stage"></div><div class="uq-toast" role="status" aria-live="polite"></div></section></div>';
+      '<div class="uq-stage"></div></section></div>';
 
     var root = shadow.querySelector('.uq');
     var head = shadow.querySelector('.uq-head');
     var stage = shadow.querySelector('.uq-stage');
     var countEl = shadow.querySelector('.uq-count');
     var barEl = shadow.querySelector('.uq-bar > span');
-    var toastEl = shadow.querySelector('.uq-toast');
 
     var reduced = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
     function canAnimate() { return !reduced.matches && typeof Element.prototype.animate === 'function'; }
@@ -219,13 +213,6 @@
     }
 
     function syncNext() { stage.querySelector('.uq-next').setAttribute('aria-disabled', !valid(QUESTIONS[step])); }
-
-    function toast(msg) {
-      toastEl.textContent = msg;
-      toastEl.classList.add('on');
-      clearTimeout(toast.t);
-      toast.t = setTimeout(function () { toastEl.classList.remove('on'); }, 1800);
-    }
 
     /* ---------- dot flood ---------- */
     function hexRgb(h) {
@@ -359,7 +346,7 @@
         : Promise.resolve(debug && console.log('[unbroke-quiz] test mode, not sent:', payload));
       send.then(function () {
         host.dispatchEvent(new CustomEvent('unbroke-quiz:signup', { bubbles: true, composed: true, detail: { bucket: result.bucket, score: result.final, tier: COL_TIER_NAMES[result.tier], adjustment: result.adjustment } }));
-        showResult();
+        goToResult();
       }, function () {
         busy = false;
         btn.disabled = false;
@@ -419,82 +406,27 @@
       });
     }
 
-    /* ---------- results view ---------- */
-    function showResult() {
+    /* ---------- hand-off to the Webflow result page ----------
+       The result page script reads this to guard the page, personalise it and build the PDF. */
+    function goToResult() {
       var r = REPORT[result.bucket];
-      var h0 = root.offsetHeight;
-      leave(1).then(function () {
-        mode = 'result';
-        var share = encodeURIComponent(shareUrl), text = encodeURIComponent(fill(COPY.shareText, { name: r.name }));
-        stage.innerHTML =
-          '<span class="uq-kicker uq-a">Your result</span>' +
-          '<p class="uq-level uq-a"><span class="uq-chip">' + esc(r.level) + '</span><span>' + esc(r.desc) + '</span></p>' +
-          '<h3 class="uq-result-title uq-a" tabindex="-1">' + esc(person.firstName) + ", you're " + esc(r.name) + '.</h3>' +
-          '<p class="uq-reading uq-a">' + esc(r.reading) + '</p>' +
-          '<p class="uq-label uq-a">Preview: move 1 of ' + r.moves.length + '</p>' +
-          '<div class="uq-move uq-a">' + esc(r.moves[0]) + '</div>' +
-          '<div class="uq-report uq-a"><h4>' + esc(COPY.reportHeading) + '</h4><ul>' +
-            COPY.reportItems.map(function (i) { return '<li>' + esc(fill(i, { n: r.moves.length })) + '</li>'; }).join('') + '</ul>' +
-            '<div><button type="button" class="uq-pdf">' + ICON.download + '<span>' + esc(COPY.pdfButton) + '</span></button></div>' +
-            '<p class="uq-pdf-msg" role="status"></p></div>' +
-          '<div class="uq-share uq-a"><p class="uq-label">' + esc(COPY.shareLabel) + '</p><div class="uq-share-row">' +
-            (navigator.share ? '<button type="button" class="uq-sbtn" data-share="native">' + ICON.share + 'Share</button>' : '') +
-            '<button type="button" class="uq-sbtn" data-share="copy">' + ICON.link + 'Copy link</button>' +
-            '<a class="uq-sbtn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=' + text + '&url=' + share + '">' + ICON.x + 'Post</a>' +
-            '<a class="uq-sbtn" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url=' + share + '">' + ICON.in + 'LinkedIn</a>' +
-            '<a class="uq-sbtn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + share + '">' + ICON.fb + 'Facebook</a>' +
-          '</div></div>' +
-          '<button type="button" class="uq-retake uq-a">' + esc(COPY.retake) + '</button>';
-        morph(root, h0, M.unlockHeight);
-        keepInView();
-        return enter(0);
-      }).then(function () { busy = false; focusHeading(); });
-    }
-
-    function shareNative() {
-      var r = REPORT[result.bucket];
-      navigator.share({ title: 'How broke are you?', text: fill(COPY.shareText, { name: r.name }), url: shareUrl }).catch(function () {});
-    }
-
-    function copyLink() {
-      var text = shareUrl;
-      var ok = function () { toast('Link copied'); };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(ok, fallback);
-      } else fallback();
-      function fallback() {
-        var t = document.createElement('textarea');
-        t.value = text; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
-        document.body.appendChild(t); t.select();
-        try { document.execCommand('copy'); ok(); } catch (e) { toast(text); }
-        t.remove();
-      }
-    }
-
-    function retake() {
-      busy = true;
-      var h0 = root.offsetHeight;
-      leave(-1).then(function () {
-        mode = 'quiz'; step = 0; answers = {}; result = null; person = null;
-        root.classList.remove('is-unlock');
-        [countEl, head.querySelector('.uq-bar')].forEach(function (el) { el.getAnimations().forEach(function (a) { a.cancel(); }); });
-        renderQuestion();
-        morph(root, h0);
-        keepInView();
-        return enter(0);
-      }).then(function () { busy = false; focusHeading(); });
+      var data = {
+        bucket: result.bucket, firstName: person.firstName, lastName: person.lastName,
+        final: result.final, tier: result.tier, adjustment: result.adjustment,
+        report: r, disclaimer: COPY.disclaimer, shareText: fill(COPY.shareText, { name: r.name }), shareUrl: shareUrl
+      };
+      try {
+        sessionStorage.setItem('uq_unlocked', result.bucket);
+        sessionStorage.setItem('uq_name', person.firstName);
+        sessionStorage.setItem('uq_report', JSON.stringify(data));
+      } catch (e) {}
+      location.href = PAGES[result.bucket];
     }
 
     /* ---------- events ---------- */
     root.addEventListener('click', function (e) {
       if (busy) return;
       var t;
-      if (mode === 'result') {
-        if (e.target.closest('.uq-pdf')) return downloadPdf(e.target.closest('.uq-pdf'));
-        if ((t = e.target.closest('[data-share]'))) return t.getAttribute('data-share') === 'native' ? shareNative() : copyLink();
-        if (e.target.closest('.uq-retake')) return retake();
-        return;
-      }
       if (mode !== 'quiz') return;
       var q = QUESTIONS[step];
       if ((t = e.target.closest('.uq-opt'))) {
@@ -527,114 +459,6 @@
       if (!busy && mode === 'gate') submitGate(e.target);
     });
 
-    /* ---------- PDF ---------- */
-    var pdfLib = null;
-    function loadScript(src) {
-      return new Promise(function (res, rej) {
-        var s = document.createElement('script');
-        s.src = src; s.async = true; s.onload = res; s.onerror = function () { rej(new Error('load ' + src)); };
-        document.head.appendChild(s);
-      });
-    }
-    var JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    function getPdfLib() {
-      if (pdfLib) return pdfLib;
-      pdfLib = window.jspdf ? Promise.resolve() : loadScript(JSPDF_URL);
-      pdfLib.catch(function () { pdfLib = null; });
-      return pdfLib;
-    }
-
-    function downloadPdf(btn) {
-      var msg = stage.querySelector('.uq-pdf-msg');
-      btn.setAttribute('aria-busy', 'true');
-      msg.textContent = 'Building your report…';
-      getPdfLib().then(function () {
-        buildPdf();
-        msg.textContent = '';
-      }).catch(function (e) {
-        if (debug) console.error(e);
-        msg.textContent = "The report didn't download. Try again in a moment.";
-      }).then(function () { btn.removeAttribute('aria-busy'); });
-    }
-
-    function buildPdf() {
-      var r = REPORT[result.bucket];
-      var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
-      var FACE = { IT500: ['helvetica', 'normal'], IT700: ['helvetica', 'bold'], IT800: ['helvetica', 'bold'], IT500i: ['helvetica', 'italic'] };
-      var PW = 612, PH = 792, ML = 54, MR = 54, CW = PW - ML - MR, y = 0;
-      var GREEN = [148, 252, 174], INK = [0, 0, 0], DEEP = [10, 58, 38], MINT = [237, 253, 240];
-      function font(n, size, color) { doc.setFont(FACE[n][0], FACE[n][1]); doc.setFontSize(size); doc.setTextColor.apply(doc, color || INK); }
-      function lines(text, n, size, width) { font(n, size); return doc.splitTextToSize(text, width || CW); }
-      function ensure(h) { if (y + h > PH - 70) { doc.addPage(); y = 64; } }
-      function para(text, n, size, lh, color, width, x) {
-        var ls = lines(text, n, size, width);
-        font(n, size, color);
-        ls.forEach(function (l) { ensure(size * lh); doc.text(l, x || ML, y + size); y += size * lh; });
-      }
-
-      // Header band
-      doc.setFillColor.apply(doc, GREEN); doc.rect(0, 0, PW, 150, 'F');
-      doc.setDrawColor.apply(doc, INK); doc.setLineWidth(2); doc.line(0, 150, PW, 150);
-      font('IT800', 22); doc.text('UNBROKE', ML, 60, { charSpace: -0.6 });
-      font('IT700', 10, DEEP); doc.text('HOW BROKE ARE YOU?  ·  YOUR FULL REPORT', ML, 82, { charSpace: 0.6 });
-      font('IT500', 11, DEEP);
-      var when = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      doc.text('Prepared for ' + person.firstName + ' ' + person.lastName + '  ·  ' + when, ML, 124);
-      y = 190;
-
-      // Level chip + descriptor
-      font('IT700', 9); var chipW = doc.getTextWidth(r.level.toUpperCase()) + 18;
-      doc.setFillColor.apply(doc, INK); doc.roundedRect(ML, y - 2, chipW, 20, 4, 4, 'F');
-      font('IT700', 9, [255, 255, 255]); doc.text(r.level.toUpperCase(), ML + 9, y + 11.5, { charSpace: 0.6 });
-      font('IT500', 11, DEEP); doc.text(r.desc, ML + chipW + 10, y + 12);
-      y += 36;
-
-      // Title + reading
-      para(person.firstName + ", you're " + r.name + '.', 'IT800', 30, 1.08, INK);
-      y += 14;
-      para(r.reading, 'IT500', 12, 1.5, INK);
-      y += 22;
-
-      // Moves
-      ensure(40);
-      font('IT800', 16); doc.text('What changes it', ML, y + 16); y += 34;
-      r.moves.forEach(function (m, i) {
-        var ls = lines(m, 'IT500', 11.5, CW - 58), h = ls.length * 11.5 * 1.45 + 26;
-        ensure(h + 10);
-        doc.setFillColor.apply(doc, MINT); doc.setDrawColor.apply(doc, INK); doc.setLineWidth(1.5);
-        doc.roundedRect(ML, y, CW, h, 10, 10, 'FD');
-        doc.setFillColor.apply(doc, DEEP); doc.circle(ML + 22, y + 22, 10, 'F');
-        font('IT800', 11, [255, 255, 255]); doc.text(String(i + 1), ML + 22, y + 26, { align: 'center' });
-        font('IT500', 11.5, INK);
-        ls.forEach(function (l, j) { doc.text(l, ML + 44, y + 13 + 11.5 + j * 11.5 * 1.45); });
-        y += h + 10;
-      });
-      y += 10;
-
-      // Note
-      para(r.note, 'IT500i', 12, 1.5, DEEP);
-      y += 18;
-
-      // How we scored it
-      ensure(60);
-      doc.setDrawColor.apply(doc, DEEP); doc.setLineWidth(0.75); doc.line(ML, y, ML + CW, y); y += 18;
-      font('IT700', 9, DEEP); doc.text('HOW WE SCORED IT', ML, y + 9, { charSpace: 0.6 }); y += 20;
-      var tierWord = ['low', 'mid', 'high', 'very high'][result.tier];
-      para('Score ' + result.final + ' on a scale of −2 to 18. Your salary and zip put you in a ' + tierWord +
-        ' cost-of-living area, which moved your score by ' + (result.adjustment > 0 ? '+' : '') + result.adjustment + '.', 'IT500', 10.5, 1.5, DEEP);
-
-      // Footer on every page
-      var pages = doc.getNumberOfPages();
-      for (var p = 1; p <= pages; p++) {
-        doc.setPage(p);
-        font('IT500', 8.5, [63, 71, 67]);
-        doc.text(COPY.disclaimer, ML, PH - 36);
-        doc.text(shareUrl.replace(/^https?:\/\//, ''), ML, PH - 24);
-        doc.text(p + ' / ' + pages, PW - MR, PH - 24, { align: 'right' });
-      }
-      doc.save('unbroke-report-' + r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.pdf');
-    }
-
     /* ---------- start ---------- */
     renderQuestion();
     enter(0);
@@ -664,7 +488,7 @@
     var block = document.querySelector('script[data-unbroke-quiz-content]');
     try {
       var content = JSON.parse(block.textContent);
-      COPY = content.copy; QUESTIONS = content.questions; REPORT = content.results;
+      COPY = content.copy; QUESTIONS = content.questions; REPORT = content.results; PAGES = content.pages;
     } catch (e) {
       console.error('[unbroke-quiz] Could not read the quiz content. Check the JSON in the Code Embed (quotes and commas).', e);
       return;

@@ -156,48 +156,6 @@
 .uq-form-err{grid-column:1/-1;margin:4px 0 0;font-family:var(--uq-font-mono);font-size:13px;color:var(--uq-err);min-height:0}
 .uq-form-err:empty{display:none}
 
-/* ---------- Results view ---------- */
-.uq-level{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 clamp(16px,2.6cqi,22px);
-  font-family:var(--uq-font-mono);font-size:14px;line-height:1.3;color:var(--uq-btn)}
-.uq-chip{display:inline-block;padding:4px 9px;border-radius:5px;background:var(--uq-ink);color:#fff;
-  font:700 11px/1.25 var(--uq-font);letter-spacing:.07em;text-transform:uppercase}
-.uq-result-title{font-family:var(--uq-font);font-weight:800;font-size:clamp(32px,5.6cqi,58px);line-height:1;letter-spacing:-.04em;
-  margin:0 0 clamp(16px,2.6cqi,22px);outline:none;text-wrap:balance}
-.uq-reading{font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,2cqi,20px);line-height:1.45;letter-spacing:-.01em;
-  max-width:56ch;margin:0 0 clamp(24px,4cqi,34px)}
-.uq-label{font:700 11px/1 var(--uq-font);letter-spacing:.08em;text-transform:uppercase;color:var(--uq-btn);margin:0 0 10px}
-.uq-move{padding:16px 18px;border:2px solid var(--uq-ink);border-radius:14px;background:#fff;max-width:62ch;margin:0 0 clamp(20px,3cqi,28px);
-  font-family:var(--uq-font);font-weight:500;font-size:clamp(16px,1.8cqi,18px);line-height:1.45}
-.uq-report{display:grid;gap:16px;padding:clamp(18px,3cqi,28px);border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-btn);color:#fff;
-  margin:0 0 clamp(20px,3cqi,28px)}
-.uq-report h4{margin:0;font-family:var(--uq-font);font-weight:800;font-size:clamp(20px,2.6cqi,26px);line-height:1.15;letter-spacing:-.02em}
-.uq-report ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
-.uq-report li{position:relative;padding-left:24px;font-family:var(--uq-font);font-weight:600;font-size:16px;line-height:1.4}
-.uq-report li::before{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:3px;background:var(--uq-unlock-bg,#94fcae)}
-.uq-pdf{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:clamp(56px,7cqi,68px);
-  padding:0 clamp(18px,3cqi,26px);border-radius:12px;background:var(--uq-unlock-bg,#94fcae);color:var(--uq-ink);cursor:pointer;
-  font:800 clamp(16px,2cqi,19px)/1 var(--uq-font);text-transform:uppercase;letter-spacing:.01em;transition:transform .15s ease,filter .2s ease}
-.uq-pdf svg{width:1.1em;height:1.1em}
-.uq-pdf:focus-visible{outline:3px solid #fff;outline-offset:3px}
-@media (hover:hover){.uq-pdf:hover{filter:brightness(1.06)}}
-.uq-pdf:active{transform:scale(.98)}
-.uq-pdf[aria-busy="true"]{cursor:progress;opacity:.75}
-.uq-pdf-msg{margin:0;font-family:var(--uq-font-mono);font-size:13px;color:#d9f9e2}
-.uq-pdf-msg:empty{display:none}
-.uq-share{display:grid;gap:10px;margin:0 0 clamp(20px,3cqi,28px)}
-.uq-share-row{display:flex;flex-wrap:wrap;gap:8px}
-.uq-sbtn{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:2px solid var(--uq-ink);
-  border-radius:10px;background:#fff;color:var(--uq-ink);cursor:pointer;font:700 14px/1 var(--uq-font);letter-spacing:.01em;text-decoration:none;
-  transition:background-color .2s ease,transform .15s ease}
-.uq-sbtn svg{width:16px;height:16px;flex:none}
-.uq-sbtn:focus-visible{outline:3px solid var(--uq-btn);outline-offset:3px}
-@media (hover:hover){.uq-sbtn:hover{background:var(--uq-opt)}}
-.uq-sbtn:active{transform:scale(.97)}
-.uq-retake{all:unset;cursor:pointer;font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);text-decoration:underline;text-underline-offset:3px}
-.uq-retake:focus-visible{outline:2px solid var(--uq-btn);outline-offset:4px}
-.uq-toast{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 14px;border-radius:8px;background:var(--uq-ink);color:#fff;
-  font:600 14px/1.2 var(--uq-font);pointer-events:none;opacity:0;transition:opacity .2s ease}
-.uq-toast.on{opacity:1}
 @container (max-width:340px){
   .uq-next{font-size:15px;letter-spacing:.02em;padding:0 14px;gap:6px}
   .uq-next svg{width:16px;height:16px}
