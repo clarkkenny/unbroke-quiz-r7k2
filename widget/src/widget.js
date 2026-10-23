@@ -339,15 +339,21 @@
       btn.disabled = true;
       btn.textContent = COPY.gateWait;
       var wf = findWebflowForm();
+      var testMode = host.hasAttribute('data-test-mode');
+      if (debug) console.log('[unbroke-quiz] signup form:', wf || 'NOT FOUND', '| payload:', payload);
       var send = wf ? sendViaWebflow(wf, payload)
         : endpoint
         ? fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
-        : Promise.resolve(debug && console.log('[unbroke-quiz] test mode, not sent:', payload));
+        : testMode
+        ? Promise.resolve()
+        : Promise.reject(new Error('No Webflow form named "' + (host.getAttribute('data-webflow-form') || 'Quiz Signup') +
+            '" on this page. Check the Form Block\'s form name in its settings.'));
       send.then(function () {
         host.dispatchEvent(new CustomEvent('unbroke-quiz:signup', { bubbles: true, composed: true, detail: { bucket: result.bucket, score: result.final, tier: COL_TIER_NAMES[result.tier], adjustment: result.adjustment } }));
         goToResult();
-      }, function () {
+      }, function (e) {
+        console.error('[unbroke-quiz] Signup was not saved:', e && e.message);
         busy = false;
         btn.disabled = false;
         btn.textContent = COPY.gateButton;
@@ -397,8 +403,8 @@
         var t0 = Date.now();
         (function poll() {
           if (ok && !okBefore && shown(ok)) return resolve();
-          if (fail && shown(fail)) return reject(new Error('Webflow form error'));
-          if (Date.now() - t0 > 15000) return reject(new Error('Webflow form timeout'));
+          if (fail && shown(fail)) return reject(new Error('Webflow rejected the submission (its error message showed). Check for extra required fields or reCAPTCHA on the form.'));
+          if (Date.now() - t0 > 15000) return reject(new Error('Webflow never confirmed the submission. A required field on the hidden form may be empty, or the page needs republishing.'));
           setTimeout(poll, 150);
         })();
         if (form.requestSubmit) form.requestSubmit();
