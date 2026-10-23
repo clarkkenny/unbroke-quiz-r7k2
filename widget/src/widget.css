@@ -86,10 +86,10 @@
 .uq-next,.uq-back{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;
   height:clamp(60px,8cqi,84px);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;
   font-family:var(--uq-font);text-transform:uppercase}
-.uq-next{flex:1;background:var(--uq-btn);color:#fff;font-weight:800;font-size:clamp(18px,2.6cqi,26px);letter-spacing:.01em;
+.uq-next{flex:1;min-width:0;padding:0 24px;border:2px solid var(--uq-btn);white-space:nowrap;background:var(--uq-btn);color:#fff;font-weight:800;font-size:clamp(18px,2.6cqi,26px);letter-spacing:.01em;
   transition:background-color .25s ease,color .25s ease,transform .15s ease}
 .uq-next svg,.uq-back svg{width:1em;height:1em;flex:none;transition:transform .3s var(--uq-ease)}
-.uq-next[aria-disabled="true"]{background:var(--uq-off-bg);color:var(--uq-off-ink);cursor:not-allowed}
+.uq-next[aria-disabled="true"]{background:var(--uq-off-bg);border-color:var(--uq-off-bg);color:var(--uq-off-ink);cursor:not-allowed}
 .uq-back{flex:none;padding:0 clamp(18px,3cqi,28px);background:#fff;color:var(--uq-ink);border:2px solid var(--uq-ink);
   font-weight:700;font-size:clamp(15px,1.8cqi,18px);letter-spacing:.02em;
   transition:background-color .2s ease,transform .15s ease}
@@ -137,9 +137,13 @@
 @container (max-width:520px){
   .uq{border-radius:22px}
   .uq-opt{gap:12px;border-radius:14px}
-  .uq-back{width:60px;padding:0}
+  .uq-actions{gap:10px}
+  .uq-next,.uq-back{height:56px;border-radius:12px}
+  .uq-next{padding:0 18px;gap:8px;font-size:16px;letter-spacing:.03em}
+  .uq-next svg{width:18px;height:18px}
+  .uq-back{width:56px;padding:0}
   .uq-back-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .uq-back svg{width:22px;height:22px}
+  .uq-back svg{width:20px;height:20px}
   .uq-form .uq-field.uq-half{grid-column:1/-1}
 }
 @media (prefers-reduced-motion:reduce){
@@ -194,3 +198,8 @@
 .uq-toast{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 14px;border-radius:8px;background:var(--uq-ink);color:#fff;
   font:600 14px/1.2 var(--uq-font);pointer-events:none;opacity:0;transition:opacity .2s ease}
 .uq-toast.on{opacity:1}
+@container (max-width:340px){
+  .uq-next{font-size:15px;letter-spacing:.02em;padding:0 14px;gap:6px}
+  .uq-next svg{width:16px;height:16px}
+  .uq-back{width:52px}
+}
