@@ -397,7 +397,11 @@
       // Webflow's spam check (Cloudflare Turnstile) only runs on forms that scroll into view, so it
       // never clears on a hidden form and Webflow keeps the submit button locked.
       var lockedBtn = form.querySelector('[type=submit]');
-      if (form.hasAttribute('data-turnstile-sitekey') && !form.hasAttribute('data-wf-no-turnstile') && lockedBtn && lockedBtn.disabled) {
+      if (form.hasAttribute('data-turnstile-sitekey') && !form.hasAttribute('data-wf-no-turnstile')) {
+        form.setAttribute('data-wf-no-turnstile', '');
+        try { window.jQuery.removeData(form, '.w-form'); window.Webflow.require('forms').ready(); } catch (e) {}
+      }
+      if (!form.hasAttribute('data-wf-no-turnstile') && lockedBtn && lockedBtn.disabled) {
         return Promise.reject(new Error('Webflow spam protection (Turnstile) is blocking the hidden form. ' +
           'Add the custom attribute data-wf-no-turnstile to the Quiz Signup form element and republish.'));
       }
@@ -495,6 +499,20 @@
       }
     };
   }
+
+  /* Webflow guards every form with Cloudflare Turnstile, but only starts the check once a form
+     scrolls into view, so a hidden form never gets a token and never submits. Webflow's own form
+     code skips Turnstile for any <form> carrying data-wf-no-turnstile. This runs before Webflow
+     sets up its forms (inline script, before DOMContentLoaded), so the opt-out takes effect. */
+  function optOutTurnstile() {
+    var host = document.querySelector('[data-unbroke-quiz]');
+    var name = (host && host.getAttribute('data-webflow-form')) || 'Quiz Signup';
+    var forms = document.querySelectorAll('form[data-name]');
+    for (var i = 0; i < forms.length; i++) {
+      if (forms[i].getAttribute('data-name') === name) forms[i].setAttribute('data-wf-no-turnstile', '');
+    }
+  }
+  optOutTurnstile();
 
   function boot() {
     var hosts = document.querySelectorAll('[data-unbroke-quiz]');

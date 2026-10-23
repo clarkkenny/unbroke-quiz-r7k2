@@ -9,8 +9,8 @@ The quiz runs entirely inside Webflow. This repo holds the source and a demo pag
 3. Page settings > Custom code > **Before </body> tag**: paste `webflow/2-before-body.html`.
 4. Add a **Form Block** to the same page. Form name: `Quiz Signup`. Fields: First Name, Last Name, Email.
    No other required fields, no redirect, reCAPTCHA off. Set it to Display: none.
-   On the Form element inside the block, add the custom attribute `data-wf-no-turnstile` (no value).
-   Webflow's Turnstile spam check only runs on forms that scroll into view, so it blocks a hidden form.
+   The quiz script turns off Webflow's Turnstile check for this one form automatically
+   (it only runs on forms that scroll into view, so it would block a hidden form).
    Each signup arrives in Webflow form submissions with `quiz_bucket`, `quiz_result`, `quiz_score`,
    `quiz_dream`, `quiz_col_tier`, `quiz_answers`, `quiz_timestamp`.
 5. Build four result pages (paths are set in the `pages` part of the Code Embed JSON):
