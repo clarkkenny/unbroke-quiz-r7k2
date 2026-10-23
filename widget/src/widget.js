@@ -394,6 +394,14 @@
       put(['quizanswers'], p.answers, 'quiz_answers');
       put(['quiztimestamp'], p.timestamp, 'quiz_timestamp');
 
+      // Webflow's spam check (Cloudflare Turnstile) only runs on forms that scroll into view, so it
+      // never clears on a hidden form and Webflow keeps the submit button locked.
+      var lockedBtn = form.querySelector('[type=submit]');
+      if (form.hasAttribute('data-turnstile-sitekey') && !form.hasAttribute('data-wf-no-turnstile') && lockedBtn && lockedBtn.disabled) {
+        return Promise.reject(new Error('Webflow spam protection (Turnstile) is blocking the hidden form. ' +
+          'Add the custom attribute data-wf-no-turnstile to the Quiz Signup form element and republish.'));
+      }
+
       var wrap = form.closest('.w-form') || form.parentNode;
       var ok = wrap.querySelector('.w-form-done'), fail = wrap.querySelector('.w-form-fail');
       function shown(el) { return el && (el.style.display === 'block' || getComputedStyle(el).display !== 'none'); }
