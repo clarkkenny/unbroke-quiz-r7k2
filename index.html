@@ -25,25 +25,244 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 .embed p{font-weight:500;font-size:17px;line-height:1.5;max-width:60ch;margin:0 0 20px}
 .code{position:relative;border:2px solid #000;border-radius:14px;background:#0a3a26;color:#e9fdef;overflow-x:auto}
 .code pre{margin:0;padding:20px 18px;font:13.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+.steps{margin:0;padding-left:22px;display:grid;gap:10px;max-width:62ch;font-size:17px;line-height:1.5}
+.steps code,.embed p code{font:14px ui-monospace,Menlo,monospace;background:#edfdf0;padding:1px 5px;border-radius:4px}
 .copy{position:absolute;top:10px;right:10px;border:0;border-radius:8px;background:#94fcae;color:#000;font:700 13px/1 "Inter Tight",system-ui,sans-serif;padding:9px 12px;cursor:pointer}
 .copy:focus-visible{outline:3px solid #fff;outline-offset:2px}
 </style></head><body>
 <nav class="nav"><a class="logo" href="./">Unbroke</a><div class="links"><a href="#">Home</a><a href="#">Reserve a copy</a><a class="on" href="./">Take quiz</a><a href="#">Chapters</a><a href="#">Contact us</a></div></nav>
 <header class="hero"><h1>How broke are you?</h1><p>A quiz that knows more about you than your banking app does. Take the next 2 minutes to discover your status.</p></header>
 <main class="quiz">
-<div class="note" role="note"><strong>Test build.</strong> The quiz is a self-contained widget hosted separately from Webflow. You add it with one Code Embed element, plus a hidden Webflow form that receives the signups. It brings its own questions, email pop-up, results page, PDF download, sharing and fonts. Nothing else on the site needs to change.</div>
+<div class="note" role="note"><strong>Test build.</strong> The quiz runs entirely inside Webflow: one Code Embed holds the quiz and all its copy, one script goes in the page settings, and a hidden Webflow form receives the signups. It brings its own questions, email pop-up, results page, PDF download and sharing. Nothing else on the site needs to change. GitHub only hosts this demo.</div>
 <div class="demo-frame">
-<!-- The two lines below are the whole Webflow embed -->
+<!-- UNBROKE QUIZ: Code Embed. All quiz copy lives in the JSON below. Edit the text between quotes; keep the quotes, commas and brackets. -->
 <div data-unbroke-quiz></div>
-<script src="widget/unbroke-quiz.js" defer></script>
+<script type="application/json" data-unbroke-quiz-content>
+{
+  "copy": {
+    "gateKicker": "Results ready",
+    "gateHeadline": "We know how broke you are. You should probably sit down for this.",
+    "gateSub": [
+      "Your results are weirdly specific. Drop your name and email to see where you landed and download your full report.",
+      "You'll get your reading, the one uncomfortable truth, and the exact thing to do about it."
+    ],
+    "gateFine": "No spam. No \"one weird trick.\" Occasionally a genuinely useful email about being less broke.",
+    "gateButton": "Read my results",
+    "gateWait": "Unlocking…",
+    "gateError": "That didn't go through. Check your connection and try again.",
+    "reportHeading": "Your full report",
+    "reportItems": [
+      "All {n} moves that change your number",
+      "How your salary and zip shaped this result",
+      "A copy to keep, as a PDF"
+    ],
+    "pdfButton": "Download full report",
+    "shareLabel": "Share your result",
+    "shareText": "I got \"{name}\" on the How Broke Are You? quiz. Where do you land?",
+    "retake": "Retake the quiz",
+    "disclaimer": "For educational purposes only. Not individual investment, legal or tax advice."
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "It's the 14th of the month. Your card gets declined buying a $6 coffee. Your first thought:",
+      "options": [
+        {
+          "key": "a",
+          "text": "\"Weird, the machine must be broken.\" (It is not the machine.)"
+        },
+        {
+          "key": "b",
+          "text": "\"Right, I moved money into savings. Let me shuffle it back.\" Mild logistics, no panic."
+        },
+        {
+          "key": "c",
+          "text": "\"Huh.\" You tap a different card. You genuinely didn't notice."
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Let's talk numbers. What's the household salary situation?",
+      "options": [
+        {
+          "key": "a",
+          "text": "Under $50K, and the group chat thinks I make more"
+        },
+        {
+          "key": "b",
+          "text": "$50K–$100K, comfortable-ish, one bad month from un-comfortable"
+        },
+        {
+          "key": "c",
+          "text": "$100K–$200K and still somehow broke, which is its own genre of pain"
+        },
+        {
+          "key": "d",
+          "text": "$200K+ (we'll allow it, show-off)"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "type": "zip",
+      "text": "Drop your zip code. We're not stalking you, we're doing math.",
+      "placeholder": "Five digit ZIP code",
+      "note": "Because $70K in Des Moines and $70K in Brooklyn are two completely different personalities, and one of them owns a couch."
+    },
+    {
+      "id": "q4",
+      "text": "The dream. When you picture \"made it,\" what's the actual image?",
+      "options": [
+        {
+          "key": "a",
+          "text": "Not flinching at the grocery total. That's it. That's the dream."
+        },
+        {
+          "key": "b",
+          "text": "A house, a dog, and the ability to book the flight without a spreadsheet summit"
+        },
+        {
+          "key": "c",
+          "text": "Quitting the job that's fine but slowly killing me"
+        },
+        {
+          "key": "d",
+          "text": "A beach, a laptop, and geographic smugness"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Someone hands you an unexpected $2,000. Be honest. It:",
+      "options": [
+        {
+          "key": "a",
+          "text": "Is already spent. It was spent before it arrived. RIP."
+        },
+        {
+          "key": "b",
+          "text": "Kills a credit card balance that's been following me like a stray cat"
+        },
+        {
+          "key": "c",
+          "text": "Goes straight to savings, and I feel a small, weird thrill about it"
+        },
+        {
+          "key": "d",
+          "text": "Gets invested, and I have Opinions about where"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Your relationship with risk, described as a dating profile:",
+      "options": [
+        {
+          "key": "a",
+          "text": "Avoidant. One surprise expense and I ghost my own budget."
+        },
+        {
+          "key": "b",
+          "text": "\"Looking for something stable.\" Index funds. A high-yield savings account. Nothing that texts back weird."
+        },
+        {
+          "key": "c",
+          "text": "Down to gamble a little if the upside is real. I've read one Reddit thread and feel prepared."
+        },
+        {
+          "key": "d",
+          "text": "I have crypto opinions at dinner parties. People have stopped inviting me."
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Sunday night. Bed. Lights off. When money crosses your mind, you feel:",
+      "options": [
+        {
+          "key": "a",
+          "text": "A low hum of dread I've learned to sleep through"
+        },
+        {
+          "key": "b",
+          "text": "Fine, mostly. Until I remember one specific thing. Then less fine."
+        },
+        {
+          "key": "c",
+          "text": "Genuinely calm. If something broke tomorrow, I could handle it."
+        }
+      ]
+    }
+  ],
+  "results": {
+    "bucket_1": {
+      "level": "Crisis",
+      "name": "One Flat Tire From a Full Spiral",
+      "desc": "less than a month of cushion",
+      "reading": "You're running on timing. It works right up until a $400 surprise lands on a Tuesday, and then it doesn't. Here's the truth most finance advice skips: this isn't a discipline problem. Building your first cushion is the slowest, least rewarding stretch of the whole thing. It feels like nothing is happening because mathematically, almost nothing is. That's the design. Not your failure.",
+      "moves": [
+        "Stop canceling subscriptions to fix this. Trimming $12 lattes won't save a situation like yours, and pretending it will is how you stay stuck. Small stuff is the lowest-stakes corner of your finances.",
+        "Run a Stability Sprint. A bounded 60 to 90 day push, with an end date, where every spare dollar goes to one target. Not a forever-diet. It ends.",
+        "Get to one month of runway. Then three. That's the whole assignment. Boring, and the most useful thing on this list.",
+        "If cutting won't close the gap alone, add income: sell what you don't use, pick up a short gig, renegotiate one bill eating your cash flow."
+      ],
+      "note": "Your salary and zip nudged this. A modest income in an expensive city can land you here even when you're doing everything right, which is more or less the entire point of the book."
+    },
+    "bucket_2": {
+      "level": "Fragile",
+      "name": "Cautiously Caffeinated",
+      "desc": "roughly one to three months of runway",
+      "reading": "You can survive one bad thing. You can't yet survive two in the same month, and disasters travel in packs. You've got a cushion and a plan that mostly holds, which puts you ahead of most people and squarely in the limbo where the dream still feels a few zeros off. You already did the ugly part. What matters now isn't clipping coupons harder.",
+      "moves": [
+        "Move your attention from pennies to the decisions that actually change the number: your career, where you live, what you pay for housing. A $15K raise beats a decade of grocery optimizing, and it isn't close.",
+        "Run a Career Audit once a year. What's your real market value today, not what you accepted three years ago? More than 15% under market is a gap worth a conversation.",
+        "If housing is the thing crushing you, there are five things to try before you relocate: downsize in-market, renegotiate mid-lease, add a roommate, audit the lease for costs your landlord owes, check assistance programs. Relocating is the last resort, not the first.",
+        "Before any decision that's hard to undo, ask whether it's a one-way door or a two-way door. Two-way doors get your gut. One-way doors get real analysis."
+      ],
+      "note": "Your zip did quiet work here. The same life costs wildly different amounts city to city, and that gap is a lever, not a sentence."
+    },
+    "bucket_3": {
+      "level": "Stable",
+      "name": "Solid, Still Building",
+      "desc": "three-plus months of runway, but the pile is still small",
+      "reading": "A surprise expense doesn't scare you anymore. That's real, and most people never get here. But don't mistake a solid cushion for being done. You're in the hardest stretch of wealth-building: the climb toward your first $100K, where progress feels slow because it genuinely is slow. Below that line the math barely moves. The difference now is that your safety net finally lets you stop playing defense and start pulling the levers that actually compound.",
+      "moves": [
+        "Your first $100K is the hardest money you'll ever save and the most important. After it, compounding starts doing a bigger share of the work. You're not there yet, so the job is to feed the machine.",
+        "Automate retirement. Get the full employer match (it's free money), pick a target-date fund, and stop overthinking it. Below $100K, the act of contributing beats any clever strategy.",
+        "Raise your contribution 1% every six months. You'll barely feel each step, and you'll be at 10% in two years without a painful overhaul.",
+        "Point your attention at the big levers, not the grocery budget: career, location, housing. And when the next raise comes, don't let lifestyle creep quietly eat it."
+      ],
+      "note": "Your salary and zip held this steady. You've got breathing room. The task is turning breathing room into momentum."
+    },
+    "bucket_4": {
+      "level": "Durable",
+      "name": "Quietly Unbothered",
+      "desc": "deep runway, and the invested assets to match",
+      "reading": "An unexpected expense doesn't wreck your week. It mildly annoys you, and you should know how rare that is. You're past the hardest, most important money you'll ever save, and compounding is quietly doing the work now. Your risk isn't being broke anymore. It's being quietly, expensively stuck while your net worth looks great on paper.",
+      "moves": [
+        "Watch for paper wealth. A strong balance sheet trapped in home equity and retirement accounts you can't touch isn't freedom. If you can't spend it without a penalty or selling the roof over your head, it's a number on a screen.",
+        "Check you're not house-poor in disguise: the beautiful home that quietly ate your 401(k) contribution and your Friday nights.",
+        "Ask the question the whole book builds to. Money is one score. Are your Work, Time, and Life freedoms keeping up, or is the money growing while the life shrinks?",
+        "Past a certain point, a few hours a year with a fee-only planner pays for itself. This is the one stage where good advice is worth the fee."
+      ],
+      "note": "The number says you're winning. The only thing left to confirm is whether you're winning the game you meant to play."
+    }
+  }
+}
+</script>
 </div>
 </main>
 <section class="list"><h2>Feeling broke is temporary. What you learn in this book shouldn't be.</h2></section>
 <section class="embed" id="embed">
 <h2>Add it to Webflow</h2>
-<p>Paste these two lines into one Code Embed element where the quiz should sit. Then add a Form Block to the same page, name it <strong>Quiz Signup</strong>, give it First Name, Last Name and Email fields, and hide it. The widget fills that form in and submits it, so every signup lands in Webflow form submissions.</p>
-<div class="code"><button type="button" class="copy" id="copy">Copy</button><pre id="snippet">&lt;div data-unbroke-quiz&gt;&lt;/div&gt;
-&lt;script src=&quot;https://clarkkenny.github.io/unbroke-quiz-r7k2/widget/unbroke-quiz.js&quot; defer&gt;&lt;/script&gt;</pre></div>
+<p>Four steps, all inside Webflow. The two code files are in the <code>webflow</code> folder of the project.</p>
+<ol class="steps">
+<li><strong>Font.</strong> Add Inter Tight in Site settings &gt; Fonts.</li>
+<li><strong>Code Embed.</strong> Paste <code>1-code-embed.html</code> where the quiz card should sit. All the quiz copy is inside it.</li>
+<li><strong>Page script.</strong> Paste <code>2-before-body.html</code> into the page's Custom code, Before &lt;/body&gt; tag.</li>
+<li><strong>Signup form.</strong> Add a Form Block named <strong>Quiz Signup</strong> with First Name, Last Name and Email fields, and hide it.</li>
+</ol>
 <h2 style="margin-top:clamp(36px,6vw,56px)">What Webflow receives</h2>
 <p>This page has a stand-in for the hidden Webflow form. Finish the quiz above and the fields it would send to Webflow show up here.</p>
 <div class="code"><pre id="wf-log">Waiting for a signup…</pre></div>
@@ -66,13 +285,17 @@ body{font-family:"Inter Tight",system-ui,sans-serif;color:#000;background:#fff;-
 </section>
 <p class="foot">Demo build for internal review. Page shell is approximate.</p>
 <div class="demo-badge">Demo</div>
+<!-- UNBROKE QUIZ: engine. Paste into Page settings > Custom code > Before </body> tag. Edit widget/src in the repo and rebuild instead of editing this. -->
 <script>
-document.getElementById('copy').addEventListener('click', function () {
-  var b = this, t = document.getElementById('snippet').textContent;
-  var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1400); };
-  var sel = function () { var r = document.createRange(); r.selectNodeContents(document.getElementById('snippet')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Press Cmd+C'; };
-  navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t).then(done, sel) : sel();
-});
+/*! Unbroke "How broke are you?" quiz, Webflow build
+ *  Lives entirely in Webflow:
+ *   1. Code Embed where the card sits: <div data-unbroke-quiz></div> plus the content JSON (all copy).
+ *   2. Page settings > Custom code > Before </body>: this script.
+ *   3. A hidden Form Block named "Quiz Signup" on the same page. The quiz fills and submits it.
+ *  Fonts come from the site (Inter Tight in Site settings > Fonts). jsPDF loads from cdnjs on first PDF download.
+ *  Edit widget/src, then run: python3 widget/build.py
+ */
+!function(){"use strict";var e,t,r;function a(e,t){return String(e).replace(/\{(\w+)\}/g,function(e,r){return null!=t[r]?t[r]:e})}var n={a:0,b:3,c:6},o={a:0,b:2,c:4},i={a:0,b:2,c:4,d:4},u={a:0,b:1,c:2,d:2},s={a:0,b:1,c:2,d:3},l=["low","mid","high","very_high"],c=[[100,102,3],[112,112,3],[940,941,3],[943,951,3],[103,111,2],[113,119,2],[206,209,2],[220,223,2],[19,24,2],[68,69,2],[330,331,2],[606,606,2],[800,803,2],[10,27,1],[28,29,1],[30,38,1],[39,49,1],[50,59,1],[60,69,1],[70,79,2],[80,89,1],[120,149,1],[150,196,1],[197,199,1],[200,205,2],[206,219,1],[220,246,1],[247,268,0],[270,289,1],[290,299,1],[300,319,0],[320,349,1],[350,369,0],[370,385,0],[386,397,0],[398,399,0],[400,427,0],[430,459,0],[460,479,0],[480,499,0],[500,528,0],[530,549,1],[550,567,1],[570,577,0],[580,588,0],[590,599,1],[600,629,1],[630,658,0],[660,679,0],[680,693,0],[700,714,0],[716,729,0],[730,749,0],[750,799,1],[885,885,1],[800,816,1],[820,831,1],[832,838,1],[840,847,1],[850,865,1],[870,884,1],[889,898,1],[900,961,2],[967,968,3],[970,979,2],[980,994,2],[995,999,2]];var p={inDuration:560,outDuration:200,stagger:55,distance:32,rise:14,blur:6,heightDuration:460,selectDuration:340,ease:"cubic-bezier(.16,1,.3,1)",easeOut:"cubic-bezier(.55,0,1,.45)",unlockColor:"#94fcae",floodOrigin:"button",floodSpread:700,dotGrow:420,floodJitter:160,unlockHeight:760},d='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',f='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',q='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',m='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',h='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>',g='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.8 8 10.2h-6.3l-4.9-6.4L5.3 21H2.2l7.3-8.3L1.8 3h6.4l4.4 5.9L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg>',x='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4v11H3v-11zm7 0h3.8v1.6h.1c.5-1 1.8-2 3.8-2 4 0 4.8 2.6 4.8 6.1v5.3h-4v-4.7c0-1.1 0-2.6-1.6-2.6s-1.8 1.2-1.8 2.5v4.8h-4v-11z"/></svg>',v='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.8v3h2.6V21h3.1z"/></svg>';function b(e){return String(e).replace(/[&<>"']/g,function(e){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[e]})}function y(y){if(!y.__unbrokeQuiz){y.__unbrokeQuiz=!0;var k=y.getAttribute("data-endpoint")||"",w=y.getAttribute("data-share-url")||location.origin+location.pathname,z=/quizdebug/.test(location.search),S=y.attachShadow({mode:"open"});S.innerHTML='<style>:host{all:initial;display:block;width:100%}[hidden]{display:none!important}.uq-wrap{container-type:inline-size;width:100%;text-align:left;line-height:1.4}.uq{--uq-ink:#000;--uq-btn:#0a3a26;--uq-btn-hover:#11553a;--uq-opt:#edfdf0;--uq-opt-on:#a9f5bf;--uq-accent:#1b7a46;--uq-dot:#c4f2d1;--uq-off-bg:#d7dcd9;--uq-off-ink:#3f4743;--uq-err:#9b1c13;--uq-font:"Inter Tight",system-ui,-apple-system,sans-serif;--uq-font-letter:Georgia,"Times New Roman",serif;--uq-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;--uq-ease:cubic-bezier(.16,1,.3,1);--uq-sel-dur:320ms;position:relative;max-width:1040px;margin:0 auto;padding:clamp(24px,6cqi,64px);border:2px solid var(--uq-ink);border-radius:28px;background:#fff;color:var(--uq-ink);overflow:hidden;box-sizing:border-box;font-family:var(--uq-font);-webkit-font-smoothing:antialiased;scroll-margin-top:24px;}.uq *,.uq *::before,.uq *::after{box-sizing:border-box}.uq::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,var(--uq-dot) 1.3px,transparent 1.8px);background-size:11px 11px;-webkit-mask-image:radial-gradient(ellipse 75% 70% at 50% 50%,#000 35%,transparent 100%);mask-image:radial-gradient(ellipse 75% 70% at 50% 50%,#000 35%,transparent 100%);}.uq>*{position:relative}.uq-head{margin-bottom:clamp(28px,6cqi,60px)}.uq-count{font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);display:block}.uq-bar{margin-top:12px;height:3px;border-radius:3px;background:rgba(10,58,38,.12);overflow:hidden}.uq-bar>span{display:block;height:100%;background:var(--uq-btn);transform-origin:left;transform:scaleX(0);transition:transform 700ms var(--uq-ease)}.uq-stage{margin:-6px;padding:6px}.uq-q{font-family:var(--uq-font);font-weight:700;font-size:clamp(23px,3cqi,34px);line-height:1.15;letter-spacing:-.025em;margin:0 0 clamp(20px,3cqi,28px);outline:none;text-wrap:balance}.uq-opts{display:grid;gap:clamp(10px,1.6cqi,16px)}.uq-opt{all:unset;box-sizing:border-box;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:clamp(14px,2cqi,20px) clamp(18px,2.6cqi,26px);border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-opt);cursor:pointer;font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,1.8cqi,18px);line-height:1.3;letter-spacing:-.01em;-webkit-tap-highlight-color:transparent;transition:color .2s ease,transform .25s var(--uq-ease),box-shadow .25s var(--uq-ease)}.uq-opt::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--uq-opt-on);transform:scaleX(0);transform-origin:left center;transition:transform var(--uq-sel-dur) var(--uq-ease)}.uq-opt[aria-pressed="true"]::before{transform:scaleX(1)}.uq-opt:focus-visible{outline:3px solid var(--uq-accent);outline-offset:3px}.uq-opt:active{transform:scale(.985)}@media (hover:hover){.uq-opt:hover{color:var(--uq-accent);transform:translateY(-2px);box-shadow:0 4px 0 0 var(--uq-ink)}.uq-opt[aria-pressed="true"]:hover{color:var(--uq-ink)}.uq-opt:active{transform:translateY(0) scale(.985);box-shadow:0 0 0 0 var(--uq-ink)}}.uq-letter{font-family:var(--uq-font-letter);font-weight:400;font-size:clamp(24px,3cqi,28px);line-height:1;flex:none;display:inline-block;min-width:.9em}.uq-zip{display:block;width:100%;height:clamp(96px,17cqi,200px);padding:0 clamp(20px,3cqi,32px);border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-opt);color:var(--uq-ink);font-family:var(--uq-font);font-weight:600;font-size:clamp(22px,3cqi,32px);letter-spacing:.04em;transition:box-shadow .25s var(--uq-ease)}.uq-zip::placeholder{color:#5f6b65;letter-spacing:0;font-weight:500}.uq-zip:focus{outline:none;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--uq-accent)}.uq-note{font-family:var(--uq-font);font-weight:700;font-size:clamp(18px,2.5cqi,26px);line-height:1.22;letter-spacing:-.02em;margin:clamp(18px,3cqi,28px) 0 0;text-wrap:pretty}.uq-actions{display:flex;gap:12px;margin-top:clamp(28px,4cqi,40px)}.uq-next,.uq-back{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:clamp(60px,8cqi,84px);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:var(--uq-font);text-transform:uppercase}.uq-next{flex:1;min-width:0;padding:0 24px;border:2px solid var(--uq-btn);white-space:nowrap;background:var(--uq-btn);color:#fff;font-weight:800;font-size:clamp(18px,2.6cqi,26px);letter-spacing:.01em;transition:background-color .25s ease,color .25s ease,transform .15s ease}.uq-next svg,.uq-back svg{width:1em;height:1em;flex:none;transition:transform .3s var(--uq-ease)}.uq-next[aria-disabled="true"]{background:var(--uq-off-bg);border-color:var(--uq-off-bg);color:var(--uq-off-ink);cursor:not-allowed}.uq-back{flex:none;padding:0 clamp(18px,3cqi,28px);background:#fff;color:var(--uq-ink);border:2px solid var(--uq-ink);font-weight:700;font-size:clamp(15px,1.8cqi,18px);letter-spacing:.02em;transition:background-color .2s ease,transform .15s ease}.uq-next:focus-visible,.uq-back:focus-visible{outline:3px solid var(--uq-accent);outline-offset:3px}@media (hover:hover){.uq-next:not([aria-disabled="true"]):hover{background:var(--uq-btn-hover)}.uq-next:not([aria-disabled="true"]):hover svg{transform:translateX(4px)}.uq-back:hover{background:var(--uq-opt)}.uq-back:hover svg{transform:translateX(-3px)}}.uq-next:not([aria-disabled="true"]):active,.uq-back:active{transform:scale(.98)}.uq-hint{font-family:var(--uq-font-mono);font-size:13px;color:var(--uq-err);text-align:center;margin:12px 0 0;min-height:1.3em}.uq-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.uq>.uq-flood{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.uq.is-unlock{background:var(--uq-unlock-bg,#94fcae)}.uq.is-unlock::before{display:none}.uq.is-unlock .uq-head{display:none}.uq-kicker{display:block;font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);margin-bottom:clamp(20px,4cqi,36px)}.uq-gate-sub{font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,2cqi,19px);line-height:1.4;letter-spacing:-.01em;margin:0 0 12px;max-width:52ch}.uq-form{margin-top:clamp(14px,2.6cqi,26px)}.uq-gate-fine{font-family:var(--uq-font-mono);font-size:13px;line-height:1.5;color:var(--uq-btn);margin:16px 0 0;max-width:60ch}.uq-form form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0}.uq-form .uq-field{position:relative;grid-column:1/-1;margin:0}.uq-form .uq-field.uq-half{grid-column:auto}.uq-form .uq-field label{position:absolute;top:12px;left:14px;z-index:1;margin:0;padding:3px 7px;border-radius:4px;background:var(--uq-ink);color:#fff;font:700 10px/1.25 var(--uq-font);letter-spacing:.07em;text-transform:uppercase;pointer-events:none}.uq-form .uq-field input{display:block;width:100%;height:clamp(72px,9cqi,84px);margin:0;padding:30px 16px 10px;border:2px solid var(--uq-ink);border-radius:16px;background:#fff;color:var(--uq-ink);box-shadow:none;font:600 clamp(17px,2cqi,20px)/1.2 var(--uq-font);letter-spacing:-.01em;-webkit-appearance:none;appearance:none;transition:box-shadow .25s var(--uq-ease),transform .25s var(--uq-ease)}.uq-form .uq-field input::placeholder{color:#5f6b65;font-weight:500}.uq-form .uq-field input:focus{outline:none;box-shadow:0 0 0 2px #fff,0 0 0 5px var(--uq-btn)}.uq-form .uq-submit{grid-column:1/-1;display:block;width:100%;height:clamp(60px,8cqi,84px);margin:8px 0 0;padding:0 16px;border:0;border-radius:12px;background:var(--uq-btn);color:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;font:800 clamp(18px,2.6cqi,26px)/1 var(--uq-font);text-transform:uppercase;letter-spacing:.01em;transition:background-color .25s ease,transform .15s ease}.uq-form .uq-submit:focus-visible{outline:3px solid var(--uq-btn);outline-offset:3px}@media (hover:hover){.uq-form .uq-submit:hover{background:var(--uq-btn-hover)}}.uq-form .uq-submit:active{transform:scale(.98)}@container (max-width:520px){.uq{border-radius:22px}.uq-opt{gap:12px;border-radius:14px}.uq-actions{gap:10px}.uq-next,.uq-back{height:56px;border-radius:12px}.uq-next{padding:0 18px;gap:8px;font-size:16px;letter-spacing:.03em}.uq-next svg{width:18px;height:18px}.uq-back{width:56px;padding:0}.uq-back-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.uq-back svg{width:20px;height:20px}.uq-form .uq-field.uq-half{grid-column:1/-1}}@media (prefers-reduced-motion:reduce){.uq *,.uq *::before{transition-duration:.01ms!important}}.uq-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:clamp(14px,2.6cqi,26px) 0 0}.uq-form .uq-submit:disabled{background:var(--uq-off-bg);color:var(--uq-off-ink);cursor:progress}.uq-form-err{grid-column:1/-1;margin:4px 0 0;font-family:var(--uq-font-mono);font-size:13px;color:var(--uq-err);min-height:0}.uq-form-err:empty{display:none}.uq-level{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 clamp(16px,2.6cqi,22px);font-family:var(--uq-font-mono);font-size:14px;line-height:1.3;color:var(--uq-btn)}.uq-chip{display:inline-block;padding:4px 9px;border-radius:5px;background:var(--uq-ink);color:#fff;font:700 11px/1.25 var(--uq-font);letter-spacing:.07em;text-transform:uppercase}.uq-result-title{font-family:var(--uq-font);font-weight:800;font-size:clamp(32px,5.6cqi,58px);line-height:1;letter-spacing:-.04em;margin:0 0 clamp(16px,2.6cqi,22px);outline:none;text-wrap:balance}.uq-reading{font-family:var(--uq-font);font-weight:600;font-size:clamp(16px,2cqi,20px);line-height:1.45;letter-spacing:-.01em;max-width:56ch;margin:0 0 clamp(24px,4cqi,34px)}.uq-label{font:700 11px/1 var(--uq-font);letter-spacing:.08em;text-transform:uppercase;color:var(--uq-btn);margin:0 0 10px}.uq-move{padding:16px 18px;border:2px solid var(--uq-ink);border-radius:14px;background:#fff;max-width:62ch;margin:0 0 clamp(20px,3cqi,28px);font-family:var(--uq-font);font-weight:500;font-size:clamp(16px,1.8cqi,18px);line-height:1.45}.uq-report{display:grid;gap:16px;padding:clamp(18px,3cqi,28px);border:2px solid var(--uq-ink);border-radius:16px;background:var(--uq-btn);color:#fff;margin:0 0 clamp(20px,3cqi,28px)}.uq-report h4{margin:0;font-family:var(--uq-font);font-weight:800;font-size:clamp(20px,2.6cqi,26px);line-height:1.15;letter-spacing:-.02em}.uq-report ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}.uq-report li{position:relative;padding-left:24px;font-family:var(--uq-font);font-weight:600;font-size:16px;line-height:1.4}.uq-report li::before{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:3px;background:var(--uq-unlock-bg,#94fcae)}.uq-pdf{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:clamp(56px,7cqi,68px);padding:0 clamp(18px,3cqi,26px);border-radius:12px;background:var(--uq-unlock-bg,#94fcae);color:var(--uq-ink);cursor:pointer;font:800 clamp(16px,2cqi,19px)/1 var(--uq-font);text-transform:uppercase;letter-spacing:.01em;transition:transform .15s ease,filter .2s ease}.uq-pdf svg{width:1.1em;height:1.1em}.uq-pdf:focus-visible{outline:3px solid #fff;outline-offset:3px}@media (hover:hover){.uq-pdf:hover{filter:brightness(1.06)}}.uq-pdf:active{transform:scale(.98)}.uq-pdf[aria-busy="true"]{cursor:progress;opacity:.75}.uq-pdf-msg{margin:0;font-family:var(--uq-font-mono);font-size:13px;color:#d9f9e2}.uq-pdf-msg:empty{display:none}.uq-share{display:grid;gap:10px;margin:0 0 clamp(20px,3cqi,28px)}.uq-share-row{display:flex;flex-wrap:wrap;gap:8px}.uq-sbtn{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:2px solid var(--uq-ink);border-radius:10px;background:#fff;color:var(--uq-ink);cursor:pointer;font:700 14px/1 var(--uq-font);letter-spacing:.01em;text-decoration:none;transition:background-color .2s ease,transform .15s ease}.uq-sbtn svg{width:16px;height:16px;flex:none}.uq-sbtn:focus-visible{outline:3px solid var(--uq-btn);outline-offset:3px}@media (hover:hover){.uq-sbtn:hover{background:var(--uq-opt)}}.uq-sbtn:active{transform:scale(.97)}.uq-retake{all:unset;cursor:pointer;font-family:var(--uq-font-mono);font-size:14px;color:var(--uq-btn);text-decoration:underline;text-underline-offset:3px}.uq-retake:focus-visible{outline:2px solid var(--uq-btn);outline-offset:4px}.uq-toast{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 14px;border-radius:8px;background:var(--uq-ink);color:#fff;font:600 14px/1.2 var(--uq-font);pointer-events:none;opacity:0;transition:opacity .2s ease}.uq-toast.on{opacity:1}@container (max-width:340px){.uq-next{font-size:15px;letter-spacing:.02em;padding:0 14px;gap:6px}.uq-next svg{width:16px;height:16px}.uq-back{width:52px}}</style><div class="uq-wrap"><section class="uq" aria-label="How broke are you? quiz"><div class="uq-head"><span class="uq-count"></span><div class="uq-bar" aria-hidden="true"><span></span></div></div><div class="uq-stage"></div><div class="uq-toast" role="status" aria-live="polite"></div></section></div>';var C=S.querySelector(".uq"),T=S.querySelector(".uq-head"),E=S.querySelector(".uq-stage"),L=S.querySelector(".uq-count"),M=S.querySelector(".uq-bar > span"),I=S.querySelector(".uq-toast"),j=window.matchMedia?matchMedia("(prefers-reduced-motion: reduce)"):{matches:!1},P=0,N={},A=t.length,D=!1,H="quiz",_=null,F=null;C.addEventListener("click",function(n){if(!D){var o,i,u,s,l;if("result"===H)return n.target.closest(".uq-pdf")?(u=n.target.closest(".uq-pdf"),s=E.querySelector(".uq-pdf-msg"),u.setAttribute("aria-busy","true"),s.textContent="Building your report…",void(O||((O=window.jspdf?Promise.resolve():(l=B,new Promise(function(e,t){var r=document.createElement("script");r.src=l,r.async=!0,r.onload=e,r.onerror=function(){t(new Error("load "+l))},document.head.appendChild(r)}))).catch(function(){O=null}),O)).then(function(){!function(){var t=e[_.bucket],a=new window.jspdf.jsPDF({unit:"pt",format:"letter"}),n={IT500:["helvetica","normal"],IT700:["helvetica","bold"],IT800:["helvetica","bold"],IT500i:["helvetica","italic"]},o=612,i=792,u=54,s=54,l=o-u-s,c=0,p=[148,252,174],d=[0,0,0],f=[10,58,38],q=[237,253,240];function m(e,t,r){a.setFont(n[e][0],n[e][1]),a.setFontSize(t),a.setTextColor.apply(a,r||d)}function h(e,t,r,n){return m(t,r),a.splitTextToSize(e,n||l)}function g(e){c+e>i-70&&(a.addPage(),c=64)}function x(e,t,r,n,o,i,s){var l=h(e,t,r,i);m(t,r,o),l.forEach(function(e){g(r*n),a.text(e,s||u,c+r),c+=r*n})}a.setFillColor.apply(a,p),a.rect(0,0,o,150,"F"),a.setDrawColor.apply(a,d),a.setLineWidth(2),a.line(0,150,o,150),m("IT800",22),a.text("UNBROKE",u,60,{charSpace:-.6}),m("IT700",10,f),a.text("HOW BROKE ARE YOU?  ·  YOUR FULL REPORT",u,82,{charSpace:.6}),m("IT500",11,f);var v=(new Date).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});a.text("Prepared for "+F.firstName+" "+F.lastName+"  ·  "+v,u,124),c=190,m("IT700",9);var b=a.getTextWidth(t.level.toUpperCase())+18;a.setFillColor.apply(a,d),a.roundedRect(u,c-2,b,20,4,4,"F"),m("IT700",9,[255,255,255]),a.text(t.level.toUpperCase(),u+9,c+11.5,{charSpace:.6}),m("IT500",11,f),a.text(t.desc,u+b+10,c+12),c+=36,x(F.firstName+", you're "+t.name+".","IT800",30,1.08,d),c+=14,x(t.reading,"IT500",12,1.5,d),c+=22,g(40),m("IT800",16),a.text("What changes it",u,c+16),c+=34,t.moves.forEach(function(e,t){var r=h(e,"IT500",11.5,l-58),n=11.5*r.length*1.45+26;g(n+10),a.setFillColor.apply(a,q),a.setDrawColor.apply(a,d),a.setLineWidth(1.5),a.roundedRect(u,c,l,n,10,10,"FD"),a.setFillColor.apply(a,f),a.circle(u+22,c+22,10,"F"),m("IT800",11,[255,255,255]),a.text(String(t+1),u+22,c+26,{align:"center"}),m("IT500",11.5,d),r.forEach(function(e,t){a.text(e,u+44,c+13+11.5+11.5*t*1.45)}),c+=n+10}),c+=10,x(t.note,"IT500i",12,1.5,f),c+=18,g(60),a.setDrawColor.apply(a,f),a.setLineWidth(.75),a.line(u,c,u+l,c),c+=18,m("IT700",9,f),a.text("HOW WE SCORED IT",u,c+9,{charSpace:.6}),c+=20;var y=["low","mid","high","very high"][_.tier];x("Score "+_.final+" on a scale of −2 to 18. Your salary and zip put you in a "+y+" cost-of-living area, which moved your score by "+(_.adjustment>0?"+":"")+_.adjustment+".","IT500",10.5,1.5,f);for(var k=a.getNumberOfPages(),z=1;z<=k;z++)a.setPage(z),m("IT500",8.5,[63,71,67]),a.text(r.disclaimer,u,i-36),a.text(w.replace(/^https?:\/\//,""),u,i-24),a.text(z+" / "+k,o-s,i-24,{align:"right"});a.save("unbroke-report-"+t.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".pdf")}(),s.textContent=""}).catch(function(e){z&&console.error(e),s.textContent="The report didn't download. Try again in a moment."}).then(function(){u.removeAttribute("aria-busy")})):(o=n.target.closest("[data-share]"))?"native"===o.getAttribute("data-share")?(i=e[_.bucket],void navigator.share({title:"How broke are you?",text:a(r.shareText,{name:i.name}),url:w}).catch(function(){})):function(){var e=w,t=function(){te("Link copied")};function r(){var r=document.createElement("textarea");r.value=e,r.setAttribute("readonly",""),r.style.position="fixed",r.style.opacity="0",document.body.appendChild(r),r.select();try{document.execCommand("copy"),t()}catch(t){te(e)}r.remove()}navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(e).then(t,r):r()}():n.target.closest(".uq-retake")?function(){D=!0;var e=C.offsetHeight;J(-1).then(function(){return H="quiz",P=0,N={},_=null,F=null,C.classList.remove("is-unlock"),[L,T.querySelector(".uq-bar")].forEach(function(e){e.getAnimations().forEach(function(e){e.cancel()})}),V(),Q(C,e),G(),$(0)}).then(function(){D=!1,K()})}():void 0;if("quiz"===H){var c=t[P];if(o=n.target.closest(".uq-opt"))N[c.id]=o.dataset.key,E.querySelectorAll(".uq-opt").forEach(function(e){e.setAttribute("aria-pressed",e===o)}),E.querySelector(".uq-hint").textContent="",R()&&o.querySelector(".uq-letter").animate([{transform:"scale(1) rotate(0)"},{transform:"scale(1.3) rotate(-8deg)"},{transform:"scale(1) rotate(0)"}],{duration:420,easing:p.ease}),ee();else if(n.target.closest(".uq-back"))Z(-1);else if(n.target.closest(".uq-next")){if(!W(c))return function(e){var t=E.querySelector(".uq-hint"),r=E.querySelector(".uq-next");t.textContent=e,R()&&r.animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},{transform:"translateX(5px)"},{transform:"translateX(-3px)"},{transform:"translateX(0)"}],{duration:360,easing:"ease-out"})}("zip"===c.type?"Five digits, US ZIP only.":"Pick an answer to keep going.");P===A-1?ae():Z(1)}}}}),C.addEventListener("input",function(e){"quiz"===H&&e.target.classList.contains("uq-zip")&&(e.target.value=e.target.value.replace(/\D/g,"").slice(0,5),N[t[P].id]=e.target.value,E.querySelector(".uq-hint").textContent="",ee())}),C.addEventListener("keydown",function(e){"Enter"===e.key&&e.target.classList&&e.target.classList.contains("uq-zip")&&(e.preventDefault(),E.querySelector(".uq-next").click())}),C.addEventListener("submit",function(e){e.preventDefault(),D||"gate"!==H||oe(e.target)});var O=null,B="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";V(),$(0),window.UQ={motion:p,apply:X,replay:function(){D||(D=!0,$(1).then(function(){D=!1}))},restart:function(){H="quiz",P=0,N={},_=null,F=null,D=!1,C.classList.remove("is-unlock"),C.style.height="",[L,T.querySelector(".uq-bar")].forEach(function(e){e.getAnimations().forEach(function(e){e.cancel()})}),V(),$(0)},skipToUnlock:function(){D||(t.forEach(function(e){N[e.id]="zip"===e.type?"10001":e.options[1].key}),P=A-1,V(),ae())}}}function R(){return!j.matches&&"function"==typeof Element.prototype.animate}function U(e){return Promise.all(e.map(function(e){return e.finished.catch(function(){})}))}function X(){C.style.setProperty("--uq-ease",p.ease),C.style.setProperty("--uq-sel-dur",p.selectDuration+"ms"),C.style.setProperty("--uq-unlock-bg",p.unlockColor)}function W(e){return"zip"===e.type?/^\d{5}$/.test(N[e.id]||""):!!N[e.id]}function V(){X();var e,r=t[P],a=P===A-1;e="zip"===r.type?'<input class="uq-zip uq-a" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="postal-code" maxlength="5" aria-labelledby="uq-q" aria-describedby="uq-hint" placeholder="'+b(r.placeholder)+'" value="'+b(N[r.id]||"")+'"><p class="uq-note uq-a">'+b(r.note)+"</p>":'<div class="uq-opts" role="group" aria-labelledby="uq-q">'+r.options.map(function(e){return'<button type="button" class="uq-opt uq-a" aria-pressed="'+(N[r.id]===e.key)+'" data-key="'+e.key+'"><span class="uq-letter" aria-hidden="true">'+e.key+".</span><span>"+b(e.text)+"</span></button>"}).join("")+"</div>",E.innerHTML='<h3 class="uq-q uq-a" id="uq-q" tabindex="-1">'+b(r.text)+"</h3>"+e+'<div class="uq-actions uq-a">'+(P>0?'<button type="button" class="uq-back">'+f+'<span class="uq-back-label">Back</span></button>':"")+'<button type="button" class="uq-next" aria-disabled="'+!W(r)+'" aria-describedby="uq-hint"><span>'+(a?"Get my results":"Next question")+"</span>"+d+'</button></div><p class="uq-hint" id="uq-hint" role="status"></p>',L.textContent="Question "+(P+1)+" of "+A,M.style.transform="scaleX("+(P+1)/A+")"}function Y(){return Array.prototype.slice.call(E.querySelectorAll(".uq-a"))}function $(e){if(!R())return Promise.resolve();var t=p.distance*e,r=e?0:p.rise;return U(Y().map(function(e,a){return e.animate([{opacity:0,transform:"translate3d("+t+"px,"+r+"px,0)",filter:"blur("+p.blur+"px)"},{opacity:1,transform:"none",filter:"blur(0px)"}],{duration:p.inDuration,delay:a*p.stagger,easing:p.ease,fill:"backwards"})}))}function J(e,t){if(!R())return Promise.resolve();var r=.6*-p.distance*(e||1);return U((t||[]).concat(Y()).map(function(e,t){return e.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translate3d("+r+"px,0,0)"}],{duration:p.outDuration,delay:t*Math.round(.35*p.stagger),easing:p.easeOut,fill:"forwards"})}))}function Q(e,t,r){var a=e.offsetHeight;if(r=null==r?p.heightDuration:r,R()&&r&&t!==a){var n=e.style.overflow;e.style.overflow="hidden",e.animate([{height:t+"px"},{height:a+"px"}],{duration:r,easing:p.ease}).finished.catch(function(){}).then(function(){e.style.overflow=n})}}function G(){C.getBoundingClientRect().top<0&&C.scrollIntoView({behavior:R()?"smooth":"auto",block:"start"})}function K(){var e=E.querySelector('[tabindex="-1"]');e&&e.focus({preventScroll:!0})}function Z(e){if(!D){D=!0;var t=E.offsetHeight;J(e).then(function(){return P+=e,V(),Q(E,t),G(),$(e)}).then(function(){D=!1,K()})}}function ee(){E.querySelector(".uq-next").setAttribute("aria-disabled",!W(t[P]))}function te(e){I.textContent=e,I.classList.add("on"),clearTimeout(te.t),te.t=setTimeout(function(){I.classList.remove("on")},1800)}function re(e){return 3===(e=String(e).trim().replace("#","")).length&&(e=e.replace(/./g,"$&$&")),[parseInt(e.slice(0,2),16),parseInt(e.slice(2,4),16),parseInt(e.slice(4,6),16)]}function ae(){var e,t,a,l;D=!0,e=N,t=function(e){for(var t=/^\d{5}$/.test(e||"")?parseInt(e.slice(0,3),10):-1,r=0;r<c.length;r++)if(t>=c[r][0]&&t<=c[r][1])return c[r][2];return 1}(N.q3),a=Math.max(-2,Math.min(2,s[e.q2]-t)),l=n[e.q7]+o[e.q1]+i[e.q5]+u[e.q6]+a,_={final:l,bucket:l<=3?"bucket_1":l<=9?"bucket_2":l<=14?"bucket_3":"d"===e.q5?"bucket_4":"bucket_3",tier:t,adjustment:a},z&&console.log("[unbroke-quiz] result",_,N);var d=E.querySelector(".uq-next"),f=C.offsetHeight;C.style.height=f+"px",J(1,[L,T.querySelector(".uq-bar")]).then(function(){return e=d,new Promise(function(t){if(!R())return t();var r=C.getBoundingClientRect(),a=r.width-4,n=r.height-4,o=Math.min(window.devicePixelRatio||1,2),i=document.createElement("canvas");i.className="uq-flood",i.width=Math.round(a*o),i.height=Math.round(n*o),C.insertBefore(i,C.firstChild);var u=i.getContext("2d");u.scale(o,o);var s=a/2,l=n/2;if("top"===p.floodOrigin&&(l=0),"button"===p.floodOrigin&&e){var c=e.getBoundingClientRect();s=c.left+c.width/2-r.left-2,l=c.top+c.height/2-r.top-2}for(var d=11,f=[],q=1,m=5.5;m<n+d;m+=d)for(var h=5.5;h<a+d;h+=d){var g=Math.sqrt((h-s)*(h-s)+(m-l)*(m-l));g>q&&(q=g),f.push([h,m,g,Math.random()])}for(var x=re(getComputedStyle(C).getPropertyValue("--uq-dot")||"#c4f2d1"),v=re(p.unlockColor),b=[],y=0;y<=12;y++){var k=y/12;b.push("rgb("+[0,1,2].map(function(e){return Math.round(x[e]+(v[e]-x[e])*k)}).join(",")+")")}function w(e){return e<.5?4*e*e*e:1-Math.pow(-2*e+2,3)/2}var z=performance.now();!function e(r){var o=r-z,s=!0;u.clearRect(0,0,a,n);for(var l=[],c=0;c<f.length;c++){var d=f[c],m=(o-(d[2]/q*p.floodSpread+d[3]*p.floodJitter))/p.dotGrow;if(m<1&&(s=!1),!(m<=0)){var h=w(Math.min(m,1)),g=Math.round(12*h);(l[g]||(l[g]=[])).push(d[0],d[1],8.25*h)}}for(var x=0;x<l.length;x++){var v=l[x];if(v){u.fillStyle=b[x],u.beginPath();for(var y=0;y<v.length;y+=3)u.moveTo(v[y]+v[y+2],v[y+1]),u.arc(v[y],v[y+1],v[y+2],0,6.2832);u.fill()}}if(!s)return requestAnimationFrame(e);C.classList.add("is-unlock"),t(),requestAnimationFrame(function(){i.remove()})}(z)});var e}).then(function(){return H="gate",C.classList.add("is-unlock"),E.innerHTML='<span class="uq-kicker uq-a">'+b(r.gateKicker)+'</span><h3 class="uq-q uq-a" tabindex="-1">'+b(r.gateHeadline)+"</h3>"+r.gateSub.map(function(e){return'<p class="uq-gate-sub uq-a">'+b(e)+"</p>"}).join("")+'<form class="uq-form" novalidate>'+ne("uq-first","First name","text","given-name","Sam",!0)+ne("uq-last","Last name","text","family-name","Rivera",!0)+ne("uq-email","Email address","email","email","you@email.com",!1)+'<button type="submit" class="uq-submit uq-a">'+b(r.gateButton)+'</button><p class="uq-form-err" role="alert"></p></form><p class="uq-gate-fine uq-a">'+b(r.gateFine)+"</p>",C.style.height="",Q(C,f,p.unlockHeight),G(),$(0)}).then(function(){D=!1,K()})}function ne(e,t,r,a,n,o){return'<div class="uq-field uq-a'+(o?" uq-half":"")+'"><label for="'+e+'">'+b(t)+'</label><input id="'+e+'" name="'+e+'" type="'+r+'" autocomplete="'+a+'" placeholder="'+b(n)+'" required maxlength="120"></div>'}function oe(n){var o=n.querySelector("#uq-first"),i=n.querySelector("#uq-last"),u=n.querySelector("#uq-email"),s=n.querySelector(".uq-form-err"),c=n.querySelector(".uq-submit");s.textContent="";var d=[o,i,u].filter(function(e){return!e.value.trim()})[0]||(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.value.trim())?null:u);if(d)return s.textContent=d===u&&u.value.trim()?"That email address looks off. Check it and try again.":"Fill in all three fields to see your results.",void d.focus();var f={firstName:(F={firstName:o.value.trim(),lastName:i.value.trim(),email:u.value.trim()}).firstName,lastName:F.lastName,email:F.email,bucket:_.bucket,result:e[_.bucket].level+": "+e[_.bucket].name,score:_.final,dream:"q4_"+N.q4,colTier:l[_.tier],answers:t.filter(function(e){return"zip"!==e.type}).map(function(e){return e.id+"_"+N[e.id]}).join(","),timestamp:(new Date).toISOString(),page:location.origin+location.pathname};D=!0,c.disabled=!0,c.textContent=r.gateWait;var S=function(){for(var e=y.getAttribute("data-webflow-form")||"Quiz Signup",t=document.querySelectorAll("form[data-name]"),r=0;r<t.length;r++)if(t[r].getAttribute("data-name")===e)return t[r];return null}(),T=S?function(e,t){var r=function(e){return String(e||"").toLowerCase().replace(/[^a-z0-9]/g,"")},a=Array.prototype.filter.call(e.querySelectorAll("input, textarea, select"),function(e){return"submit"!==e.type});function n(e){for(var t=0;t<a.length;t++)if(e.indexOf(r(a[t].name))>-1)return a[t];return null}function o(t,r,o){var i=n(t);i||((i=document.createElement("input")).type="hidden",i.name=o,e.appendChild(i),a.push(i)),i.value=r}o(["firstname","first"],t.firstName,"First-Name"),o(["lastname","last","surname"],t.lastName,"Last-Name");var i=n(["name","fullname"]);i&&(i.value=t.firstName+" "+t.lastName);o(["email","emailaddress"],t.email,"Email"),o(["quizbucket"],t.bucket,"quiz_bucket"),o(["quizresult"],t.result,"quiz_result"),o(["quizscore"],String(t.score),"quiz_score"),o(["quizdream"],t.dream,"quiz_dream"),o(["quizcoltier"],t.colTier,"quiz_col_tier"),o(["quizanswers"],t.answers,"quiz_answers"),o(["quiztimestamp"],t.timestamp,"quiz_timestamp");var u=e.closest(".w-form")||e.parentNode,s=u.querySelector(".w-form-done"),l=u.querySelector(".w-form-fail");function c(e){return e&&("block"===e.style.display||"none"!==getComputedStyle(e).display)}var p=c(s);return new Promise(function(t,r){var a=Date.now();!function e(){return s&&!p&&c(s)?t():l&&c(l)?r(new Error("Webflow form error")):Date.now()-a>15e3?r(new Error("Webflow form timeout")):void setTimeout(e,150)}(),e.requestSubmit?e.requestSubmit():e.dispatchEvent(new Event("submit",{bubbles:!0,cancelable:!0}))})}(S,f):k?fetch(k,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(f)}).then(function(e){if(!e.ok)throw new Error("HTTP "+e.status)}):Promise.resolve(z&&console.log("[unbroke-quiz] test mode, not sent:",f));T.then(function(){var t,n;y.dispatchEvent(new CustomEvent("unbroke-quiz:signup",{bubbles:!0,composed:!0,detail:{bucket:_.bucket,score:_.final,tier:l[_.tier],adjustment:_.adjustment}})),t=e[_.bucket],n=C.offsetHeight,J(1).then(function(){H="result";var e=encodeURIComponent(w),o=encodeURIComponent(a(r.shareText,{name:t.name}));return E.innerHTML='<span class="uq-kicker uq-a">Your result</span><p class="uq-level uq-a"><span class="uq-chip">'+b(t.level)+"</span><span>"+b(t.desc)+'</span></p><h3 class="uq-result-title uq-a" tabindex="-1">'+b(F.firstName)+", you're "+b(t.name)+'.</h3><p class="uq-reading uq-a">'+b(t.reading)+'</p><p class="uq-label uq-a">Preview: move 1 of '+t.moves.length+'</p><div class="uq-move uq-a">'+b(t.moves[0])+'</div><div class="uq-report uq-a"><h4>'+b(r.reportHeading)+"</h4><ul>"+r.reportItems.map(function(e){return"<li>"+b(a(e,{n:t.moves.length}))+"</li>"}).join("")+'</ul><div><button type="button" class="uq-pdf">'+q+"<span>"+b(r.pdfButton)+'</span></button></div><p class="uq-pdf-msg" role="status"></p></div><div class="uq-share uq-a"><p class="uq-label">'+b(r.shareLabel)+'</p><div class="uq-share-row">'+(navigator.share?'<button type="button" class="uq-sbtn" data-share="native">'+h+"Share</button>":"")+'<button type="button" class="uq-sbtn" data-share="copy">'+m+'Copy link</button><a class="uq-sbtn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text='+o+"&url="+e+'">'+g+'Post</a><a class="uq-sbtn" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url='+e+'">'+x+'LinkedIn</a><a class="uq-sbtn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+e+'">'+v+'Facebook</a></div></div><button type="button" class="uq-retake uq-a">'+b(r.retake)+"</button>",Q(C,n,p.unlockHeight),G(),$(0)}).then(function(){D=!1,K()})},function(){D=!1,c.disabled=!1,c.textContent=r.gateButton,s.textContent=r.gateError})}}function k(){var a=document.querySelectorAll("[data-unbroke-quiz]");if(a.length){var n=document.querySelector("script[data-unbroke-quiz-content]");try{var o=JSON.parse(n.textContent);r=o.copy,t=o.questions,e=o.results}catch(e){return void console.error("[unbroke-quiz] Could not read the quiz content. Check the JSON in the Code Embed (quotes and commas).",e)}Array.prototype.forEach.call(a,y)}}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",k):k()}();
 </script>
 <style>
 .mp{position:fixed;right:16px;bottom:16px;z-index:50;width:300px;max-height:calc(100vh - 32px);overflow:auto;

@@ -13,7 +13,7 @@
   --uq-off-bg:#d7dcd9;      /* disabled CTA fill */
   --uq-off-ink:#3f4743;     /* disabled CTA text, 6.8:1 on the fill */
   --uq-err:#9b1c13;
-  --uq-font:"Unbroke Inter Tight","Inter Tight",system-ui,-apple-system,sans-serif;
+  --uq-font:"Inter Tight",system-ui,-apple-system,sans-serif;
   --uq-font-letter:Georgia,"Times New Roman",serif;
   --uq-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   /* Motion (overwritten by the script config) */

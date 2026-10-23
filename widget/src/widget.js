@@ -1,69 +1,22 @@
-/*! Unbroke "How broke are you?" quiz widget
- *  Add to any page with:
- *    <div data-unbroke-quiz></div>
- *    <script src="https://clarkkenny.github.io/unbroke-quiz-r7k2/widget/unbroke-quiz.js" defer></script>
- *  Signups: put a native Webflow Form Block on the same page, named "Quiz Signup", and hide it.
- *  The widget fills and submits it, so entries land in Webflow form submissions.
- *  Optional attributes on the div:
- *    data-webflow-form="Quiz Signup"  Webflow form name to use, if you named it something else.
- *    data-endpoint="https://..."      POST URL for signups as JSON, only used when no Webflow form is found.
- *    data-share-url="https://..."     Link people share. Defaults to the page the quiz is on.
- *  With neither a Webflow form nor an endpoint, the quiz runs in test mode and stores nothing.
- *  Built from widget/src. Edit there, then run: python3 widget/build.py
+/*! Unbroke "How broke are you?" quiz, Webflow build
+ *  Lives entirely in Webflow:
+ *   1. Code Embed where the card sits: <div data-unbroke-quiz></div> plus the content JSON (all copy).
+ *   2. Page settings > Custom code > Before </body>: this script.
+ *   3. A hidden Form Block named "Quiz Signup" on the same page. The quiz fills and submits it.
+ *  Fonts come from the site (Inter Tight in Site settings > Fonts). jsPDF loads from cdnjs on first PDF download.
+ *  Edit widget/src, then run: python3 widget/build.py
  */
 (function () {
   'use strict';
 
-  var SCRIPT = document.currentScript || document.querySelector('script[src*="unbroke-quiz.js"]');
-  var BASE = SCRIPT ? SCRIPT.src.replace(/[^\/]*$/, '') : '';
 
   /* =====================================================================
      CONTENT AND SCORING (follows "How Broke Are You — Scoring & Results Spec")
      ===================================================================== */
 
-  // Spec §9 report copy per bucket: level, name, desc, reading, moves, note
-  var REPORT = /*__REPORT__*/null;
-
-  // Spec §2 questions. Answer ID = question id + '_' + key (e.g. q5_d)
-  var QUESTIONS = [
-    { id: 'q1', text: "It's the 14th of the month. Your card gets declined buying a $6 coffee. Your first thought:", options: [
-      { key: 'a', text: '"Weird, the machine must be broken." (It is not the machine.)' },
-      { key: 'b', text: '"Right, I moved money into savings. Let me shuffle it back." Mild logistics, no panic.' },
-      { key: 'c', text: '"Huh." You tap a different card. You genuinely didn\'t notice.' }
-    ]},
-    { id: 'q2', text: "Let's talk numbers. What's the household salary situation?", options: [
-      { key: 'a', text: 'Under $50K, and the group chat thinks I make more' },
-      { key: 'b', text: '$50K–$100K, comfortable-ish, one bad month from un-comfortable' },
-      { key: 'c', text: '$100K–$200K and still somehow broke, which is its own genre of pain' },
-      { key: 'd', text: "$200K+ (we'll allow it, show-off)" }
-    ]},
-    { id: 'q3', type: 'zip', text: "Drop your zip code. We're not stalking you, we're doing math.",
-      placeholder: 'Five digit ZIP code',
-      note: 'Because $70K in Des Moines and $70K in Brooklyn are two completely different personalities, and one of them owns a couch.' },
-    { id: 'q4', text: 'The dream. When you picture "made it," what\'s the actual image?', options: [
-      { key: 'a', text: "Not flinching at the grocery total. That's it. That's the dream." },
-      { key: 'b', text: 'A house, a dog, and the ability to book the flight without a spreadsheet summit' },
-      { key: 'c', text: "Quitting the job that's fine but slowly killing me" },
-      { key: 'd', text: 'A beach, a laptop, and geographic smugness' }
-    ]},
-    { id: 'q5', text: 'Someone hands you an unexpected $2,000. Be honest. It:', options: [
-      { key: 'a', text: 'Is already spent. It was spent before it arrived. RIP.' },
-      { key: 'b', text: "Kills a credit card balance that's been following me like a stray cat" },
-      { key: 'c', text: 'Goes straight to savings, and I feel a small, weird thrill about it' },
-      { key: 'd', text: 'Gets invested, and I have Opinions about where' }
-    ]},
-    { id: 'q6', text: 'Your relationship with risk, described as a dating profile:', options: [
-      { key: 'a', text: 'Avoidant. One surprise expense and I ghost my own budget.' },
-      { key: 'b', text: '"Looking for something stable." Index funds. A high-yield savings account. Nothing that texts back weird.' },
-      { key: 'c', text: "Down to gamble a little if the upside is real. I've read one Reddit thread and feel prepared." },
-      { key: 'd', text: 'I have crypto opinions at dinner parties. People have stopped inviting me.' }
-    ]},
-    { id: 'q7', text: 'Sunday night. Bed. Lights off. When money crosses your mind, you feel:', options: [
-      { key: 'a', text: "A low hum of dread I've learned to sleep through" },
-      { key: 'b', text: 'Fine, mostly. Until I remember one specific thing. Then less fine.' },
-      { key: 'c', text: 'Genuinely calm. If something broke tomorrow, I could handle it.' }
-    ]}
-  ];
+  // Copy, questions and results come from the content JSON in the Code Embed (see boot()).
+  var REPORT, QUESTIONS, COPY;
+  function fill(s, vars) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; }); }
 
   // Spec §3 points, already weighted. Q4 is not scored.
   var SCORING = {
@@ -113,29 +66,6 @@
   }
 
   /* =====================================================================
-     COPY
-     ===================================================================== */
-  var COPY = {
-    gateKicker: 'Results ready',
-    gateHeadline: 'We know how broke you are. You should probably sit down for this.',
-    gateSub: [
-      'Your results are weirdly specific. Drop your name and email to see where you landed and download your full report.',
-      "You'll get your reading, the one uncomfortable truth, and the exact thing to do about it."
-    ],
-    gateFine: 'No spam. No "one weird trick." Occasionally a genuinely useful email about being less broke.',
-    gateButton: 'Read my results',
-    gateWait: 'Unlocking…',
-    gateError: "That didn't go through. Check your connection and try again.",
-    reportHeading: 'Your full report',
-    reportItems: function (n) { return ['All ' + n + ' moves that change your number', 'How your salary and zip shaped this result', 'A copy to keep, as a PDF']; },
-    pdfButton: 'Download full report',
-    shareLabel: 'Share your result',
-    shareText: function (name) { return 'I got "' + name + '" on the How Broke Are You? quiz. Where do you land?'; },
-    retake: 'Retake the quiz',
-    disclaimer: 'For educational purposes only. Not individual investment, legal or tax advice.'
-  };
-
-  /* =====================================================================
      MOTION (tune with ?tune on the demo page)
      ===================================================================== */
   var M = {
@@ -145,23 +75,6 @@
     unlockColor: '#94fcae', floodOrigin: 'button', floodSpread: 700, dotGrow: 420, floodJitter: 160,
     unlockHeight: 760
   };
-
-  /* =====================================================================
-     FONTS: @font-face must live in the page, not the shadow root.
-     A unique family name keeps it from touching the site's own fonts.
-     ===================================================================== */
-  function injectFonts() {
-    if (document.getElementById('unbroke-quiz-fonts')) return;
-    var faces = [['500', 'normal', '500-normal'], ['600', 'normal', '600-normal'], ['700', 'normal', '700-normal'], ['800', 'normal', '800-normal'], ['500', 'italic', '500-italic']];
-    var css = faces.map(function (f) {
-      return '@font-face{font-family:"Unbroke Inter Tight";font-style:' + f[1] + ';font-weight:' + f[0] +
-        ';font-display:swap;src:url(' + BASE + 'fonts/inter-tight-latin-' + f[2] + '.woff2) format("woff2")}';
-    }).join('');
-    var s = document.createElement('style');
-    s.id = 'unbroke-quiz-fonts';
-    s.textContent = css;
-    document.head.appendChild(s);
-  }
 
   var CSS = /*__CSS__*/'';
 
@@ -512,7 +425,7 @@
       var h0 = root.offsetHeight;
       leave(1).then(function () {
         mode = 'result';
-        var share = encodeURIComponent(shareUrl), text = encodeURIComponent(COPY.shareText(r.name));
+        var share = encodeURIComponent(shareUrl), text = encodeURIComponent(fill(COPY.shareText, { name: r.name }));
         stage.innerHTML =
           '<span class="uq-kicker uq-a">Your result</span>' +
           '<p class="uq-level uq-a"><span class="uq-chip">' + esc(r.level) + '</span><span>' + esc(r.desc) + '</span></p>' +
@@ -521,7 +434,7 @@
           '<p class="uq-label uq-a">Preview: move 1 of ' + r.moves.length + '</p>' +
           '<div class="uq-move uq-a">' + esc(r.moves[0]) + '</div>' +
           '<div class="uq-report uq-a"><h4>' + esc(COPY.reportHeading) + '</h4><ul>' +
-            COPY.reportItems(r.moves.length).map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>' +
+            COPY.reportItems.map(function (i) { return '<li>' + esc(fill(i, { n: r.moves.length })) + '</li>'; }).join('') + '</ul>' +
             '<div><button type="button" class="uq-pdf">' + ICON.download + '<span>' + esc(COPY.pdfButton) + '</span></button></div>' +
             '<p class="uq-pdf-msg" role="status"></p></div>' +
           '<div class="uq-share uq-a"><p class="uq-label">' + esc(COPY.shareLabel) + '</p><div class="uq-share-row">' +
@@ -540,7 +453,7 @@
 
     function shareNative() {
       var r = REPORT[result.bucket];
-      navigator.share({ title: 'How broke are you?', text: COPY.shareText(r.name), url: shareUrl }).catch(function () {});
+      navigator.share({ title: 'How broke are you?', text: fill(COPY.shareText, { name: r.name }), url: shareUrl }).catch(function () {});
     }
 
     function copyLink() {
@@ -623,22 +536,10 @@
         document.head.appendChild(s);
       });
     }
-    function fontB64(file) {
-      return fetch(BASE + 'fonts/' + file).then(function (r) { if (!r.ok) throw new Error(file); return r.arrayBuffer(); }).then(function (buf) {
-        var bytes = new Uint8Array(buf), bin = '';
-        for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-        return btoa(bin);
-      });
-    }
+    var JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
     function getPdfLib() {
       if (pdfLib) return pdfLib;
-      var files = { IT500: 'inter-tight-500-normal.ttf', IT700: 'inter-tight-700-normal.ttf', IT800: 'inter-tight-800-normal.ttf', IT500i: 'inter-tight-500-italic.ttf' };
-      pdfLib = (window.jspdf ? Promise.resolve() : loadScript(BASE + 'vendor/jspdf.umd.min.js')).then(function () {
-        var names = Object.keys(files);
-        return Promise.all(names.map(function (n) { return fontB64(files[n]); })).then(function (data) {
-          var fonts = {}; names.forEach(function (n, i) { fonts[n] = data[i]; }); return fonts;
-        });
-      });
+      pdfLib = window.jspdf ? Promise.resolve() : loadScript(JSPDF_URL);
       pdfLib.catch(function () { pdfLib = null; });
       return pdfLib;
     }
@@ -647,8 +548,8 @@
       var msg = stage.querySelector('.uq-pdf-msg');
       btn.setAttribute('aria-busy', 'true');
       msg.textContent = 'Building your report…';
-      getPdfLib().then(function (fonts) {
-        buildPdf(fonts);
+      getPdfLib().then(function () {
+        buildPdf();
         msg.textContent = '';
       }).catch(function (e) {
         if (debug) console.error(e);
@@ -656,13 +557,13 @@
       }).then(function () { btn.removeAttribute('aria-busy'); });
     }
 
-    function buildPdf(fonts) {
+    function buildPdf() {
       var r = REPORT[result.bucket];
       var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
-      Object.keys(fonts).forEach(function (n) { doc.addFileToVFS(n + '.ttf', fonts[n]); doc.addFont(n + '.ttf', n, 'normal'); });
+      var FACE = { IT500: ['helvetica', 'normal'], IT700: ['helvetica', 'bold'], IT800: ['helvetica', 'bold'], IT500i: ['helvetica', 'italic'] };
       var PW = 612, PH = 792, ML = 54, MR = 54, CW = PW - ML - MR, y = 0;
       var GREEN = [148, 252, 174], INK = [0, 0, 0], DEEP = [10, 58, 38], MINT = [237, 253, 240];
-      function font(n, size, color) { doc.setFont(n, 'normal'); doc.setFontSize(size); doc.setTextColor.apply(doc, color || INK); }
+      function font(n, size, color) { doc.setFont(FACE[n][0], FACE[n][1]); doc.setFontSize(size); doc.setTextColor.apply(doc, color || INK); }
       function lines(text, n, size, width) { font(n, size); return doc.splitTextToSize(text, width || CW); }
       function ensure(h) { if (y + h > PH - 70) { doc.addPage(); y = 64; } }
       function para(text, n, size, lh, color, width, x) {
@@ -760,7 +661,14 @@
   function boot() {
     var hosts = document.querySelectorAll('[data-unbroke-quiz]');
     if (!hosts.length) return;
-    injectFonts();
+    var block = document.querySelector('script[data-unbroke-quiz-content]');
+    try {
+      var content = JSON.parse(block.textContent);
+      COPY = content.copy; QUESTIONS = content.questions; REPORT = content.results;
+    } catch (e) {
+      console.error('[unbroke-quiz] Could not read the quiz content. Check the JSON in the Code Embed (quotes and commas).', e);
+      return;
+    }
     Array.prototype.forEach.call(hosts, mount);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

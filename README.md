@@ -1,20 +1,20 @@
-# Unbroke quiz widget
+# Unbroke quiz (Webflow build)
 
-Self-contained "How broke are you?" quiz. Add it to any page (Webflow Code Embed) with:
+The quiz runs entirely inside Webflow. This repo holds the source and a demo page (GitHub Pages).
 
-```html
-<div data-unbroke-quiz></div>
-<script src="https://clarkkenny.github.io/unbroke-quiz-r7k2/widget/unbroke-quiz.js" defer></script>
-```
+## Add it to Webflow
+1. Site settings > Fonts: add **Inter Tight** (Google Fonts, weights 500 to 800).
+2. On the quiz page, add a **Code Embed** where the card sits and paste `webflow/1-code-embed.html`.
+   All copy (questions, unlock text, the four results) is in the JSON inside it.
+3. Page settings > Custom code > **Before </body> tag**: paste `webflow/2-before-body.html`.
+4. Add a **Form Block** to the same page. Form name: `Quiz Signup`. Fields: First Name, Last Name, Email.
+   No other required fields, no redirect, reCAPTCHA off. Set it to Display: none.
+   Each signup arrives in Webflow form submissions with `quiz_bucket`, `quiz_result`, `quiz_score`,
+   `quiz_dream`, `quiz_col_tier`, `quiz_answers`, `quiz_timestamp`.
 
-Signups: add a Form Block to the same Webflow page, name it `Quiz Signup`, give it First Name, Last Name and Email fields, and hide it.
-The widget fills and submits it, so entries land in Webflow form submissions with these extra fields:
-`quiz_bucket`, `quiz_result`, `quiz_score`, `quiz_dream`, `quiz_col_tier`, `quiz_answers`, `quiz_timestamp`.
+The PDF download loads jsPDF 2.5.1 from cdnjs the first time someone clicks it. Nothing loads from GitHub.
 
-Optional attributes on the div:
-- `data-webflow-form="..."` if the form is named something other than Quiz Signup.
-- `data-endpoint="https://..."` receives signups as a JSON POST, only when no Webflow form is found.
-- `data-share-url="https://..."` is the link people share. Defaults to the page the quiz is on.
-
-Edit `widget/src/` (copy, scoring, styles, report text), then run `python3 widget/build.py`.
-Fonts are Inter Tight (SIL Open Font License, see `widget/fonts/OFL.txt`). PDFs use jsPDF 2.5.2 (MIT).
+## Editing
+- Copy only: edit the JSON in the Code Embed directly in Webflow, or `widget/src/content.json` here.
+- Logic, scoring, styles: edit `widget/src/widget.js` / `widget.css`, then run `python3 widget/build.py`
+  (needs `terser`: `npm i -g terser`) and re-paste `webflow/2-before-body.html`.
