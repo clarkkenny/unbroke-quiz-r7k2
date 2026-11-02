@@ -22,6 +22,8 @@ css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
 css = re.sub(r'\s*\n\s*', ' ', css)
 css = re.sub(r'\s*([{};,])\s*', r'\1', css).strip()
 js = (src / 'widget.js').read_text()
+assert js.count('/*__ZIPDATA__*/') == 1
+js = js.replace('/*__ZIPDATA__*/', (src / 'zipdata.js').read_text())
 assert js.count("/*__CSS__*/''") == 1
 js = js.replace("/*__CSS__*/''", json.dumps(css, ensure_ascii=False))
 mini = subprocess.run([terser, '--compress', '--mangle', '--comments', '/^!/'], input=js,
@@ -97,7 +99,7 @@ if idx.exists():
 f'''</head><body>
 {nav}
 <main class="result">
-<div class="note" role="note"><strong>Stand-in result page.</strong> The real result pages are designed in Webflow. The buttons here are plain elements with the custom attributes the result page script looks for: <code>data-quiz-pdf</code>, <code>data-quiz-share</code> and <code>data-quiz-name</code>.</div>
+<div class="note" role="note"><strong>Stand-in result page.</strong> The real result pages are designed in Webflow. The buttons here are plain elements with the custom attributes the result page script looks for: <code>data-quiz-pdf</code>, <code>data-quiz-share</code>, <code>data-quiz-name</code> and <code>data-quiz-zip-reveal</code>.</div>
 <div class="card">
 <p class="level"><span class="chip">{html.escape(r["level"])}</span><span>{html.escape(r["desc"])}</span></p>
 <h1><span data-quiz-name>You</span>, you're {html.escape(r["name"])}.</h1>
@@ -105,6 +107,7 @@ f'''</head><body>
 <h2>What changes it</h2>
 <ol>{moves}</ol>
 <p class="n">{html.escape(r["note"])}</p>
+<div data-quiz-zip-reveal style="margin:0 0 32px"></div>
 <div class="actions"><button type="button" class="btn" data-quiz-pdf>Download full report</button></div>
 <div class="actions"><button type="button" class="sbtn" data-quiz-share="native">Share</button><button type="button" class="sbtn" data-quiz-share="copy">Copy link</button><a class="sbtn" data-quiz-share="x">Post on X</a><a class="sbtn" data-quiz-share="linkedin">LinkedIn</a><a class="sbtn" data-quiz-share="facebook">Facebook</a></div>
 <a class="retake" href="../">Retake the quiz</a>

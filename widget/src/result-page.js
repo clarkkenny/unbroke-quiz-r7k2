@@ -7,6 +7,8 @@
  *    data-quiz-share="copy"         copies the quiz link
  *    data-quiz-share="x" | "linkedin" | "facebook"   opens that site's share window
  *    data-quiz-share="native"       phone share sheet (hidden where the browser has none)
+ *    data-quiz-zip-reveal           an empty div: becomes "Your zip, by the numbers" (hidden if there's no data)
+ *  Reveal fonts follow the site; override with CSS variables on that div: --uq-display, --uq-serif, --uq-sans, --uq-mono
  */
 (function () {
   'use strict';
@@ -35,6 +37,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     each('[data-quiz-name]', function (el) { el.textContent = data.firstName; });
+    each('[data-quiz-zip-reveal]', renderReveal);
 
     var url = encodeURIComponent(data.shareUrl), text = encodeURIComponent(data.shareText);
     var LINKS = {
@@ -68,6 +71,46 @@
       });
     });
   });
+
+  /* ---------- "Your zip, by the numbers" ---------- */
+  var REVEAL_CSS =
+    ':host{all:initial;display:block;container-type:inline-size;' +
+      '--ink:#000;--mint:#95ffb1;--soft:#effff4;--forest:#073823;' +
+      'font-family:var(--uq-sans,"Inter Tight",Arial,sans-serif);color:var(--ink)}' +
+    '.zs{position:relative;padding:56px clamp(18px,3.4cqi,40px) clamp(20px,2.8cqi,32px);border:2.5px solid var(--ink);border-radius:16px;background:var(--soft)}' +
+    '.chip{position:absolute;top:12px;left:12px;padding:6px 10px;border-radius:4px;background:var(--ink);color:#fff;' +
+      'font:700 11px/1.2 var(--uq-sans,"Inter Tight",Arial,sans-serif);letter-spacing:-.02em;text-transform:uppercase}' +
+    'h3{margin:0 0 18px;font-family:var(--uq-serif,"Lastik - reg",Georgia,serif);font-weight:400;font-size:clamp(32px,4.6cqi,56px);line-height:1.02;letter-spacing:-.035em}' +
+    '.sub{display:block;margin-top:6px;font-family:var(--uq-mono,Inconsolata,ui-monospace,Menlo,monospace);font-size:14px;letter-spacing:.02em;color:var(--forest)}' +
+    '.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 22px}' +
+    '.tiles.n2{grid-template-columns:repeat(2,minmax(0,1fr))}' +
+    '.tile{display:flex;flex-direction:column;gap:6px;min-width:0;padding:16px 18px;border:2px solid var(--ink);border-radius:10px;background:var(--mint)}' +
+    '.v{font-family:var(--uq-display,"Abcgravityxxcompressed Ultra",Impact,"Arial Narrow",sans-serif);font-size:clamp(40px,8.4cqi,92px);line-height:.92;letter-spacing:.005em;white-space:nowrap}' +
+    '.n2 .v{font-size:clamp(56px,11cqi,112px)}' +
+    '.l{font-family:var(--uq-mono,Inconsolata,ui-monospace,Menlo,monospace);font-size:14px;line-height:1.35;color:var(--forest)}' +
+    'p{margin:0 0 12px;font-size:clamp(16px,1.9cqi,21px);line-height:1.4;letter-spacing:-.02em}' +
+    'p.s{font-weight:700}' +
+    'p.src{margin:16px 0 0;font-family:var(--uq-mono,Inconsolata,ui-monospace,Menlo,monospace);font-size:12px;line-height:1.5;letter-spacing:.01em;color:#555}' +
+    '@container (max-width:720px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.v{font-size:clamp(40px,14cqi,80px)}}' +
+    '@container (max-width:340px){.zs{padding-top:52px}.tile{padding:12px 14px}}';
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+  }
+
+  function renderReveal(el) {
+    var s = data.zipStats;
+    if (!s || !s.tiles || !s.tiles.length) { el.style.display = 'none'; return; }
+    var root = el.shadowRoot || el.attachShadow({ mode: 'open' });
+    root.innerHTML = '<style>' + REVEAL_CSS + '</style>' +
+      '<section class="zs" aria-label="Your zip, by the numbers"><span class="chip">Your zip, by the numbers</span>' +
+      '<h3>' + esc(s.title) + (s.subtitle ? '<span class="sub">' + esc(s.subtitle) + '</span>' : '') + '</h3>' +
+      '<div class="tiles n' + s.tiles.length + '">' + s.tiles.map(function (t) {
+        return '<div class="tile"><span class="v">' + esc(t.value) + '</span><span class="l">' + esc(t.label) + '</span></div>';
+      }).join('') + '</div>' +
+      s.lines.map(function (l) { return '<p' + (l.strong ? ' class="s"' : '') + '>' + esc(l.text) + '</p>'; }).join('') +
+      '<p class="src">' + esc(s.source) + ' Estimates, rounded.</p></section>';
+  }
 
   function copy(text, el) {
     function ok() { flash(el, 'Link copied'); }
@@ -147,6 +190,31 @@
 
     para(r.note, 'i', 12, 1.5, DEEP);
     y += 18;
+
+    var zs = data.zipStats;
+    if (zs && zs.tiles && zs.tiles.length) {
+      var pdfText = function (s) { return String(s).replace(/\u2212/g, '-'); };
+      ensure(170);
+      font('b', 9); var zchip = doc.getTextWidth('YOUR ZIP, BY THE NUMBERS') + 18;
+      doc.setFillColor.apply(doc, INK); doc.roundedRect(ML, y, zchip, 20, 4, 4, 'F');
+      font('b', 9, WHITE); doc.text('YOUR ZIP, BY THE NUMBERS', ML + 9, y + 13.5, { charSpace: 0.6 }); y += 32;
+      font('b', 22, INK); doc.text(pdfText(zs.title), ML, y + 20); y += 28;
+      if (zs.subtitle) { font('r', 10.5, DEEP); doc.text(pdfText(zs.subtitle), ML, y + 10); y += 20; }
+      y += 6;
+      var gap = 8, tw = (CW - gap * (zs.tiles.length - 1)) / zs.tiles.length, th = 64;
+      zs.tiles.forEach(function (tile, i) {
+        var x = ML + i * (tw + gap);
+        doc.setFillColor.apply(doc, GREEN); doc.setDrawColor.apply(doc, INK); doc.setLineWidth(1.5);
+        doc.roundedRect(x, y, tw, th, 6, 6, 'FD');
+        font('b', 20, INK); doc.text(pdfText(tile.value), x + 10, y + 26);
+        var ll = lines(tile.label, 'r', 8, tw - 20); font('r', 8, DEEP);
+        ll.slice(0, 2).forEach(function (l, j) { doc.text(l, x + 10, y + 42 + j * 10); });
+      });
+      y += th + 16;
+      zs.lines.forEach(function (l) { para(pdfText(l.text), l.strong ? 'b' : 'r', 11, 1.45, INK); y += 4; });
+      para(pdfText(zs.source) + ' Estimates, rounded.', 'r', 8, 1.4, [85, 85, 85]);
+      y += 18;
+    }
 
     ensure(60);
     doc.setDrawColor.apply(doc, DEEP); doc.setLineWidth(0.75); doc.line(ML, y, ML + CW, y); y += 18;

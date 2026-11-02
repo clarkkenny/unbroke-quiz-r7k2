@@ -16,7 +16,7 @@
      ===================================================================== */
 
   // Copy, questions and results come from the content JSON in the Code Embed (see boot()).
-  var REPORT, QUESTIONS, COPY, PAGES;
+  var REPORT, QUESTIONS, COPY, PAGES, ZIP_DATA_URL;
   function fill(s, vars) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; }); }
 
   // Spec §3 points, already weighted. Q4 is not scored.
@@ -66,6 +66,7 @@
     return { final: final, bucket: bucket, tier: tier, adjustment: adjustment };
   }
 
+/*__ZIPDATA__*/
   /* =====================================================================
      MOTION (tune with ?tune on the demo page)
      ===================================================================== */
@@ -120,7 +121,7 @@
     function done(anims) { return Promise.all(anims.map(function (a) { return a.finished.catch(function () {}); })); }
 
     var step = 0, answers = {}, N = QUESTIONS.length, busy = false, mode = 'quiz';
-    var result = null, person = null;
+    var result = null, person = null, zipReveal = null;
 
     function applyVars() {
       root.style.setProperty('--uq-ease', M.ease);
@@ -135,6 +136,7 @@
       applyVars();
       var q = QUESTIONS[step], last = step === N - 1, body;
       if (q.type === 'zip') {
+        loadZipData(ZIP_DATA_URL);
         body = '<input class="uq-zip uq-a" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="postal-code" maxlength="5" aria-labelledby="uq-q" aria-describedby="uq-hint" placeholder="' + esc(q.placeholder) + '" value="' + esc(answers[q.id] || '') + '">' +
                '<p class="uq-note uq-a">' + esc(q.note) + '</p>';
       } else {
@@ -285,8 +287,7 @@
     /* ---------- email step ---------- */
     function finish() {
       busy = true;
-      result = computeResult(answers, colTier(answers.q3));
-      if (debug) console.log('[unbroke-quiz] result', result, answers);
+      loadZipData(ZIP_DATA_URL);
       var btn = stage.querySelector('.uq-next');
       var lockH = root.offsetHeight;
       root.style.height = lockH + 'px';
@@ -387,6 +388,21 @@
         return;
       }
       person = { firstName: first.value.trim(), lastName: last.value.trim(), email: email.value.trim() };
+      busy = true;
+      btn.disabled = true;
+      btn.textContent = COPY.gateWait;
+      withTimeout(loadZipData(ZIP_DATA_URL), 6000).then(function (db) {
+        var area = lookupArea(db, answers.q3);
+        // Real BEA cost-of-living tier when the data loaded; the old rough table as a fallback
+        var tier = db ? (area ? tierForRpp(area.rpp) : 1) : colTier(answers.q3);
+        result = computeResult(answers, tier);
+        zipReveal = db ? zipStats(answers.q3, area, db.census[answers.q3] || null, 'q2_' + answers.q2) : null;
+        if (debug) console.log('[unbroke-quiz] result', result, '| zip data', db ? 'loaded' : 'MISSING', '| reveal', zipReveal);
+        sendSignup(first, last, email, err, btn);
+      });
+    }
+
+    function sendSignup(first, last, email, err, btn) {
       var payload = {
         firstName: person.firstName, lastName: person.lastName, email: person.email,
         bucket: result.bucket, result: REPORT[result.bucket].level + ': ' + REPORT[result.bucket].name,
@@ -394,9 +410,6 @@
         answers: QUESTIONS.filter(function (q) { return q.type !== 'zip'; }).map(function (q) { return q.id + '_' + answers[q.id]; }).join(','),
         timestamp: new Date().toISOString(), page: location.origin + location.pathname
       };
-      busy = true;
-      btn.disabled = true;
-      btn.textContent = COPY.gateWait;
       var wf = findWebflowForm();
       var testMode = host.hasAttribute('data-test-mode');
       if (debug) console.log('[unbroke-quiz] signup form:', wf || 'NOT FOUND', '| payload:', payload);
@@ -495,7 +508,8 @@
       var data = {
         bucket: result.bucket, firstName: person.firstName, lastName: person.lastName,
         final: result.final, tier: result.tier, adjustment: result.adjustment,
-        report: r, disclaimer: COPY.disclaimer, shareText: fill(COPY.shareText, { name: r.name }), shareUrl: shareUrl
+        report: r, disclaimer: COPY.disclaimer, shareText: fill(COPY.shareText, { name: r.name }), shareUrl: shareUrl,
+        zipStats: zipReveal
       };
       try {
         sessionStorage.setItem('uq_unlocked', result.bucket);
@@ -584,7 +598,7 @@
     var block = document.querySelector('script[data-unbroke-quiz-content]');
     try {
       var content = JSON.parse(block.textContent);
-      COPY = content.copy; QUESTIONS = content.questions; REPORT = content.results; PAGES = content.pages;
+      COPY = content.copy; QUESTIONS = content.questions; REPORT = content.results; PAGES = content.pages; ZIP_DATA_URL = content.zipData;
     } catch (e) {
       console.error('[unbroke-quiz] Could not read the quiz content. Check the JSON in the Code Embed (quotes and commas).', e);
       return;
