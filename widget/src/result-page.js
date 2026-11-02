@@ -162,7 +162,7 @@
     font('r', 11, DEEP); doc.text('Prepared for ' + data.firstName + ' ' + data.lastName + '  ·  ' + when, ML, 124);
     y = 190;
 
-    font('b', 9); var chipW = doc.getTextWidth(r.level.toUpperCase()) + 18;
+    font('b', 9); var chipW = doc.getTextWidth(r.level.toUpperCase()) + 0.6 * r.level.length + 18;
     doc.setFillColor.apply(doc, INK); doc.roundedRect(ML, y - 2, chipW, 20, 4, 4, 'F');
     font('b', 9, WHITE); doc.text(r.level.toUpperCase(), ML + 9, y + 11.5, { charSpace: 0.6 });
     font('r', 11, DEEP); doc.text(r.desc, ML + chipW + 10, y + 12);
@@ -195,7 +195,7 @@
     if (zs && zs.tiles && zs.tiles.length) {
       var pdfText = function (s) { return String(s).replace(/\u2212/g, '-'); };
       ensure(170);
-      font('b', 9); var zchip = doc.getTextWidth('YOUR ZIP, BY THE NUMBERS') + 18;
+      font('b', 9); var zchip = doc.getTextWidth('YOUR ZIP, BY THE NUMBERS') + 0.6 * 24 + 18;
       doc.setFillColor.apply(doc, INK); doc.roundedRect(ML, y, zchip, 20, 4, 4, 'F');
       font('b', 9, WHITE); doc.text('YOUR ZIP, BY THE NUMBERS', ML + 9, y + 13.5, { charSpace: 0.6 }); y += 32;
       font('b', 22, INK); doc.text(pdfText(zs.title), ML, y + 20); y += 28;

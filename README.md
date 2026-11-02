@@ -25,3 +25,11 @@ The PDF download on the result pages loads jsPDF 2.5.1 from cdnjs the first time
 - Copy only: edit the JSON in the Code Embed directly in Webflow, or `widget/src/content.json` here.
 - Logic, scoring, styles: edit `widget/src/widget.js` / `widget.css`, then run `python3 widget/build.py`
   (needs `terser`: `npm i -g terser`) and re-paste `webflow/2-before-body.html`.
+
+## Zip reveal ("Your zip, by the numbers")
+Ported from the client's build (`how-broke-am-i-quiz`): Census ACS 2020-2024 zip figures and BEA Regional
+Price Parities. Packed into one file hosted in the Webflow site's assets (URL in `zipData` in the Code Embed
+JSON). The quiz downloads it whole, so the zip never leaves the browser, and also uses it for the real
+cost-of-living tier in scoring. On a result page, an empty div with `data-quiz-zip-reveal` becomes the section.
+Output matches the client's code on all 165,476 zip x salary-band combinations.
+
