@@ -131,3 +131,10 @@ tj = result_for('bucket_3', '#')[len('<script>\n'):-len('</script>\n')].replace(
 tpl = tpl.replace('/*__SAMPLE__*/', json.dumps(sample, ensure_ascii=False).replace('</', '<\\/')).replace('/*__RESULT_SCRIPT__*/', tj)
 (root / 'tune-cta.html').write_text(tpl)
 print('tune-cta.html:', f'{len(tpl):,} characters')
+
+# ---------- quiz -> result transition tuner (inlines the exact engine) ----------
+tx = (src / 'transition.js').read_text()
+tt = (here / 'tune-transition.template.html').read_text()
+assert tt.count('/*__ENGINE__*/') == 1
+(root / 'tune-transition.html').write_text(tt.replace('/*__ENGINE__*/', tx.replace('</', '<\\/')))
+print('tune-transition.html built')

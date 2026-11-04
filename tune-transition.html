@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz Transition Tuner</title><meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono&family=Instrument+Serif&family=Inter+Tight:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#000;--mint:#95ffb1;--soft:#effff4;--forest:#073823;--dot:#bff3cf;--line:#d9e3dc;--muted:#56625b}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Inter Tight",system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+.site{min-height:100vh;background-color:#fff;background-image:radial-gradient(var(--dot) 1.6px,transparent 1.7px);background-size:22px 22px;padding-right:340px}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:2px solid #000;background:#fff}
+.logo{font:400 30px/1 Anton,Impact,sans-serif;letter-spacing:.01em}
+.nav span{font:13px "DM Mono",monospace;color:var(--forest)}
+.page{display:none;padding:56px 32px 96px;max-width:1000px;margin:0 auto}
+.page.on{display:block}
+.kick{font:13px "DM Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--forest);margin:0 0 10px}
+.h1{font:400 clamp(56px,8vw,104px)/.9 Anton,Impact,sans-serif;margin:0 0 28px;letter-spacing:.005em;text-transform:uppercase}
+.card{position:relative;border:2px solid #000;border-radius:28px;background:#94fcae;padding:56px clamp(24px,5vw,56px);overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;background-image:radial-gradient(#7ae898 2px,transparent 2.1px);background-size:18px 18px;opacity:.6}
+.card>*{position:relative}
+.card h2{font:400 clamp(40px,5vw,64px)/1 "Instrument Serif",Georgia,serif;margin:0 0 14px;letter-spacing:-.02em}
+.card p{font-weight:500;font-size:19px;line-height:1.45;max-width:46ch;margin:0 0 30px}
+.go{display:inline-flex;align-items:center;gap:12px;height:72px;padding:0 30px;border:2px solid var(--forest);border-radius:12px;background:var(--forest);color:#fff;
+  font:800 22px/1 "Inter Tight",sans-serif;text-transform:uppercase;cursor:pointer}
+.go svg{width:1em;height:1em}
+.hero{background:var(--forest);color:#fff;border-radius:24px;padding:48px 32px;text-align:center;margin:0 0 32px}
+.chip{display:inline-block;padding:5px 14px;border:1.5px solid #000;border-radius:6px;background:var(--mint);color:#000;font:22px "Instrument Serif",serif;margin:0 0 16px}
+.title{font-weight:800;font-size:clamp(40px,6vw,72px);line-height:1;letter-spacing:-.04em;margin:0}
+.title em{font:400 1.1em "Instrument Serif",serif;font-style:normal;color:var(--mint);letter-spacing:-.01em}
+.read{font-size:19px;line-height:1.5;max-width:62ch;margin:0 0 28px}
+.moves{display:grid;gap:10px}
+.move{display:flex;gap:18px;align-items:center;border:2px solid #000;border-radius:12px;background:var(--mint);padding:16px 20px;font-size:16px;line-height:1.45}
+.move b{font:400 30px/1 Anton,sans-serif;color:var(--forest)}
+.panel{position:fixed;top:0;right:0;z-index:2147483600;width:340px;height:100vh;overflow:auto;background:#fff;border-left:1px solid var(--line);padding:16px 16px 28px}
+.hide-panel .panel{transform:translateX(100%)}.hide-panel .site{padding-right:0}
+.panel{transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.peek{position:fixed;right:12px;top:12px;z-index:2147483600;display:none;font:600 12px/1 "Inter Tight",sans-serif;padding:9px 10px;border:1.5px solid var(--forest);border-radius:6px;background:#fff;color:var(--forest);cursor:pointer}
+.hide-panel .peek{display:block}
+.panel h1{font-size:15px;font-weight:800;margin:0 0 2px;text-transform:uppercase}
+.panel .sub{margin:0 0 12px;font:12px/1.45 "DM Mono",monospace;color:var(--muted)}
+.grp{border-top:1px solid var(--line);padding:12px 0 4px}
+.grp h2{font:600 11px/1 "DM Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);margin:0 0 10px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;margin:0 0 10px}
+.ctl label{font-size:13px;font-weight:600}
+.ctl output{font:12px "DM Mono",monospace;color:var(--muted)}
+.ctl input[type=range],.ctl select{grid-column:1/-1;width:100%;margin:0;accent-color:var(--forest)}
+.ctl select{font:12px "DM Mono",monospace;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.ctl input[type=color]{width:44px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:#fff}
+.ctl.off{display:none}
+.desc{font-size:12.5px;line-height:1.45;color:var(--muted);margin:-2px 0 10px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 10px}
+.btns button{font:600 12px/1 "Inter Tight",sans-serif;padding:9px 8px;border:1.5px solid var(--forest);border-radius:6px;background:#fff;color:var(--forest);cursor:pointer}
+.btns button[aria-pressed=true]{background:var(--forest);color:#fff}
+.btns .primary{grid-column:1/-1;background:var(--forest);color:#fff;padding:12px;font-size:13px;text-transform:uppercase;letter-spacing:.02em}
+.btns .copy{grid-column:1/-1;background:var(--mint);color:#000;border-color:#000;padding:12px;font-size:13px;text-transform:uppercase;letter-spacing:.02em}
+.scrub output{min-width:80px;text-align:right}
+canvas.graph{width:100%;height:120px;border:1px solid var(--line);border-radius:6px;background:#fbfdfc;display:block;margin:0 0 8px}
+textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical}
+.marker{position:fixed;z-index:2147483500;width:22px;height:22px;margin:-11px 0 0 -11px;border:2px solid #e0245e;border-radius:50%;pointer-events:none;display:none}
+.marker::before,.marker::after{content:"";position:absolute;background:#e0245e;left:50%;top:50%}
+.marker::before{width:30px;height:2px;margin:-1px 0 0 -15px}.marker::after{width:2px;height:30px;margin:-15px 0 0 -1px}
+.picking .site{cursor:crosshair}
+.toast{position:fixed;left:16px;bottom:16px;z-index:2147483600;background:#000;color:#fff;font:12px "DM Mono",monospace;padding:8px 10px;border-radius:6px;display:none}
+@media (max-width:900px){.site{padding-right:0}.panel{position:static;width:auto;height:auto;border-left:0;border-top:1px solid var(--line)}}
+</style>
+<script>
+/*! Unbroke page transition. Quiz page: cover, then a real page load. Result page: reveal.
+ *  The cover is one full-screen canvas. Every style ends fully covered in config.color, so the
+ *  result page can paint that same colour before its first frame (see ARRIVAL) and the hand-off is seamless.
+ */
+(function () {
+  'use strict';
+  var config = {
+    style: 'flood',            // flood | iris | shutter | blinds | card
+    color: '#95ffb1',          // cover colour
+    coverEase: 'inout',        // see EASES
+    revealEase: 'expo',
+    coverDuration: 720,        // ms on the quiz page
+    revealDuration: 820,       // ms on the result page
+    revealFrom: 'same',        // same (where the click was) | center | top
+    // flood
+    dotSize: 22,               // grid cell, px
+    spread: 0.7,               // share of the time spent travelling outward (0 = all at once)
+    jitter: 0.25,              // randomness in each dot's start
+    // shutter / card
+    curve: 90,                 // bulge of the moving edge, px
+    radius: 28,                // card corner radius at the start
+    // blinds
+    bars: 7,
+    stagger: 0.45,
+    // the word held on the cover across the page load
+    word: 'level',             // level ("Stable") | name ("Solid, Still Building") | none
+    wordColor: '#073823',
+    wordFont: '"Abcgravityxxcompressed Ultra", Anton, Impact, "Arial Narrow", sans-serif',
+    wordSize: 0.17,            // share of viewport width
+    wordRise: 36               // px it travels in and out
+  };
+
+  var EASES = {
+    expo: [0.16, 1, 0.3, 1], soft: [0.22, 1, 0.36, 1], inout: [0.65, 0, 0.35, 1],
+    snappy: [0.2, 0.8, 0.2, 1], overshoot: [0.34, 1.4, 0.64, 1], linear: [0, 0, 1, 1]
+  };
+  function bezier(p) {
+    var x1 = p[0], y1 = p[1], x2 = p[2], y2 = p[3];
+    function a(a1, a2) { return 1 - 3 * a2 + 3 * a1; }
+    function b(a1, a2) { return 3 * a2 - 6 * a1; }
+    function c(a1) { return 3 * a1; }
+    function at(t, a1, a2) { return ((a(a1, a2) * t + b(a1, a2)) * t + c(a1)) * t; }
+    function slope(t, a1, a2) { return 3 * a(a1, a2) * t * t + 2 * b(a1, a2) * t + c(a1); }
+    return function (x) {
+      if (x <= 0) return 0; if (x >= 1) return 1;
+      var t = x;
+      for (var i = 0; i < 8; i++) { var s = slope(t, x1, x2); if (Math.abs(s) < 1e-6) break; t -= (at(t, x1, x2) - x) / s; }
+      return at(Math.min(1, Math.max(0, t)), y1, y2);
+    };
+  }
+  function ease(name) { return bezier(EASES[name] || EASES.expo); }
+  function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+
+  var KEY = 'uq_tx', canvas = null, ctx = null, W = 0, H = 0, raf = 0;
+  var state = { ox: 0.5, oy: 0.5, rect: null, word: '' };
+
+  function mount() {
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-hidden', 'true');
+      canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483000;pointer-events:none';
+      ctx = canvas.getContext('2d');
+    }
+    if (!canvas.isConnected) document.documentElement.appendChild(canvas);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function unmount() { cancelAnimationFrame(raf); if (canvas && canvas.isConnected) canvas.remove(); }
+
+  function origin(phase) {
+    if (phase === 'reveal' && config.revealFrom === 'center') return [W / 2, H / 2];
+    if (phase === 'reveal' && config.revealFrom === 'top') return [W / 2, -H * 0.1];
+    return [state.ox * W, state.oy * H];
+  }
+  function far(x, y) { return Math.max(Math.hypot(x, y), Math.hypot(W - x, y), Math.hypot(x, H - y), Math.hypot(W - x, H - y)); }
+
+  /* ---- one frame of one phase at raw progress p (0..1). Exposed for the scrub slider. ---- */
+  function frame(phase, p) {
+    if (!ctx) mount();
+    var cover = phase === 'cover', e = ease(cover ? config.coverEase : config.revealEase);
+    var o = origin(phase), ox = o[0], oy = o[1], s = config.style;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = config.color;
+
+    if (s === 'flood') {
+      var cell = Math.max(6, config.dotSize), R = cell * 0.75, maxD = far(ox, oy), sp = clamp(config.spread), j = clamp(config.jitter);
+      var cols = Math.ceil(W / cell) + 1, rows = Math.ceil(H / cell) + 1, n = 0;
+      ctx.beginPath();
+      for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+        var x = c * cell + cell / 2, y = r * cell + cell / 2, d = Math.hypot(x - ox, y - oy) / maxD;
+        var start = sp * (d * (1 - j) + rnd(++n) * j), lp = sp >= 1 ? (p >= start ? 1 : 0) : clamp((p - start) / (1 - sp));
+        var k = cover ? e(lp) : 1 - e(lp), rad = R * k;
+        if (rad > 0.3) { ctx.moveTo(x + rad, y); ctx.arc(x, y, rad, 0, Math.PI * 2); }
+      }
+      ctx.fill();
+    } else if (s === 'iris') {
+      var m = far(ox, oy), t = e(p);
+      if (cover) { ctx.beginPath(); ctx.arc(ox, oy, m * t, 0, Math.PI * 2); ctx.fill(); }
+      else { ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(ox, oy, m * t, 0, Math.PI * 2, true); ctx.fill(); }
+    } else if (s === 'shutter') {
+      var t2 = e(p), bulge = Math.sin(Math.PI * clamp(p)) * config.curve;
+      ctx.beginPath();
+      if (cover) { // rises from the bottom, top edge bowed upward
+        var top = H * (1 - t2);
+        ctx.moveTo(0, H); ctx.lineTo(0, top); ctx.quadraticCurveTo(W / 2, top - bulge, W, top); ctx.lineTo(W, H);
+      } else {     // keeps rising off the top, bottom edge bowed
+        var bot = H * (1 - t2);
+        ctx.moveTo(0, 0); ctx.lineTo(0, bot); ctx.quadraticCurveTo(W / 2, bot - bulge, W, bot); ctx.lineTo(W, 0);
+      }
+      ctx.closePath(); ctx.fill();
+    } else if (s === 'blinds') {
+      var nb = Math.max(2, Math.round(config.bars)), bh = H / nb, st = clamp(config.stagger);
+      var order = []; for (var i = 0; i < nb; i++) order.push({ i: i, d: Math.abs((i + 0.5) * bh - oy) });
+      order.sort(function (a, b) { return a.d - b.d; });
+      order.forEach(function (it, rank) {
+        var start = nb > 1 ? st * rank / (nb - 1) : 0, lp = st >= 1 ? 1 : clamp((p - start) / (1 - st));
+        var k = cover ? e(lp) : 1 - e(lp), h = (bh + 1) * k;
+        ctx.fillRect(0, it.i * bh + (bh - h) / 2, W, h);
+      });
+    } else if (s === 'card') {
+      var t3 = e(p);
+      if (cover) {
+        var rc = state.rect || { x: ox - 40, y: oy - 28, w: 80, h: 56 };
+        var x0 = rc.x * (1 - t3), y0 = rc.y * (1 - t3), w0 = rc.w + (W - rc.w) * t3, h0 = rc.h + (H - rc.h) * t3;
+        round(x0, y0, w0, h0, config.radius * (1 - t3));
+      } else {     // the sheet lifts away, bottom corners rounding as it goes
+        var lift = H * t3;
+        roundBottom(0, -lift, W, H, config.radius * Math.min(1, t3 * 3));
+      }
+    }
+
+    // the word, held across the load
+    if (state.word && config.word !== 'none') {
+      var a, dy;
+      if (cover) { var q = clamp((p - 0.55) / 0.45); a = q; dy = config.wordRise * (1 - ease('expo')(q)); }
+      else { var q2 = ease('expo')(clamp(p / 0.5)); a = 1 - q2; dy = -config.wordRise * q2; }
+      if (a > 0.01) {
+        var size = Math.round(Math.min(W * config.wordSize, H * 0.32, 260));
+        ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = config.wordColor;
+        ctx.font = size + 'px ' + config.wordFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        fit(state.word, size);
+        ctx.fillText(state.word, W / 2, H / 2 + dy);
+        ctx.restore();
+      }
+    }
+  }
+  function fit(text, size) {
+    var w = ctx.measureText(text).width, max = W * 0.9;
+    if (w > max) ctx.font = Math.floor(size * max / w) + 'px ' + config.wordFont;
+  }
+  function round(x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); ctx.fill();
+  }
+  function roundBottom(x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.closePath(); ctx.fill();
+  }
+
+  function run(phase, ms) {
+    return new Promise(function (res) {
+      var t0 = performance.now();
+      cancelAnimationFrame(raf);
+      (function tick(now) {
+        var p = Math.min(1, (now - t0) / ms);
+        frame(phase, p);
+        if (p < 1) raf = requestAnimationFrame(tick); else res();
+      })(t0);
+    });
+  }
+  function reduced() { return window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; }
+
+  function setOrigin(from) {
+    var r = from && from.getBoundingClientRect ? from.getBoundingClientRect() : null;
+    if (r) { state.ox = (r.left + r.width / 2) / innerWidth; state.oy = (r.top + r.height / 2) / innerHeight; state.rect = { x: r.left, y: r.top, w: r.width, h: r.height }; }
+    else if (from && typeof from.x === 'number') { state.ox = from.x / innerWidth; state.oy = from.y / innerHeight; state.rect = null; }
+  }
+
+  /* Quiz page: cover the screen, remember how, then resolve so the caller can navigate. */
+  function cover(from, word) {
+    mount(); setOrigin(from); state.word = word || '';
+    canvas.style.pointerEvents = 'auto';
+    try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), ox: state.ox, oy: state.oy, color: config.color, word: config.word === 'none' ? '' : state.word, wordColor: config.wordColor, wordFont: config.wordFont, wordSize: config.wordSize })); } catch (e) {}
+    if (reduced()) { frame('cover', 1); return Promise.resolve(); }
+    return run('cover', config.coverDuration);
+  }
+
+  /* Result page: pick up from the held colour and reveal. Safe to call when there was no transition. */
+  function reveal(opts) {
+    var t = null;
+    try { t = JSON.parse(sessionStorage.getItem(KEY) || 'null'); sessionStorage.removeItem(KEY); } catch (e) {}
+    if (!t && !(opts && opts.force)) { release(); return Promise.resolve(false); }
+    if (t) { state.ox = t.ox; state.oy = t.oy; state.word = t.word || ''; }
+    mount(); frame('reveal', 0); release();
+    var go = function () { return reduced() ? Promise.resolve() : run('reveal', config.revealDuration); };
+    var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
+    return fonts.then(go).then(function () { unmount(); return true; });
+  }
+  // drop the pre-paint hold painted by ARRIVAL
+  function release() { var h = document.getElementById('uq-tx-hold'); if (h) h.remove(); }
+
+  window.UQTransition = { config: config, EASES: EASES, ease: ease, frame: frame, cover: cover, reveal: reveal, mount: mount, unmount: unmount, setOrigin: setOrigin, state: state };
+})();
+
+</script>
+</head><body>
+<div class="site" id="site">
+  <nav class="nav"><span class="logo">UNBROKE</span><span id="where">/take-quiz</span></nav>
+  <section class="page on" id="pageA">
+    <p class="kick">The quiz</p>
+    <h1 class="h1">How broke are you?</h1>
+    <div class="card">
+      <h2>You're in, Leon.</h2>
+      <p>Your results are ready. This is the moment the quiz hands off to the result page.</p>
+      <button type="button" class="go" id="go">See my results <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </div>
+  </section>
+  <section class="page" id="pageB">
+    <div class="hero"><span class="chip">Stable Mode</span><h1 class="title">Solid, <em>Still Building</em></h1></div>
+    <p class="read">A surprise expense doesn't scare you anymore. That's real, and most people never get here. But don't mistake a solid cushion for being done.</p>
+    <div class="moves">
+      <div class="move"><b>01</b>Your first $100K is the hardest money you'll ever save and the most important.</div>
+      <div class="move"><b>02</b>Automate retirement. Get the full employer match, pick a target-date fund, and stop overthinking it.</div>
+      <div class="move"><b>03</b>Raise your contribution 1% every six months. You'll barely feel each step.</div>
+    </div>
+  </section>
+</div>
+<div class="marker" id="marker"></div>
+<div class="toast" id="toast"></div>
+<button type="button" class="peek" id="peek">Show panel (H)</button>
+
+<aside class="panel" aria-label="Transition controls">
+  <h1>Quiz → result transition</h1>
+  <p class="sub">Click "See my results" or Play. Hide the panel (H) to judge the full screen; the word centres on the whole window. Panel changes live in this tab only: press Copy config before you close it.</p>
+  <div class="btns">
+    <button type="button" class="primary" id="play">Play transition</button>
+    <button type="button" id="back">Back to quiz page</button>
+    <button type="button" id="pick" aria-pressed="false">Pick origin</button>
+    <button type="button" id="origReset">Origin = button</button>
+    <button type="button" id="slow" aria-pressed="false">Slow-mo ×4</button>
+    <button type="button" id="hide">Hide panel (H)</button>
+    <button type="button" class="copy" id="copy">Copy config</button>
+  </div>
+  <div class="grp scrub"><h2># Scrub</h2>
+    <div class="ctl"><label for="scrub">Freeze at</label><output id="scrubOut">live</output><input type="range" id="scrub" min="0" max="2000" step="1" value="0"></div>
+    <p class="desc">0 to 1 is the cover on the quiz page, 1 to 2 the reveal on the result page. Every other control redraws the frozen frame. Press Play to unfreeze.</p>
+  </div>
+  <div id="controls"></div>
+  <div class="grp"><h2># Config</h2><textarea id="out" readonly aria-label="Config"></textarea></div>
+</aside>
+
+<script>
+(function () {
+  var T = window.UQTransition, C = T.config, DEFAULTS = JSON.parse(JSON.stringify(C));
+  var STYLES = {
+    flood: 'Dot flood. The quiz card\'s own dots grow out from the button until they fill the screen, then shrink away on the result page. Continues the unlock you already have.',
+    iris: 'Iris. A solid circle opens from the button, and the result page opens through a hole from the same spot. The cleanest, fastest read.',
+    shutter: 'Shutter. A sheet rises from the bottom with a bowed edge and keeps going off the top on the result page. Feels like turning a page.',
+    blinds: 'Blinds. Horizontal bars close outward from the button\'s row, then open again. Echoes the staggered share buttons.',
+    card: 'Card expand. The button grows into the whole screen, then the sheet lifts off the result page. Reads as "opening your report".'
+  };
+  var EASE_NAMES = { expo: 'Expo out (quiz)', soft: 'Soft out', inout: 'In-out', snappy: 'Snappy', overshoot: 'Slight overshoot', linear: 'Linear' };
+  var DEMO = { hold: 260 }; // simulated page load, demo only
+  var S = { only: null };   // which styles a control applies to
+  var CONTROLS = [
+    ['# Style', [
+      ['style', 'select', 'Style', Object.keys(STYLES)],
+      ['color', 'color', 'Cover colour'],
+      ['revealFrom', 'select', 'Reveal from', ['same', 'center', 'top']]
+    ]],
+    ['# Timing', [
+      ['coverDuration', 'range', 'Cover', 200, 1600, 10, 'ms'],
+      ['revealDuration', 'range', 'Reveal', 200, 1600, 10, 'ms'],
+      ['hold', 'demo', 'Simulated page load', 0, 1500, 10, 'ms'],
+      ['coverEase', 'ease', 'Cover easing'],
+      ['revealEase', 'ease', 'Reveal easing']
+    ]],
+    ['# Dot flood', [
+      ['dotSize', 'range', 'Dot grid', 8, 60, 1, 'px', ['flood']],
+      ['spread', 'range', 'Travel', 0, 0.95, 0.01, '', ['flood']],
+      ['jitter', 'range', 'Jitter', 0, 1, 0.01, '', ['flood']]
+    ]],
+    ['# Shape', [
+      ['curve', 'range', 'Edge bow', 0, 300, 2, 'px', ['shutter']],
+      ['radius', 'range', 'Corner radius', 0, 80, 1, 'px', ['card']],
+      ['bars', 'range', 'Bars', 2, 16, 1, '', ['blinds']],
+      ['stagger', 'range', 'Stagger', 0, 0.9, 0.01, '', ['blinds']]
+    ]],
+    ['# Word on the cover', [
+      ['word', 'select', 'Word', ['level', 'name', 'none']],
+      ['wordColor', 'color', 'Word colour'],
+      ['wordSize', 'range', 'Size', 0.06, 0.3, 0.005, '× vw'],
+      ['wordRise', 'range', 'Travel', 0, 120, 1, 'px']
+    ]]
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var out = $('out'), scrub = $('scrub'), scrubOut = $('scrubOut'), marker = $('marker');
+  var picked = null, frozen = false, playing = false, slow = 1;
+
+  function words() { return C.word === 'name' ? 'Solid, Still Building' : C.word === 'level' ? 'STABLE' : ''; }
+  function showPage(b) { $('pageA').classList.toggle('on', !b); $('pageB').classList.toggle('on', b); $('where').textContent = b ? '/quiz/solid-still-building' : '/take-quiz'; }
+  function originFrom() { return picked || $('go'); }
+  function cfgText() {
+    return 'Object.assign(UQTransition.config,{\n' + Object.keys(C).map(function (k) {
+      return k + ':' + (typeof C[k] === 'string' ? "'" + C[k].replace(/'/g, "\\'") + "'" : C[k]);
+    }).join(',\n') + '\n});';
+  }
+  function sync() { out.value = cfgText(); drawGraph(); refreshOff(); if (frozen) drawFrozen(); }
+
+  /* ---- controls ---- */
+  var box = $('controls'), rows = [];
+  CONTROLS.forEach(function (g) {
+    var w = document.createElement('div'); w.className = 'grp'; w.innerHTML = '<h2>' + g[0] + '</h2>';
+    g[1].forEach(function (c) {
+      var key = c[0], kind = c[1], d = document.createElement('div'); d.className = 'ctl'; d.only = c[7] || null;
+      var id = 'c-' + key, target = kind === 'demo' ? DEMO : C;
+      if (kind === 'select' || kind === 'ease') {
+        var opts = kind === 'ease' ? Object.keys(EASE_NAMES) : c[3];
+        d.innerHTML = '<label for="' + id + '">' + c[2] + '</label><output></output><select id="' + id + '">' +
+          opts.map(function (o) { return '<option value="' + o + '">' + (kind === 'ease' ? EASE_NAMES[o] : o) + '</option>'; }).join('') + '</select>';
+        var sel = d.querySelector('select'); sel.value = C[key];
+        sel.addEventListener('change', function () { C[key] = sel.value; if (key === 'style') $('styleDesc').textContent = STYLES[C.style]; sync(); });
+        d.reset = function () { sel.value = C[key]; };
+      } else if (kind === 'color') {
+        d.innerHTML = '<label for="' + id + '">' + c[2] + '</label><input type="color" id="' + id + '">';
+        var col = d.querySelector('input'); col.value = C[key];
+        col.addEventListener('input', function () { C[key] = col.value; sync(); });
+        d.reset = function () { col.value = C[key]; };
+      } else {
+        d.innerHTML = '<label for="' + id + '">' + c[2] + (kind === 'demo' ? ' <small>(demo only)</small>' : '') + '</label><output></output>' +
+          '<input type="range" id="' + id + '" min="' + c[3] + '" max="' + c[4] + '" step="' + c[5] + '">';
+        var r = d.querySelector('input'), o = d.querySelector('output');
+        var show = function () { o.textContent = target[key] + c[6]; };
+        r.value = target[key]; show();
+        r.addEventListener('input', function () { target[key] = Number(r.value); show(); sync(); });
+        d.reset = function () { r.value = target[key]; show(); };
+      }
+      rows.push(d); w.appendChild(d);
+      if (key === 'style') { var p = document.createElement('p'); p.className = 'desc'; p.id = 'styleDesc'; p.textContent = STYLES[C.style]; w.appendChild(p); }
+      if (key === 'revealEase') { var g2 = document.createElement('canvas'); g2.className = 'graph'; g2.id = 'graph'; w.appendChild(g2); }
+    });
+    box.appendChild(w);
+  });
+  function refreshOff() { rows.forEach(function (d) { d.classList.toggle('off', !!d.only && d.only.indexOf(C.style) < 0); }); }
+
+  /* ---- curve graph: cover in forest, reveal in mint-dark ---- */
+  function drawGraph() {
+    var g = $('graph'), dpr = window.devicePixelRatio || 1, w = g.clientWidth, h = g.clientHeight;
+    g.width = w * dpr; g.height = h * dpr; var x = g.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var pad = 12, iw = w - pad * 2, ih = h - pad * 2.4;
+    x.clearRect(0, 0, w, h); x.strokeStyle = '#d9e3dc'; x.lineWidth = 1;
+    x.strokeRect(pad, pad, iw, ih);
+    [['coverEase', '#073823'], ['revealEase', '#21b35a']].forEach(function (s) {
+      var f = T.ease(C[s[0]]); x.strokeStyle = s[1]; x.lineWidth = 2; x.beginPath();
+      for (var i = 0; i <= 60; i++) { var t = i / 60, y = f(t); x[i ? 'lineTo' : 'moveTo'](pad + t * iw, pad + ih - y * ih); }
+      x.stroke();
+    });
+    x.font = '10px "DM Mono",monospace'; x.fillStyle = '#073823'; x.fillText('cover', pad, h - 4); x.fillStyle = '#21b35a'; x.fillText('reveal', pad + 50, h - 4);
+  }
+
+  /* ---- play: the real cover → (page load) → real reveal ---- */
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function play() {
+    if (playing) return;
+    playing = true; frozen = false; scrubOut.textContent = 'live';
+    showPage(false);
+    var cd = C.coverDuration, rd = C.revealDuration;
+    C.coverDuration = cd * slow; C.revealDuration = rd * slow;
+    T.cover(originFrom(), words())
+      .then(function () { return wait(DEMO.hold * slow); })
+      .then(function () { showPage(true); window.scrollTo(0, 0); return T.reveal(); })
+      .then(function () { C.coverDuration = cd; C.revealDuration = rd; playing = false; });
+  }
+  $('play').onclick = play; $('go').onclick = play;
+  $('back').onclick = function () { frozen = false; T.unmount(); showPage(false); scrubOut.textContent = 'live'; };
+
+  /* ---- scrub ---- */
+  function drawFrozen() {
+    var v = Number(scrub.value) / 1000;
+    showPage(false); T.setOrigin(originFrom());   // measure on the quiz page, where the button is
+    T.state.word = words(); T.mount();
+    if (v < 1) T.frame('cover', v); else { showPage(true); T.frame('reveal', v - 1); }
+    scrubOut.textContent = (v < 1 ? 'cover ' + v.toFixed(2) : 'reveal ' + (v - 1).toFixed(2));
+  }
+  scrub.addEventListener('input', function () { if (playing) return; frozen = true; drawFrozen(); });
+
+  /* ---- origin picker: the next click on the page (not the panel) sets the origin ---- */
+  $('pick').onclick = function () {
+    var on = this.getAttribute('aria-pressed') !== 'true';
+    this.setAttribute('aria-pressed', on); document.body.classList.toggle('picking', on);
+    toast(on ? 'Click anywhere on the page to set the origin' : '');
+  };
+  $('site').addEventListener('click', function (e) {
+    if (!document.body.classList.contains('picking')) return;
+    e.preventDefault(); e.stopPropagation();
+    picked = { x: e.clientX, y: e.clientY };
+    marker.style.left = e.clientX + 'px'; marker.style.top = e.clientY + 'px'; marker.style.display = 'block';
+    $('pick').setAttribute('aria-pressed', 'false'); document.body.classList.remove('picking'); toast('');
+    if (frozen) drawFrozen();
+  }, true);
+  $('origReset').onclick = function () { picked = null; marker.style.display = 'none'; if (frozen) drawFrozen(); };
+  $('slow').onclick = function () { slow = slow === 1 ? 4 : 1; this.setAttribute('aria-pressed', slow > 1); };
+
+  function toast(t) { var el = $('toast'); el.textContent = t; el.style.display = t ? 'block' : 'none'; }
+  $('copy').onclick = function () {
+    var b = this, text = cfgText();
+    function ok() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy config'; }, 1500); }
+    function fallback() { out.value = text; out.focus(); out.select(); try { document.execCommand('copy') ? ok() : (b.textContent = 'Select the box, copy it'); } catch (e) { b.textContent = 'Select the box, copy it'; } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fallback); else fallback();
+  };
+  function togglePanel() { document.body.classList.toggle('hide-panel'); setTimeout(function () { if (frozen) drawFrozen(); }, 320); }
+  $('hide').onclick = togglePanel; $('peek').onclick = togglePanel;
+  document.addEventListener('keydown', function (e) { if ((e.key === 'h' || e.key === 'H') && !/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) togglePanel(); });
+  window.addEventListener('resize', function () { if (frozen) drawFrozen(); drawGraph(); });
+  sync();
+})();
+</script>
+</body></html>
