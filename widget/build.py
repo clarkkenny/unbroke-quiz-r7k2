@@ -44,7 +44,7 @@ def embed_for(pages):
 result_js = (src / 'result-page.js').read_text()
 def result_for(bucket, quiz_page, fonts=None):
     j = result_js.replace("var THIS_RESULT = 'bucket_1';", f"var THIS_RESULT = '{bucket}';")
-    j = j.replace("var QUIZ_PAGE = '/quiz';", f"var QUIZ_PAGE = '{quiz_page}';")
+    j = j.replace("var QUIZ_PAGE = '/take-quiz';", f"var QUIZ_PAGE = '{quiz_page}';")
     if fonts:
         a = j.index("var PDF_FONTS = '"); b = j.index("';", a)
         j = j[:a] + f"var PDF_FONTS = '{fonts}" + j[b:]
@@ -53,7 +53,7 @@ def result_for(bucket, quiz_page, fonts=None):
 files = {
     '1-code-embed.html': embed_for(content['pages']),
     '2-before-body.html': engine,
-    '3-result-page-head.html': result_for('bucket_1', '/quiz'),
+    '3-result-page-head.html': result_for('bucket_1', '/take-quiz'),
 }
 for name, text in files.items():
     (out / name).write_text(text)
