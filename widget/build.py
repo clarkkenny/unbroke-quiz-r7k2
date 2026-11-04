@@ -42,9 +42,12 @@ def embed_for(pages):
 
 # ---------- result page ----------
 result_js = (src / 'result-page.js').read_text()
-def result_for(bucket, quiz_page):
+def result_for(bucket, quiz_page, fonts=None):
     j = result_js.replace("var THIS_RESULT = 'bucket_1';", f"var THIS_RESULT = '{bucket}';")
     j = j.replace("var QUIZ_PAGE = '/quiz';", f"var QUIZ_PAGE = '{quiz_page}';")
+    if fonts:
+        a = j.index("var PDF_FONTS = '"); b = j.index("';", a)
+        j = j[:a] + f"var PDF_FONTS = '{fonts}" + j[b:]
     return '<script>\n' + j.strip() + '\n</script>\n'
 
 files = {
@@ -95,11 +98,11 @@ if idx.exists():
         r = content['results'][bucket]
         slug = path.rsplit('/', 1)[-1]
         moves = ''.join(f'<li>{html.escape(m)}</li>' for m in r['moves'])
-        page = (head.replace('{TITLE}', html.escape(r['name'])) + page_css + '</style>\n' + result_for(bucket, '../') +
+        page = (head.replace('{TITLE}', html.escape(r['name'])) + page_css + '</style>\n' + result_for(bucket, '../', '../widget/fonts/unbroke-pdf-fonts.json') +
 f'''</head><body>
 {nav}
 <main class="result">
-<div class="note" role="note"><strong>Stand-in result page.</strong> The real result pages are designed in Webflow. The buttons here are plain elements with the custom attributes the result page script looks for: <code>data-quiz-pdf</code>, <code>data-quiz-share</code>, <code>data-quiz-name</code> and <code>data-quiz-zip-reveal</code>.</div>
+<div class="note" role="note"><strong>Stand-in result page.</strong> The real result pages are designed in Webflow. The blocks here are plain elements with the custom attributes the result page script looks for: <code>data-quiz-name</code>, <code>data-quiz-zip-reveal</code> and <code>data-quiz-ctas</code> (the button group at the bottom).</div>
 <div class="card">
 <p class="level"><span class="chip">{html.escape(r["level"])}</span><span>{html.escape(r["desc"])}</span></p>
 <h1><span data-quiz-name>You</span>, you're {html.escape(r["name"])}.</h1>
@@ -108,9 +111,7 @@ f'''</head><body>
 <ol>{moves}</ol>
 <p class="n">{html.escape(r["note"])}</p>
 <div data-quiz-zip-reveal style="margin:0 0 32px"></div>
-<div class="actions"><button type="button" class="btn" data-quiz-pdf>Download full report</button></div>
-<div class="actions"><button type="button" class="sbtn" data-quiz-share="native">Share</button><button type="button" class="sbtn" data-quiz-share="copy">Copy link</button><a class="sbtn" data-quiz-share="x">Post on X</a><a class="sbtn" data-quiz-share="linkedin">LinkedIn</a><a class="sbtn" data-quiz-share="facebook">Facebook</a></div>
-<a class="retake" href="../">Retake the quiz</a>
+<div data-quiz-ctas></div>
 </div></main>
 <div class="result"><div class="note"><strong>Sent to the Webflow form (demo stand-in):</strong><pre id="wf" style="margin:8px 0 0;white-space:pre-wrap"></pre></div></div>
 <p class="foot">Demo build for internal review.</p>

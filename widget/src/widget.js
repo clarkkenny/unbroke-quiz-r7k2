@@ -505,7 +505,11 @@
        The result page script reads this to guard the page, personalise it and build the PDF. */
     function goToResult() {
       var r = REPORT[result.bucket];
+      // the Q4 answer, echoed back in the PDF as "Your dream, in your words"
+      var dreamQ = QUESTIONS.filter(function (q) { return q.id === 'q4'; })[0];
+      var dreamO = dreamQ && (dreamQ.options || []).filter(function (o) { return o.key === answers.q4; })[0];
       var data = {
+        dream: dreamO ? dreamO.text : '',
         bucket: result.bucket, firstName: person.firstName, lastName: person.lastName,
         final: result.final, tier: result.tier, adjustment: result.adjustment,
         report: r, disclaimer: COPY.disclaimer, shareText: fill(COPY.shareText, { name: r.name }), shareUrl: shareUrl,
