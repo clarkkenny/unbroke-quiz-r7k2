@@ -91,7 +91,7 @@
     'p{margin:0 0 12px;font-size:clamp(16px,1.9cqi,21px);line-height:1.4;letter-spacing:-.02em}' +
     'p.s{font-weight:700}' +
     'p.src{margin:16px 0 0;font-family:var(--uq-mono,Inconsolata,ui-monospace,Menlo,monospace);font-size:12px;line-height:1.5;letter-spacing:.01em;color:#555}' +
-    '@container (max-width:720px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.v{font-size:clamp(40px,14cqi,80px)}}' +
+    '@container (max-width:720px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.v{font-size:clamp(44px,19cqi,84px)}}' +
     '@container (max-width:340px){.zs{padding-top:52px}.tile{padding:12px 14px}}';
 
   function esc(s) {
