@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quiz Transition Tuner</title><meta name="robots" content="noindex">
+<title>Site Transition Tuner</title><meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Mono&family=Instrument+Serif&family=Inter+Tight:wght@400;500;600;800&display=swap" rel="stylesheet">
 <style>
@@ -9,7 +9,10 @@
 body{font-family:"Inter Tight",system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
 .site{min-height:100vh;background-color:#fff;background-image:radial-gradient(var(--dot) 1.6px,transparent 1.7px);background-size:22px 22px;padding-right:340px}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:2px solid #000;background:#fff}
-.logo{font:400 30px/1 Anton,Impact,sans-serif;letter-spacing:.01em}
+.logo{font:400 30px/1 Anton,Impact,sans-serif;letter-spacing:.01em;color:#000;text-decoration:none}
+.links{display:flex;gap:4px}.links a{padding:6px 10px;font-weight:800;font-size:13px;text-transform:uppercase;color:#000;text-decoration:none;border-left:2px solid #000}
+.anchor{font:13px "DM Mono",monospace;color:var(--forest)}
+a.go{text-decoration:none}
 .nav span{font:13px "DM Mono",monospace;color:var(--forest)}
 .page{display:none;padding:56px 32px 96px;max-width:1000px;margin:0 auto}
 .page.on{display:block}
@@ -64,9 +67,12 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
 @media (max-width:900px){.site{padding-right:0}.panel{position:static;width:auto;height:auto;border-left:0;border-top:1px solid var(--line)}}
 </style>
 <script>
-/*! Unbroke page transition. Quiz page: cover, then a real page load. Result page: reveal.
- *  The cover is one full-screen canvas. Every style ends fully covered in config.color, so the
- *  result page can paint that same colour before its first frame (see ARRIVAL) and the hand-off is seamless.
+/*! Unbroke page transition, site-wide. Click an internal link: the page is covered, then a real page load,
+ *  then the next page is revealed. Every style ends fully covered in config.color, and this script runs in
+ *  the <head>, so the next page paints that same colour (and word) before its first frame: no white flash.
+ *  Real loads keep Webflow's own interactions working; no Barba/Swup.
+ *  Links that never transition: new tab, #anchors on the same page, downloads, mailto/tel, other sites,
+ *  Cmd/Ctrl/Shift-click, and anything inside [data-tx-prevent]. Give a link data-tx-word="..." to show a word.
  */
 (function () {
   'use strict';
@@ -89,11 +95,14 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
     bars: 7,
     stagger: 0.45,
     // the word held on the cover across the page load
-    word: 'level',             // level ("Stable") | name ("Solid, Still Building") | none
+    word: 'level',             // quiz -> result: level ("STABLE") | name ("Solid, Still Building") | none
+    linkWord: 'none',          // other links: none | text (the link's own text). data-tx-word on a link always wins
     wordColor: '#073823',
     wordFont: '"Abcgravityxxcompressed Ultra", Anton, Impact, "Arial Narrow", sans-serif',
     wordSize: 0.17,            // share of viewport width
-    wordRise: 36               // px it travels in and out
+    wordRise: 36,              // px it travels in and out
+    prefetch: true,            // start loading a page when the pointer reaches its link
+    watchdog: 6000             // ms: if the next page never comes, uncover this one
   };
 
   var EASES = {
@@ -215,7 +224,9 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
   }
   function fit(text, size) {
     var w = ctx.measureText(text).width, max = W * 0.9;
-    if (w > max) ctx.font = Math.floor(size * max / w) + 'px ' + config.wordFont;
+    if (w > max) size = Math.floor(size * max / w);
+    ctx.font = size + 'px ' + config.wordFont;
+    state.wordVw = size / W;   // the next page's pre-paint hold uses the same fitted size
   }
   function round(x, y, w, h, r) {
     r = Math.max(0, Math.min(r, w / 2, h / 2));
@@ -247,37 +258,138 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
     else if (from && typeof from.x === 'number') { state.ox = from.x / innerWidth; state.oy = from.y / innerHeight; state.rect = null; }
   }
 
-  /* Quiz page: cover the screen, remember how, then resolve so the caller can navigate. */
-  function cover(from, word) {
-    mount(); setOrigin(from); state.word = word || '';
-    canvas.style.pointerEvents = 'auto';
-    try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), ox: state.ox, oy: state.oy, color: config.color, word: config.word === 'none' ? '' : state.word, wordColor: config.wordColor, wordFont: config.wordFont, wordSize: config.wordSize })); } catch (e) {}
-    if (reduced()) { frame('cover', 1); return Promise.resolve(); }
-    return run('cover', config.coverDuration);
+  function pickWord(w) {
+    if (!w || config.word === 'none' && typeof w === 'object') return '';
+    if (typeof w === 'object') return (config.word === 'name' ? w.name : w.level) || '';
+    return String(w);
   }
 
-  /* Result page: pick up from the held colour and reveal. Safe to call when there was no transition. */
-  function reveal(opts) {
+  /* Cover the screen and remember how, so the next page can pick up from the same colour and word. */
+  function cover(from, word) {
+    mount(); setOrigin(from); state.word = pickWord(word); state.wordVw = 0;
+    canvas.style.pointerEvents = 'auto';
+    var save = function () {
+      try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), ox: state.ox, oy: state.oy, word: state.word, vw: state.wordVw })); } catch (e) {}
+    };
+    if (reduced()) { frame('cover', 1); save(); return Promise.resolve(); }
+    return run('cover', config.coverDuration).then(save);
+  }
+
+  var leaving = false, dog = 0;
+  /* Cover, then navigate. The quiz calls this with the result page, the button and {level, name}. */
+  function go(url, from, word) {
+    if (leaving) return;
+    leaving = true;
+    cover(from, word).then(function () {
+      dog = setTimeout(function () { leaving = false; unmount(); }, config.watchdog);
+      api.navigate(url);
+    });
+  }
+
+  /* Next page, in the <head>, before first paint: hold the cover colour and word. */
+  function arrive() {
+    var t = null;
+    try { t = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) {}
+    if (!t || Date.now() - t.at > 15000) return false;
+    var css = 'html{background:' + config.color + '!important}' +
+      'html::before{content:"";position:fixed;inset:0;z-index:2147483000;background:' + config.color + '}';
+    if (t.word) css += 'html::after{content:' + JSON.stringify(t.word) + ';position:fixed;left:5vw;right:5vw;top:50%;z-index:2147483001;' +
+      'transform:translateY(-50%);text-align:center;white-space:nowrap;color:' + config.wordColor + ';' +
+      'font-size:' + (t.vw ? (t.vw * 100).toFixed(3) + 'vw' : 'min(' + (config.wordSize * 100) + 'vw,32vh,260px)') + ';line-height:1;font-family:' + config.wordFont + '}';
+    var st = document.getElementById('uq-tx-hold') || document.createElement('style');
+    st.id = 'uq-tx-hold'; st.textContent = css;
+    (document.head || document.documentElement).appendChild(st);
+    return true;
+  }
+
+  /* Next page, once the DOM is in: reveal. Safe to call when there was no transition. */
+  function reveal() {
     var t = null;
     try { t = JSON.parse(sessionStorage.getItem(KEY) || 'null'); sessionStorage.removeItem(KEY); } catch (e) {}
-    if (!t && !(opts && opts.force)) { release(); return Promise.resolve(false); }
-    if (t) { state.ox = t.ox; state.oy = t.oy; state.word = t.word || ''; }
-    mount(); frame('reveal', 0); release();
-    var go = function () { return reduced() ? Promise.resolve() : run('reveal', config.revealDuration); };
+    if (!t) { release(); return Promise.resolve(false); }
+    state.ox = t.ox; state.oy = t.oy; state.word = t.word || '';
+    mount(); canvas.style.pointerEvents = 'none'; frame('reveal', 0); release();
+    var go2 = function () { return reduced() ? Promise.resolve() : run('reveal', config.revealDuration); };
     var fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 250); })]) : Promise.resolve();
-    return fonts.then(go).then(function () { unmount(); return true; });
+    return fonts.then(go2).then(function () { unmount(); return true; });
   }
-  // drop the pre-paint hold painted by ARRIVAL
+  // drop the pre-paint hold painted by arrive()
   function release() { var h = document.getElementById('uq-tx-hold'); if (h) h.remove(); }
 
-  window.UQTransition = { config: config, EASES: EASES, ease: ease, frame: frame, cover: cover, reveal: reveal, mount: mount, unmount: unmount, setOrigin: setOrigin, state: state };
+  /* ---- which links transition ---- */
+  function target(a) {
+    if (!a || !a.href || a.closest('[data-tx-prevent]') || a.hasAttribute('download')) return null;
+    var tg = a.getAttribute('target'); if (tg && tg !== '_self') return null;
+    var u; try { u = new URL(a.href, location.href); } catch (e) { return null; }
+    if (!/^https?:$/.test(u.protocol) || u.origin !== location.origin) return null;
+    if (u.pathname === location.pathname && u.search === location.search) return null; // same page / #anchor
+    return u;
+  }
+  function onClick(e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href]'), u = target(a);
+    if (!u) return;
+    e.preventDefault();
+    var w = a.getAttribute('data-tx-word');
+    if (w === null && config.linkWord === 'text') { w = (a.textContent || '').trim(); if (w.length > 24) w = ''; }
+    go(u.href, { x: e.clientX || innerWidth / 2, y: e.clientY || innerHeight / 2 }, w || '');
+  }
+  var fetched = {};
+  function onHover(e) {
+    if (!config.prefetch) return;
+    var a = e.target.closest && e.target.closest('a[href]'), u = target(a);
+    if (!u || fetched[u.href]) return;
+    fetched[u.href] = 1;
+    var l = document.createElement('link'); l.rel = 'prefetch'; l.href = u.href; document.head.appendChild(l);
+  }
+
+  /* Wire it up. Call once, in the <head>, after any config changes. */
+  function start() {
+    var vt = document.createElement('style');
+    // hold the covered frame across the load where the browser can (Chrome, Safari), with no animation of its own
+    vt.textContent = '@view-transition{navigation:auto}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none}';
+    (document.head || document.documentElement).appendChild(vt);
+    arrive();
+    var ready = function () { api.reveal(); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
+    document.addEventListener('click', onClick);
+    document.addEventListener('pointerover', onHover, { passive: true });
+    document.addEventListener('touchstart', onHover, { passive: true });
+    // back/forward from the cache: never come back to a covered page
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) { clearTimeout(dog); leaving = false; release(); unmount(); }
+    });
+    setTimeout(release, 4000); // the hold can never outlive a stuck page
+  }
+
+  var api = window.UQTransition = {
+    config: config, EASES: EASES, ease: ease, frame: frame, state: state,
+    start: start, go: go, cover: cover, arrive: arrive, reveal: reveal, release: release, mount: mount, unmount: unmount, setOrigin: setOrigin,
+    eligible: function (a) { return !!target(a); },
+    _reset: function () { leaving = false; clearTimeout(dog); },
+    navigate: function (url) { location.href = url; }   // the tuner swaps this for a fake page load
+  };
 })();
 
 </script>
 </head><body>
 <div class="site" id="site">
-  <nav class="nav"><span class="logo">UNBROKE</span><span id="where">/take-quiz</span></nav>
-  <section class="page on" id="pageA">
+  <nav class="nav"><a class="logo" href="/home">UNBROKE</a>
+    <span class="links"><a href="/home">Home</a><a href="/book">The book</a><a href="/take-quiz">Take the quiz</a><a href="https://www.instagram.com/unbroke_life/" target="_blank" rel="noopener">Instagram ↗</a></span>
+    <span id="where">/take-quiz</span></nav>
+  <section class="page" data-path="/home">
+    <p class="kick">Frank Rotman · early 2027</p>
+    <h1 class="h1">Feeling broke is temporary.</h1>
+    <p class="read">What you learn in the book shouldn't be. Old money rules are broken; this is how to fund the life you actually want.</p>
+    <p><a class="go" href="/take-quiz">How broke are you? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    &nbsp; <a href="#faq" class="anchor">Same-page #anchor (no transition)</a></p>
+  </section>
+  <section class="page" data-path="/book">
+    <p class="kick">The book</p>
+    <h1 class="h1">Unbroke</h1>
+    <p class="read">Why the old money rules are broken, and how to fund the life you actually want. This link has data-tx-word: <a href="/take-quiz" data-tx-word="QUIZ TIME">take the quiz</a>.</p>
+  </section>
+  <section class="page on" id="pageA" data-path="/take-quiz">
     <p class="kick">The quiz</p>
     <h1 class="h1">How broke are you?</h1>
     <div class="card">
@@ -286,7 +398,7 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
       <button type="button" class="go" id="go">See my results <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </div>
   </section>
-  <section class="page" id="pageB">
+  <section class="page" id="pageB" data-path="/quiz/solid-still-building">
     <div class="hero"><span class="chip">Stable Mode</span><h1 class="title">Solid, <em>Still Building</em></h1></div>
     <p class="read">A surprise expense doesn't scare you anymore. That's real, and most people never get here. But don't mistake a solid cushion for being done.</p>
     <div class="moves">
@@ -301,8 +413,8 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
 <button type="button" class="peek" id="peek">Show panel (H)</button>
 
 <aside class="panel" aria-label="Transition controls">
-  <h1>Quiz → result transition</h1>
-  <p class="sub">Click "See my results" or Play. Hide the panel (H) to judge the full screen; the word centres on the whole window. Panel changes live in this tab only: press Copy config before you close it.</p>
+  <h1>Site page transition</h1>
+  <p class="sub">Click any nav link, the home CTA, or "See my results" (quiz → result, with the level word). Instagram and the #anchor are excluded, as on the real site. Hide the panel (H) to judge the full screen; the word centres on the whole window. Panel changes live in this tab only: press Copy config before you close it.</p>
   <div class="btns">
     <button type="button" class="primary" id="play">Play transition</button>
     <button type="button" id="back">Back to quiz page</button>
@@ -339,6 +451,11 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
       ['color', 'color', 'Cover colour'],
       ['revealFrom', 'select', 'Reveal from', ['same', 'center', 'top']]
     ]],
+    ['# Site links', [
+      ['linkWord', 'select', 'Word on other links', ['none', 'text']],
+      ['prefetch', 'check', 'Prefetch on hover'],
+      ['watchdog', 'range', 'Give-up time', 2000, 12000, 500, 'ms']
+    ]],
     ['# Timing', [
       ['coverDuration', 'range', 'Cover', 200, 1600, 10, 'ms'],
       ['revealDuration', 'range', 'Reveal', 200, 1600, 10, 'ms'],
@@ -358,7 +475,7 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
       ['stagger', 'range', 'Stagger', 0, 0.9, 0.01, '', ['blinds']]
     ]],
     ['# Word on the cover', [
-      ['word', 'select', 'Word', ['level', 'name', 'none']],
+      ['word', 'select', 'Quiz → result word', ['level', 'name', 'none']],
       ['wordColor', 'color', 'Word colour'],
       ['wordSize', 'range', 'Size', 0.06, 0.3, 0.005, '× vw'],
       ['wordRise', 'range', 'Travel', 0, 120, 1, 'px']
@@ -369,8 +486,14 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
   var out = $('out'), scrub = $('scrub'), scrubOut = $('scrubOut'), marker = $('marker');
   var picked = null, frozen = false, playing = false, slow = 1;
 
-  function words() { return C.word === 'name' ? 'Solid, Still Building' : C.word === 'level' ? 'STABLE' : ''; }
-  function showPage(b) { $('pageA').classList.toggle('on', !b); $('pageB').classList.toggle('on', b); $('where').textContent = b ? '/quiz/solid-still-building' : '/take-quiz'; }
+  function words() { return current !== '/take-quiz' && current !== '/quiz/solid-still-building' ? '' : C.word === 'name' ? 'Solid, Still Building' : C.word === 'level' ? 'STABLE' : ''; }
+  var current = '/take-quiz';
+  function showPath(path) {
+    current = path;
+    document.querySelectorAll('.page').forEach(function (p) { p.classList.toggle('on', p.getAttribute('data-path') === path); });
+    $('where').textContent = path;
+  }
+  function showPage(b) { showPath(b ? '/quiz/solid-still-building' : '/take-quiz'); }
   function originFrom() { return picked || $('go'); }
   function cfgText() {
     return 'Object.assign(UQTransition.config,{\n' + Object.keys(C).map(function (k) {
@@ -393,6 +516,11 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
         var sel = d.querySelector('select'); sel.value = C[key];
         sel.addEventListener('change', function () { C[key] = sel.value; if (key === 'style') $('styleDesc').textContent = STYLES[C.style]; sync(); });
         d.reset = function () { sel.value = C[key]; };
+      } else if (kind === 'check') {
+        d.innerHTML = '<label for="' + id + '">' + c[2] + '</label><input type="checkbox" id="' + id + '">';
+        var cb = d.querySelector('input'); cb.checked = !!C[key];
+        cb.addEventListener('change', function () { C[key] = cb.checked; sync(); });
+        d.reset = function () { cb.checked = !!C[key]; };
       } else if (kind === 'color') {
         d.innerHTML = '<label for="' + id + '">' + c[2] + '</label><input type="color" id="' + id + '">';
         var col = d.querySelector('input'); col.value = C[key];
@@ -432,19 +560,34 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
 
   /* ---- play: the real cover → (page load) → real reveal ---- */
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  // The engine's own click handling runs (T.start below). Only the page load is faked:
+  // drop the canvas, paint the same pre-paint hold the next page would, wait, swap, reveal.
+  var saved = null;
+  function slowOn() { if (slow > 1 && !saved) { saved = [C.coverDuration, C.revealDuration]; C.coverDuration *= slow; C.revealDuration *= slow; } }
+  function slowOff() { if (saved) { C.coverDuration = saved[0]; C.revealDuration = saved[1]; saved = null; } }
+  T.navigate = function (url) {
+    var path = new URL(url, location.href).pathname;
+    T._reset(); T.unmount(); T.arrive();
+    wait(DEMO.hold * slow).then(function () {
+      showPath(document.querySelector('.page[data-path="' + path + '"]') ? path : '/home');
+      window.scrollTo(0, 0);
+      return T.reveal();
+    }).then(function () { slowOff(); playing = false; T._reset(); });
+  };
+  document.addEventListener('click', function (e) { // runs before the engine's handler
+    if (document.body.classList.contains('picking')) return;
+    var a = e.target.closest('a[href]');
+    if (a && T.eligible(a) && !e.metaKey && !e.ctrlKey && !e.shiftKey) { frozen = false; scrubOut.textContent = 'live'; slowOn(); playing = true; }
+  }, true);
   function play() {
     if (playing) return;
-    playing = true; frozen = false; scrubOut.textContent = 'live';
-    showPage(false);
-    var cd = C.coverDuration, rd = C.revealDuration;
-    C.coverDuration = cd * slow; C.revealDuration = rd * slow;
-    T.cover(originFrom(), words())
-      .then(function () { return wait(DEMO.hold * slow); })
-      .then(function () { showPage(true); window.scrollTo(0, 0); return T.reveal(); })
-      .then(function () { C.coverDuration = cd; C.revealDuration = rd; playing = false; });
+    showPage(false); frozen = false; scrubOut.textContent = 'live'; T.unmount();
+    playing = true; slowOn();
+    T.go('/quiz/solid-still-building', originFrom(), { level: 'STABLE', name: 'Solid, Still Building' });
   }
   $('play').onclick = play; $('go').onclick = play;
-  $('back').onclick = function () { frozen = false; T.unmount(); showPage(false); scrubOut.textContent = 'live'; };
+  T.start();
+  $('back').onclick = function () { frozen = false; playing = false; T.unmount(); T.release(); T._reset(); showPage(false); scrubOut.textContent = 'live'; };
 
   /* ---- scrub ---- */
   function drawFrozen() {

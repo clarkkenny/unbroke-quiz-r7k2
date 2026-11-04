@@ -138,3 +138,14 @@ tt = (here / 'tune-transition.template.html').read_text()
 assert tt.count('/*__ENGINE__*/') == 1
 (root / 'tune-transition.html').write_text(tt.replace('/*__ENGINE__*/', tx.replace('</', '<\\/')))
 print('tune-transition.html built')
+
+# ---------- site-wide transition embed: minified engine + visible tuning block + wiring ----------
+mini_tx = subprocess.run([terser, '-c', 'passes=2', '-m', '--comments', '/^!/'], input=tx, capture_output=True, text=True, check=True).stdout.strip()
+(here / 'transition.min.js').write_text(mini_tx + '\n')
+cfg = tx[tx.index('var config = {') + len('var config = '):tx.index('};', tx.index('var config = {')) + 1]
+vals = [re.sub(r'\s*//.*$', '', l).strip().rstrip(',') for l in cfg.splitlines()[1:-1]]
+block = 'Object.assign(UQTransition.config,{\n' + ',\n'.join(v for v in vals if v) + '\n});'
+embed_tx = ('<!-- UNBROKE page transition. Site settings > Custom code > Head code. Edit only the tuning block. -->\n<script>\n' + mini_tx +
+            '\n/* --- tuning: paste Copy config from the tuner over this block --- */\n' + block + '\n/* wiring */\nUQTransition.start();\n</script>\n')
+(out / '4-site-head-transition.html').write_text(embed_tx)
+print(f'4-site-head-transition.html: {len(embed_tx):,} characters')
