@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CTA Motion Tuner</title><meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=Oswald:wght@600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#000;--mint:#95ffb1;--forest:#073823;--line:#d9e3dc;--panel:#fff;--muted:#56625b}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Inter Tight",system-ui,sans-serif;color:var(--ink);background:#f3f6f4;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:100vh}
+.stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:48px 24px;transition:background-color .2s}
+.stage.bg-dots{background-color:#fff;background-image:radial-gradient(#bff3cf 1.6px,transparent 1.7px);background-size:22px 22px}
+.stage.bg-mint{background:#94fcae}
+.stage.bg-white{background:#fff}
+.frame{width:100%;max-width:860px;transition:max-width .35s cubic-bezier(.16,1,.3,1)}
+.frame.mobile{max-width:375px}
+.hint{font:12px/1.4 "DM Mono",ui-monospace,monospace;color:var(--muted);text-align:center}
+.panel{position:sticky;top:0;height:100vh;overflow:auto;background:var(--panel);border-left:1px solid var(--line);padding:18px 18px 28px}
+.panel h1{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:0 0 2px;text-transform:uppercase}
+.panel p.sub{margin:0 0 14px;font:12px/1.4 "DM Mono",ui-monospace,monospace;color:var(--muted)}
+.group{border-top:1px solid var(--line);padding:12px 0 6px}
+.group h2{font:600 11px/1 "DM Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);margin:0 0 10px}
+.ctl{display:grid;grid-template-columns:1fr 64px;align-items:center;gap:4px 10px;margin:0 0 10px}
+.ctl label{font-size:13px;font-weight:600}
+.ctl output{font:12px "DM Mono",ui-monospace,monospace;text-align:right;color:var(--muted)}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--forest);margin:0}
+.ctl select,.ctl input[type=text]{grid-column:1/-1;width:100%;font:12px "DM Mono",ui-monospace,monospace;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.seg button,.acts button{font:600 12px/1 "Inter Tight",sans-serif;padding:8px 10px;border:1.5px solid var(--forest);border-radius:6px;background:#fff;color:var(--forest);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--forest);color:#fff}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 12px}
+.acts .copy{grid-column:1/-1;background:var(--mint);color:var(--ink);border-color:var(--ink);padding:11px;font-size:13px;text-transform:uppercase;letter-spacing:.02em}
+.acts button:focus-visible,.seg button:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+textarea{width:100%;height:150px;font:11px/1.45 "DM Mono",ui-monospace,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical}
+@media (max-width:820px){.app{grid-template-columns:1fr}.panel{position:static;height:auto;border-left:0;border-top:1px solid var(--line)}}
+</style>
+<script>
+  // stand-in result so the real result-page script renders the block
+  window.UQCTA_TUNE = true;
+  try {
+    sessionStorage.setItem('uq_unlocked', 'bucket_3');
+    sessionStorage.setItem('uq_report', JSON.stringify(/*__SAMPLE__*/));
+  } catch (e) {}
+</script>
+<script>
+/*__RESULT_SCRIPT__*/
+</script>
+</head><body>
+<div class="app">
+  <main class="stage bg-dots" id="stage">
+    <div class="frame" id="frame"></div>
+    <p class="hint">Hover, press, open Share, click Copy link. Download builds a real PDF.</p>
+  </main>
+  <aside class="panel" aria-label="Motion controls">
+    <h1>CTA motion</h1>
+    <p class="sub">Defaults match the quiz. Tune, then Copy config.</p>
+    <div class="acts">
+      <button type="button" id="replay">Replay entrance</button>
+      <button type="button" id="share">Toggle share</button>
+      <button type="button" id="load">Toggle loading</button>
+      <button type="button" id="reset">Reset</button>
+      <button type="button" class="copy" id="copy">Copy config</button>
+    </div>
+    <div class="group"><h2>Preview</h2>
+      <div class="seg" id="bg"><button type="button" data-v="dots" aria-pressed="true">Dot grid</button><button type="button" data-v="mint" aria-pressed="false">Mint</button><button type="button" data-v="white" aria-pressed="false">White</button></div>
+      <div class="seg" id="width"><button type="button" data-v="desktop" aria-pressed="true">Desktop</button><button type="button" data-v="mobile" aria-pressed="false">Phone width</button></div>
+    </div>
+    <div id="controls"></div>
+    <div class="group"><h2>Config</h2><textarea id="out" readonly aria-label="Config JSON"></textarea></div>
+  </aside>
+</div>
+<script>
+(function () {
+  var M = window.UQCTA.motion, DEFAULTS = JSON.parse(JSON.stringify(M));
+  var EASES = {
+    'Quiz (expo out)': 'cubic-bezier(.16,1,.3,1)',
+    'Soft out': 'cubic-bezier(.22,1,.36,1)',
+    'Slight overshoot': 'cubic-bezier(.34,1.4,.64,1)',
+    'Snappy': 'cubic-bezier(.2,.8,.2,1)',
+    'Standard': 'cubic-bezier(.4,0,.2,1)'
+  };
+  var GROUPS = [
+    ['Feel', [['ease']]],
+    ['Entrance', [['inDuration', 'Duration', 200, 1200, 10, 'ms'], ['stagger', 'Stagger', 0, 160, 5, 'ms'], ['distance', 'Rise', 0, 40, 1, 'px'], ['blur', 'Blur', 0, 16, 1, 'px']]],
+    ['Hover + press', [['hoverDuration', 'Hover speed', 80, 600, 10, 'ms'], ['lift', 'Lift', 0, 6, 0.5, 'px'], ['shadow', 'Shadow drop', 0, 10, 1, 'px'], ['press', 'Press scale', 0.94, 1, 0.005, ''], ['wipe', 'Fill wipe', 0, 800, 10, 'ms'], ['nudge', 'Icon nudge', 0, 8, 0.5, 'px']]],
+    ['Share panel', [['foldDuration', 'Open speed', 150, 900, 10, 'ms'], ['menuDelay', 'Buttons delay', 0, 300, 10, 'ms']]],
+    ['States', [['sweep', 'Loading sweep', 500, 2400, 50, 'ms'], ['pop', '"Copied!" pop', 1, 1.3, 0.01, '×']]]
+  ];
+  var frame = document.getElementById('frame'), out = document.getElementById('out');
+  var el = null, shareOpen = false;
+
+  function render() {
+    var fresh = document.createElement('div');
+    fresh.setAttribute('data-quiz-ctas', '');
+    if (el) el.replaceWith(fresh); else frame.appendChild(fresh);
+    el = fresh;
+    window.UQCTA.render(el);
+    shareOpen = false;
+    out.value = JSON.stringify(M, null, 2);
+  }
+  var t;
+  function soon() { clearTimeout(t); t = setTimeout(render, 140); }
+
+  var box = document.getElementById('controls');
+  GROUPS.forEach(function (g) {
+    var wrap = document.createElement('div'); wrap.className = 'group';
+    wrap.innerHTML = '<h2>' + g[0] + '</h2>';
+    g[1].forEach(function (c) {
+      var d = document.createElement('div'); d.className = 'ctl';
+      if (c[0] === 'ease') {
+        d.innerHTML = '<label for="c-ease">Easing</label><output></output><select id="c-ease">' +
+          Object.keys(EASES).map(function (k) { return '<option value="' + EASES[k] + '">' + k + '</option>'; }).join('') +
+          '<option value="custom">Custom…</option></select><input type="text" id="c-ease-x" aria-label="Custom easing" value="' + M.ease + '">';
+        var sel = d.querySelector('select'), txt = d.querySelector('input');
+        sel.value = M.ease;
+        sel.addEventListener('change', function () { if (sel.value !== 'custom') { M.ease = txt.value = sel.value; soon(); } else txt.focus(); });
+        txt.addEventListener('input', function () { if (/^(cubic-bezier\([^)]*\)|ease|ease-in|ease-out|ease-in-out|linear)$/.test(txt.value.trim())) { M.ease = txt.value.trim(); sel.value = Object.values(EASES).indexOf(M.ease) > -1 ? M.ease : 'custom'; soon(); } });
+      } else {
+        var id = 'c-' + c[0];
+        d.innerHTML = '<label for="' + id + '">' + c[1] + '</label><output></output><input type="range" id="' + id + '" min="' + c[2] + '" max="' + c[3] + '" step="' + c[4] + '">';
+        var r = d.querySelector('input'), o = d.querySelector('output');
+        var show = function () { o.textContent = M[c[0]] + c[5]; };
+        r.value = M[c[0]]; show();
+        r.addEventListener('input', function () { M[c[0]] = Number(r.value); show(); soon(); });
+        d.sync = function () { r.value = M[c[0]]; show(); };
+      }
+      wrap.appendChild(d);
+    });
+    box.appendChild(wrap);
+  });
+
+  function inner(sel) { return el.shadowRoot.querySelector(sel); }
+  document.getElementById('replay').onclick = render;
+  document.getElementById('share').onclick = function () { inner('[data-a="share"]').click(); };
+  document.getElementById('load').onclick = function () { inner('[data-a="pdf"]').classList.toggle('is-loading'); };
+  document.getElementById('reset').onclick = function () {
+    Object.keys(DEFAULTS).forEach(function (k) { M[k] = DEFAULTS[k]; });
+    document.querySelectorAll('.ctl').forEach(function (d) { if (d.sync) d.sync(); });
+    var sel = document.getElementById('c-ease'); sel.value = M.ease; document.getElementById('c-ease-x').value = M.ease;
+    render();
+  };
+  document.getElementById('copy').onclick = function () {
+    var b = this, text = 'UNBROKE CTA MOTION ' + JSON.stringify(M);
+    function ok() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy config'; }, 1500); }
+    function fallback() { out.value = text; out.select(); try { document.execCommand('copy'); ok(); } catch (e) { b.textContent = 'Select the box below'; } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fallback); else fallback();
+  };
+  function seg(id, fn) {
+    var s = document.getElementById(id);
+    s.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      s.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+      fn(b.dataset.v);
+    });
+  }
+  seg('bg', function (v) { document.getElementById('stage').className = 'stage bg-' + v; });
+  seg('width', function (v) { frame.classList.toggle('mobile', v === 'mobile'); });
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
+})();
+</script>
+</body></html>

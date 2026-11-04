@@ -120,3 +120,14 @@ f'''</head><body>
 ''')
         (root / 'quiz' / f'{slug}.html').write_text(page)
     print('demo rebuilt:', ', '.join(demo_pages.values()))
+
+# ---------- CTA motion tuner ----------
+tpl = (here / 'tune-cta.template.html').read_text()
+r3 = content['results']['bucket_3']
+sample = {'bucket': 'bucket_3', 'firstName': 'Leon', 'lastName': 'Wells', 'final': 7, 'tier': 2, 'adjustment': 0,
+          'report': r3, 'dream': content['questions'][3]['options'][2]['text'], 'disclaimer': content['copy']['disclaimer'],
+          'shareText': content['copy']['shareText'].replace('{name}', r3['name']), 'shareUrl': 'https://unbroke.webflow.io/take-quiz', 'zipStats': None}
+tj = result_for('bucket_3', '#')[len('<script>\n'):-len('</script>\n')].replace('</', '<\\/')
+tpl = tpl.replace('/*__SAMPLE__*/', json.dumps(sample, ensure_ascii=False).replace('</', '<\\/')).replace('/*__RESULT_SCRIPT__*/', tj)
+(root / 'tune-cta.html').write_text(tpl)
+print('tune-cta.html:', f'{len(tpl):,} characters')
