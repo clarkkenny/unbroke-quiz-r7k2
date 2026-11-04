@@ -293,16 +293,16 @@
       box(cx, cy, cw, ch, 5, MINT, INK, 1.5);
       txt(mode, PW / 2, cy + 18, 'serif', cs, INK, { align: 'center' });
 
-      // title: heavy sans lead + mint accent, one centred line
+      // title: heavy sans lead + mint serif accent (same face as the mode chip), one centred line
       var size = 40, lw, aw;
       for (;;) {
-        lw = lead ? width(lead + ' ', 'bold', size) : 0; aw = width(accent, 'accent', size);
+        lw = lead ? width(lead + ' ', 'bold', size) : 0; aw = width(accent, 'serif', size * 1.12);
         if (lw + aw <= CW || size <= 20) break;
         size -= 1;
       }
       var tx = (PW - lw - aw) / 2, ty = 100;
       if (lead) txt(lead + ' ', tx, ty, 'bold', size, WHITE);
-      txt(accent, tx + lw, ty, 'accent', size, MINT);
+      txt(accent, tx + lw, ty, 'serif', size * 1.12, MINT);
 
       // where you sit on the scale
       var idx = Number(String(data.bucket).replace(/\D/g, '')) - 1, ls = 7, gapW = 26, pad = 7;
