@@ -520,7 +520,10 @@
         sessionStorage.setItem('uq_name', person.firstName);
         sessionStorage.setItem('uq_report', JSON.stringify(data));
       } catch (e) {}
-      location.href = PAGES[result.bucket];
+      // the site-wide transition (Site settings head code) covers the screen from the button first
+      var T = window.UQTransition;
+      if (T && T.go) T.go(PAGES[result.bucket], root.querySelector('.uq-submit') || null, { level: r.level.toUpperCase(), name: r.name });
+      else location.href = PAGES[result.bucket];
     }
 
     /* ---------- events ---------- */

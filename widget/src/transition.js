@@ -12,21 +12,21 @@
     color: '#95ffb1',          // cover colour
     coverEase: 'inout',        // see EASES
     revealEase: 'expo',
-    coverDuration: 720,        // ms on the quiz page
-    revealDuration: 820,       // ms on the result page
-    revealFrom: 'same',        // same (where the click was) | center | top
+    coverDuration: 700,        // ms on the quiz page
+    revealDuration: 800,       // ms on the result page
+    revealFrom: 'center',        // same (where the click was) | center | top
     // flood
-    dotSize: 22,               // grid cell, px
+    dotSize: 15,               // grid cell, px
     spread: 0.7,               // share of the time spent travelling outward (0 = all at once)
     jitter: 0.25,              // randomness in each dot's start
     // shutter / card
     curve: 90,                 // bulge of the moving edge, px
     radius: 28,                // card corner radius at the start
     // blinds
-    bars: 7,
+    bars: 15,
     stagger: 0.45,
     // the word held on the cover across the page load
-    word: 'level',             // quiz -> result: level ("STABLE") | name ("Solid, Still Building") | none
+    word: 'none',             // quiz -> result: level ("STABLE") | name ("Solid, Still Building") | none
     linkWord: 'none',          // other links: none | text (the link's own text). data-tx-word on a link always wins
     wordColor: '#073823',
     wordFont: '"Abcgravityxxcompressed Ultra", Anton, Impact, "Arial Narrow", sans-serif',
@@ -185,7 +185,8 @@
 
   function setOrigin(from) {
     var r = from && from.getBoundingClientRect ? from.getBoundingClientRect() : null;
-    if (r) { state.ox = (r.left + r.width / 2) / innerWidth; state.oy = (r.top + r.height / 2) / innerHeight; state.rect = { x: r.left, y: r.top, w: r.width, h: r.height }; }
+    if (r && !r.width && !r.height) { state.ox = 0.5; state.oy = 0.5; state.rect = null; }   // hidden element: start from the centre
+    else if (r) { state.ox = (r.left + r.width / 2) / innerWidth; state.oy = (r.top + r.height / 2) / innerHeight; state.rect = { x: r.left, y: r.top, w: r.width, h: r.height }; }
     else if (from && typeof from.x === 'number') { state.ox = from.x / innerWidth; state.oy = from.y / innerHeight; state.rect = null; }
   }
 
