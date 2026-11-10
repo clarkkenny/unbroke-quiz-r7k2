@@ -1,6 +1,6 @@
 /*! Unbroke quiz result page. Paste into each result page: Page settings > Custom code > Inside <head> tag.
  *  Change THIS_RESULT on each page: bucket_1 One Flat Tire, bucket_2 Cautiously Caffeinated,
- *  bucket_3 Solid Still Building, bucket_4 Quietly Unbothered.
+ *  bucket_3 Steady Still Building, bucket_4 Quietly Unbothered.
  *  Drop-in blocks (an empty div with the attribute; the script fills it):
  *    data-quiz-ctas                 Download PDF, Share (opens X / Facebook / LinkedIn / Threads / Copy link), Follow, Retake
  *    data-quiz-zip-reveal           "Your zip, by the numbers" (hidden if there's no data)
@@ -358,12 +358,12 @@
     function cs(str, k, size) { return caps(k) && str === str.toUpperCase() && /[A-Z]/.test(str) ? -0.02 * size : 0; }
     function width(str, k, size) { font(k, size); return doc.getTextWidth(str) + cs(str, k, size) * str.length; }
     function txt(str, x, y, k, size, color, opt) {
-      font(k, size, color);
-      if (!draw) return;
       var o = opt || {}, c = cs(str, k, size);
+      if (draw && o.align === 'right') { x -= width(str, k, size); delete o.align; }
+      if (draw && o.align === 'center') { x -= width(str, k, size) / 2; delete o.align; }
+      font(k, size, color);   // after measuring: width() resets the colour
+      if (!draw) return;
       if (c) o.charSpace = c;
-      if (o.align === 'right') { x -= width(str, k, size); delete o.align; }
-      if (o.align === 'center') { x -= width(str, k, size) / 2; delete o.align; }
       doc.text(str, x, y, o);
     }
     function wrap(str, k, size, w) { font(k, size); return doc.splitTextToSize(str, w); }
@@ -482,20 +482,15 @@
         y += zh + 16 * s;
       }
 
-      // the book, with an ink CTA pill
+      // the book, with an ink CTA pill (caps, no arrow)
       var bh = 92 * s, bx = M + 18, bw = CW - 36;
       card(M, y, CW, bh, C.mint, 4, 10);
       txt('FEELING BROKE IS TEMPORARY.', bx, y + 30 * s, 'gravity', 22 * s, C.ink);
       txt('What you learn in the book shouldn’t be.', bx, y + 48 * s, 'lastik', 14 * s, C.forest);
       wrap(BOOK_LINE, 'alpes', 7.6 * s, bw * 0.62).forEach(function (l, i) { txt(l, bx, y + 63 * s + i * 9.6 * s, 'alpes', 7.6 * s, C.ink); });
-      var cta = ('Follow ' + FOLLOW_HANDLE).toUpperCase(), cz = 8.5 * s, cw = width(cta, 'alpesX', cz) + 54, ch = 24 * s, cx = M + CW - 18 - cw, cy = y + bh - 18 * s - ch;
+      var cta = ('Follow ' + FOLLOW_HANDLE).toUpperCase(), cz = 8.5 * s, cw = width(cta, 'alpesX', cz) + 32, ch = 24 * s, cx = M + CW - 18 - cw, cy = y + bh - 18 * s - ch;
       pill(cx, cy, cw, ch, C.ink);
-      txt(cta, cx + 16, cy + ch / 2 + cz * 0.36, 'alpesX', cz, C.paper);
-      if (draw) {   // the arrow
-        var ax = cx + cw - 20, ay = cy + ch / 2;
-        doc.setDrawColor.apply(doc, C.mint); doc.setLineWidth(1.6); doc.setLineCap('round'); doc.setLineJoin('round');
-        doc.line(ax - 5, ay, ax + 5, ay); doc.line(ax + 1, ay - 4, ax + 5, ay); doc.line(ax + 5, ay, ax + 1, ay + 4);
-      }
+      txt(cta, cx + cw / 2, cy + ch / 2 + cz * 0.36, 'alpesX', cz, C.paper, { align: 'center' });
       y += bh + 14 * s;
 
       wrap(PDF_DISCLAIMER, 'alpes', 5.4 * s, CW).forEach(function (l) { txt(l, M, y + 4.5 * s, 'alpes', 5.4 * s, C.mute); y += 7 * s; });

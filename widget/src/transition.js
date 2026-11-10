@@ -26,7 +26,7 @@
     bars: 15,
     stagger: 0.45,
     // the word held on the cover across the page load
-    word: 'none',             // quiz -> result: level ("STABLE") | name ("Solid, Still Building") | none
+    word: 'none',             // quiz -> result: level ("STABLE") | name ("Steady, Still Building") | none
     linkWord: 'none',          // other links: none | text (the link's own text). data-tx-word on a link always wins
     wordColor: '#073823',
     wordFont: '"Abcgravityxxcompressed Ultra", Anton, Impact, "Arial Narrow", sans-serif',

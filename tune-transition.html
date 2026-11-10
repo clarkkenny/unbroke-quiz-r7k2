@@ -95,7 +95,7 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
     bars: 15,
     stagger: 0.45,
     // the word held on the cover across the page load
-    word: 'none',             // quiz -> result: level ("STABLE") | name ("Solid, Still Building") | none
+    word: 'none',             // quiz -> result: level ("STABLE") | name ("Steady, Still Building") | none
     linkWord: 'none',          // other links: none | text (the link's own text). data-tx-word on a link always wins
     wordColor: '#073823',
     wordFont: '"Abcgravityxxcompressed Ultra", Anton, Impact, "Arial Narrow", sans-serif',
@@ -487,7 +487,7 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
   var out = $('out'), scrub = $('scrub'), scrubOut = $('scrubOut'), marker = $('marker');
   var picked = null, frozen = false, playing = false, slow = 1;
 
-  function words() { return current !== '/take-quiz' && current !== '/quiz/solid-still-building' ? '' : C.word === 'name' ? 'Solid, Still Building' : C.word === 'level' ? 'STABLE' : ''; }
+  function words() { return current !== '/take-quiz' && current !== '/quiz/solid-still-building' ? '' : C.word === 'name' ? 'Steady, Still Building' : C.word === 'level' ? 'STABLE' : ''; }
   var current = '/take-quiz';
   function showPath(path) {
     current = path;
@@ -584,7 +584,7 @@ textarea{width:100%;height:170px;font:11px/1.45 "DM Mono",monospace;border:1px s
     if (playing) return;
     showPage(false); frozen = false; scrubOut.textContent = 'live'; T.unmount();
     playing = true; slowOn();
-    T.go('/quiz/solid-still-building', originFrom(), { level: 'STABLE', name: 'Solid, Still Building' });
+    T.go('/quiz/solid-still-building', originFrom(), { level: 'STABLE', name: 'Steady, Still Building' });
   }
   $('play').onclick = play; $('go').onclick = play;
   T.start();
