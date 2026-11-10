@@ -407,6 +407,7 @@
         firstName: person.firstName, lastName: person.lastName, email: person.email,
         bucket: result.bucket, result: REPORT[result.bucket].level + ': ' + REPORT[result.bucket].name,
         score: result.final, dream: 'q4_' + answers.q4, colTier: COL_TIER_NAMES[result.tier],
+        zip: /^\d{5}$/.test(String(answers.q3 || '').trim()) ? String(answers.q3).trim() : '',
         answers: QUESTIONS.filter(function (q) { return q.type !== 'zip'; }).map(function (q) { return q.id + '_' + answers[q.id]; }).join(','),
         timestamp: new Date().toISOString(), page: location.origin + location.pathname
       };
@@ -465,6 +466,9 @@
       put(['quizdream'], p.dream, 'quiz_dream');
       put(['quizcoltier'], p.colTier, 'quiz_col_tier');
       put(['quizanswers'], p.answers, 'quiz_answers');
+      // the results email reads the ZIP from here for "Your zip, by the numbers"; left out when it isn't 5 digits
+      if (p.zip) put(['quizzip'], p.zip, 'quiz_zip');
+      else { var z = find(['quizzip']); if (z) z.value = ''; }
       put(['quiztimestamp'], p.timestamp, 'quiz_timestamp');
       if (p.turnstile) put(['cfturnstileresponse'], p.turnstile, 'cf-turnstile-response');
 
