@@ -330,15 +330,16 @@
     return pdfFonts;
   }
 
+  /* The report, in the Unbroke brand system: paper with the dot grid, mint for "yours", forest for what's gone,
+     ink for type and outlines, cards with a 2px ink line and a hard shadow. Brand faces and their PDF stand-ins
+     (all SIL OFL, in the font bundle): ABC Gravity -> Anton, Alpes -> Inter Tight 400/800, Lastik -> Instrument Serif.
+     Caps are never tracked wide: all-caps Alpes and Lastik at -2%. */
   function buildPdf(fontFiles) {
     var r = data.report;
     var doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter', compress: true });
-    var FACE = {
-      sans: ['helvetica', 'normal'], bold: ['helvetica', 'bold'], display: ['helvetica', 'bold'],
-      serif: ['times', 'normal'], accent: ['helvetica', 'bold'], mono: ['courier', 'normal']
-    };
+    var FACE = { gravity: ['helvetica', 'bold'], alpes: ['helvetica', 'normal'], alpesX: ['helvetica', 'bold'], lastik: ['times', 'normal'] };
     if (fontFiles) {
-      var MAP = { sans: 'InterTight-400', bold: 'InterTight-800', display: 'Anton-400', serif: 'InstrumentSerif-400', accent: 'InstrumentSans-700', mono: 'DMMono-400' };
+      var MAP = { gravity: 'Anton-400', alpes: 'InterTight-400', alpesX: 'InterTight-800', lastik: 'InstrumentSerif-400' };
       Object.keys(MAP).forEach(function (k) {
         var f = MAP[k];
         if (!fontFiles[f]) return;
@@ -348,147 +349,167 @@
       });
     }
 
-    var PW = 612, PH = 792, M = 50, CW = PW - M * 2, HERO = 152, BOTTOM = PH - 26;
-    var MINT = [149, 255, 177], SOFT = [239, 255, 244], FOREST = [7, 56, 35], INK = [0, 0, 0], WHITE = [255, 255, 255],
-      GREY = [90, 90, 90], DIM = [104, 150, 124];
+    var PW = 612, PH = 792, M = 48, CW = PW - M * 2, BOTTOM = PH - 24;
+    var C = { ink: [11, 15, 12], paper: [255, 255, 255], mint: [149, 255, 177], dot: [196, 242, 209], forest: [7, 56, 35], mute: [78, 94, 84] };
     var draw = false;
 
-    function font(k, size, color) { doc.setFont(FACE[k][0], FACE[k][1]); doc.setFontSize(size); doc.setTextColor.apply(doc, color || INK); }
-    function width(str, k, size, cs) { font(k, size); return doc.getTextWidth(str) + (cs || 0) * str.length; }
-    function txt(str, x, y, k, size, color, opt) { font(k, size, color); if (draw) doc.text(str, x, y, opt || {}); }
-    function wrap(str, k, size, w) { font(k, size); return doc.splitTextToSize(str, w); }
-    function box(x, y, w, h, rad, fill, stroke, lw) {
+    function caps(k) { return k === 'alpesX' || k === 'lastik'; }
+    function font(k, size, color) { doc.setFont(FACE[k][0], FACE[k][1]); doc.setFontSize(size); doc.setTextColor.apply(doc, color || C.ink); }
+    // all-caps Alpes/Lastik get -2% tracking; everything else is set as drawn
+    function cs(str, k, size) { return caps(k) && str === str.toUpperCase() && /[A-Z]/.test(str) ? -0.02 * size : 0; }
+    function width(str, k, size) { font(k, size); return doc.getTextWidth(str) + cs(str, k, size) * str.length; }
+    function txt(str, x, y, k, size, color, opt) {
+      font(k, size, color);
       if (!draw) return;
-      doc.setFillColor.apply(doc, fill);
-      if (stroke) { doc.setDrawColor.apply(doc, stroke); doc.setLineWidth(lw || 1.5); }
-      doc.roundedRect(x, y, w, h, rad, rad, stroke ? 'FD' : 'F');
+      var o = opt || {}, c = cs(str, k, size);
+      if (c) o.charSpace = c;
+      if (o.align === 'right') { x -= width(str, k, size); delete o.align; }
+      if (o.align === 'center') { x -= width(str, k, size) / 2; delete o.align; }
+      doc.text(str, x, y, o);
     }
+    function wrap(str, k, size, w) { font(k, size); return doc.splitTextToSize(str, w); }
+    function fit(str, k, max, w, min) { var z = max; while (z > min && width(str, k, z) > w) z -= 0.5; return z; }
+    // a brand card: hard ink shadow, fill, 2px ink outline
+    function card(x, y, w, h, fill, sh, rad) {
+      if (!draw) return;
+      rad = rad == null ? 8 : rad;
+      if (sh) { doc.setFillColor.apply(doc, C.ink); doc.roundedRect(x + sh, y + sh, w, h, rad, rad, 'F'); }
+      doc.setFillColor.apply(doc, fill); doc.setDrawColor.apply(doc, C.ink); doc.setLineWidth(1.5);
+      doc.roundedRect(x, y, w, h, rad, rad, 'FD');
+    }
+    function pill(x, y, w, h, fill) { if (!draw) return; doc.setFillColor.apply(doc, fill); doc.roundedRect(x, y, w, h, h / 2, h / 2, 'F'); }
     function clean(s) { return String(s).replace(/−/g, '-'); }
     var when = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     var mode = r.level + ' Mode';
-    var accent = r.accent && r.name.slice(-r.accent.length) === r.accent ? r.accent : r.name.split(' ').slice(-1)[0];
-    var lead = r.name.slice(0, r.name.length - accent.length).trim();
 
-    // ---- banner: type only ----
-    function banner() {
-      if (draw) { doc.setFillColor.apply(doc, FOREST); doc.rect(0, 0, PW, HERO, 'F'); }
-      // mode chip
-      var cs = 15.5, cw = width(mode, 'serif', cs) + 24, ch = 26, cx = (PW - cw) / 2, cy = 30;
-      box(cx, cy, cw, ch, 5, MINT, INK, 1.5);
-      txt(mode, PW / 2, cy + 18, 'serif', cs, INK, { align: 'center' });
-
-      // title: heavy sans lead + mint serif accent (same face as the mode chip), one centred line
-      var size = 40, lw, aw;
-      for (;;) {
-        lw = lead ? width(lead + ' ', 'bold', size) : 0; aw = width(accent, 'serif', size * 1.12);
-        if (lw + aw <= CW || size <= 20) break;
-        size -= 1;
-      }
-      var tx = (PW - lw - aw) / 2, ty = 100;
-      if (lead) txt(lead + ' ', tx, ty, 'bold', size, WHITE);
-      txt(accent, tx + lw, ty, 'serif', size * 1.12, MINT);
-
-      // where you sit on the scale
-      var idx = Number(String(data.bucket).replace(/\D/g, '')) - 1, ls = 7, gapW = 26, pad = 7;
-      var ws = LEVELS.map(function (l) { return width(l.toUpperCase(), 'mono', ls, 0.8); });
-      var total = ws.reduce(function (a, b) { return a + b; }, 0) + gapW * (LEVELS.length - 1);
-      var lx = (PW - total) / 2, ly = 130;
-      LEVELS.forEach(function (l, i) {
-        if (i === idx) box(lx - pad, ly - 9.5, ws[i] + pad * 2 - 0.8, 14, 7, MINT);
-        txt(l.toUpperCase(), lx, ly, 'mono', ls, i === idx ? INK : DIM, { charSpace: 0.8 });
-        if (i < LEVELS.length - 1) txt('·', lx + ws[i] + gapW / 2, ly, 'mono', ls, DIM, { align: 'center' });
-        lx += ws[i] + gapW;
+    // ---- the top: the answer, on mint (the brand's "yours"), type only ----
+    function top() {
+      var y = 30, chipZ = 14, chipW = width(mode, 'lastik', chipZ) + 22, chipH = 24;
+      // measure first, so the band fits the title however long it is
+      var title = r.name.toUpperCase(), tz = fit(title, 'gravity', 64, CW, 40), tl = width(title, 'gravity', tz) > CW ? wrap(title, 'gravity', tz, CW) : [title];
+      var desc = r.desc.charAt(0).toUpperCase() + r.desc.slice(1);
+      var ty = y + chipH + 16 + tz * 0.86, dy = ty + (tl.length - 1) * tz * 0.95 + 24, sy = dy + 26, HB = sy + 18;
+      if (draw) { doc.setFillColor.apply(doc, C.mint); doc.rect(0, 0, PW, HB, 'F'); doc.setDrawColor.apply(doc, C.ink); doc.setLineWidth(1.5); doc.line(0, HB, PW, HB); }
+      card(M, y, chipW, chipH, C.paper, 3, 5);
+      txt(mode, M + 11, y + 16.5, 'lastik', chipZ, C.ink);
+      tl.forEach(function (l, i) { txt(l, M, ty + i * tz * 0.95, 'gravity', tz, C.ink); });
+      txt(desc, M, dy, 'lastik', 16, C.forest);
+      // where you sit: the four levels, yours in an ink pill
+      var LV = ['CRISIS', 'FRAGILE', 'STABLE', 'DURABLE'], cur = Number(String(data.bucket).replace(/\D/g, '')) - 1, lx = M, lz = 7.5, pad = 7;
+      LV.forEach(function (l, i) {
+        var w = width(l, 'alpesX', lz);
+        if (i === cur) { pill(lx - pad, sy - 9.5, w + pad * 2, 14, C.ink); txt(l, lx, sy, 'alpesX', lz, C.paper); }
+        else txt(l, lx, sy, 'alpesX', lz, C.forest);
+        lx += w + pad * 2 + 8;
       });
+      return HB;
     }
 
-    // ---- body, laid out at type scale s; returns the final y ----
-    function body(s) {
-      var y = HERO + 30 * s;
+    function dots(from) {
+      if (!draw) return;
+      doc.setFillColor.apply(doc, C.dot);
+      for (var yy = from + 8; yy < PH; yy += 11) for (var xx = 5.5; xx < PW; xx += 11) doc.circle(xx, yy, 0.9, 'F');
+    }
+
+    // ---- the body at type scale s; returns the final y ----
+    function body(s, HB) {
+      var y = HB + 26 * s;
       function para(str, k, size, lh, color) {
         wrap(str, k, size, CW).forEach(function (l) { txt(l, M, y + size * 0.78, k, size, color); y += lh; });
       }
-
-      txt(('Prepared for ' + data.firstName + ' ' + data.lastName + '  ·  ' + when).toUpperCase(), M, y, 'mono', 8, FOREST, { charSpace: 0.6 });
-      y += 16 * s;
-      para(r.reading, 'sans', 11 * s, 15.5 * s);
+      txt(('Prepared for ' + data.firstName + ' ' + data.lastName + '  ·  ' + when).toUpperCase(), M, y, 'alpesX', 8, C.forest);
+      y += 14 * s;
+      para(r.reading, 'alpes', 10.8 * s, 15.4 * s, C.ink);
       y += 12 * s;
 
       if (data.dream) {
-        var qs = 13.5 * s, ql = wrap('“' + data.dream + '”', 'serif', qs, CW - 28), qh = 26 * s + ql.length * qs * 1.2;
-        box(M, y, CW, qh, 8, SOFT, INK, 1.2);
-        txt('YOUR DREAM, IN YOUR WORDS', M + 14, y + 13 * s, 'mono', 7 * s, FOREST, { charSpace: 0.5 });
-        ql.forEach(function (l, i) { txt(l, M + 14, y + 29 * s + i * qs * 1.2, 'serif', qs, INK); });
-        y += qh + 16 * s;
+        var qz = 15 * s, ql = wrap('“' + data.dream + '”', 'lastik', qz, CW - 32), qh = 32 * s + ql.length * qz * 1.15;
+        card(M, y, CW, qh, C.paper, 3, 8);
+        txt('YOUR DREAM, IN YOUR WORDS', M + 16, y + 17 * s, 'alpesX', 7 * s, C.mute);
+        ql.forEach(function (l, i) { txt(l, M + 16, y + 35 * s + i * qz * 1.15, 'lastik', qz, C.ink); });
+        y += qh + 20 * s;
       }
 
-      var h2 = 28 * s;
-      txt('What can change this', M, y + h2 * 0.82, 'display', h2, INK);
-      y += h2 + 10 * s;
+      var hz = 30 * s;
+      txt('WHAT CAN CHANGE THIS', M, y + hz * 0.82, 'gravity', hz, C.ink);
+      y += hz + 10 * s;
 
+      // the moves as quiz rows: a Lastik letter on a mint tile, Alpes body
       r.moves.forEach(function (m, i) {
-        var size = 9.5 * s, lh = 12.8 * s, pad = 10 * s, numW = 44 * s, tx = M + 14 + numW;
-        var ls = wrap(m, 'sans', size, CW - (tx - M) - 14), h = Math.max(ls.length * lh, 22 * s) + pad * 2;
-        box(M, y, CW, h, 7, MINT, INK, 1.5);
-        txt(('0' + (i + 1)).slice(-2), M + 14, y + h / 2 + 7.5 * s, 'display', 21 * s, FOREST);
-        var top = y + (h - ls.length * lh) / 2;
-        ls.forEach(function (l, j) { txt(l, tx, top + size * 0.95 + j * lh, 'sans', size, INK); });
-        y += h + 6 * s;
+        var size = 9.4 * s, lh = 12.8 * s, pad = 10 * s, tile = 22 * s, tx = M + 14 + tile + 12;
+        var ls = wrap(m, 'alpes', size, CW - (tx - M) - 14), h = Math.max(ls.length * lh, tile) + pad * 2;
+        card(M, y, CW, h, C.paper, 3, 8);
+        var ty = y + (h - tile) / 2;
+        if (draw) { doc.setFillColor.apply(doc, C.mint); doc.setDrawColor.apply(doc, C.ink); doc.setLineWidth(1); doc.roundedRect(M + 14, ty, tile, tile, 5, 5, 'FD'); }
+        txt('abcd'.charAt(i) + '.', M + 14 + tile / 2, ty + tile * 0.7, 'lastik', 14 * s, C.ink, { align: 'center' });
+        var top0 = y + (h - ls.length * lh) / 2;
+        ls.forEach(function (l, j) { txt(l, tx, top0 + size * 0.95 + j * lh, 'alpes', size, C.ink); });
+        y += h + 8 * s;
       });
-      y += 8 * s;
+      y += 6 * s;
 
-      para(r.note, 'sans', 11 * s, 15.5 * s);
-      y += 12 * s;
+      para(r.note, 'lastik', 14 * s, 17 * s, C.forest);
+      y += 14 * s;
 
       var zs = data.zipStats;
       if (zs && zs.tiles && zs.tiles.length) {
-        var pad = 12 * s, size = 9 * s, lh = 12 * s, ix = M + 14, iw = CW - 28;
-        var zl = [];
+        var pad = 14 * s, ix = M + 16, iw = CW - 32, lz2 = 9 * s, llh = 12.4 * s, zl = [];
         zs.lines.forEach(function (l) {
-          var k = l.strong ? 'bold' : 'sans';
-          wrap(clean(l.text), k, size, iw).forEach(function (t) { zl.push([t, k]); });
+          var k = l.strong ? 'alpesX' : 'alpes';
+          wrap(clean(l.text), k, lz2, iw).forEach(function (t) { zl.push([t, k]); });
         });
-        var tw = iw / zs.tiles.length, vs = (zs.tiles.length <= 2 ? 26 : 22) * s, lbs = 6.5 * s;
-        var labels = zs.tiles.map(function (t) { return wrap(t.label, 'mono', lbs, tw - 12); });
-        var tilesH = vs + 5 * s + Math.max.apply(null, labels.map(function (l) { return l.length; })) * lbs * 1.3;
-        var src = wrap(clean(zs.source) + ' Estimates, rounded.', 'mono', 5.6 * s, iw);
-        var head = 'YOUR ZIP, BY THE NUMBERS  ·  ' + clean(zs.title) + (zs.subtitle ? '  ·  ' + clean(zs.subtitle) : '');
-        var zh = pad + 7 * s + 12 * s + tilesH + 12 * s + zl.length * lh + 5 * s + src.length * 7.2 * s + pad;
-        box(M, y, CW, zh, 8, SOFT, INK, 1.2);
-        var yy = y + pad + 7 * s;
-        txt(head.toUpperCase(), ix, yy, 'mono', 7 * s, FOREST, { charSpace: 0.5 });
+        var n = zs.tiles.length, gap = 8, tw = (iw - gap * (n - 1)) / n, vz = (n <= 2 ? 30 : 24) * s, lbz = 7.2 * s;
+        var labels = zs.tiles.map(function (t) { return wrap(t.label, 'alpes', lbz, tw - 16); });
+        var th = 12 * s + vz + 6 * s + Math.max.apply(null, labels.map(function (l) { return l.length; })) * lbz * 1.3 + 10 * s;
+        var gz = 26 * s, src = wrap(clean(zs.source) + ' Estimates, rounded.', 'alpes', 5.8 * s, iw);
+        var zh = pad + 8 * s + 10 * s + gz + 12 * s + th + 14 * s + zl.length * llh + 6 * s + src.length * 7.4 * s + pad;
+        card(M, y, CW, zh, C.paper, 4, 10);
+        var yy = y + pad + 8 * s;
+        txt('YOUR ZIP, BY THE NUMBERS', ix, yy, 'alpesX', 7 * s, C.mute);
+        yy += 10 * s + gz * 0.86;
+        txt(clean(zs.title).toUpperCase(), ix, yy, 'gravity', gz, C.ink);
+        if (zs.subtitle) txt(clean(zs.subtitle), ix + width(clean(zs.title).toUpperCase(), 'gravity', gz) + 10, yy, 'lastik', 15 * s, C.forest);
         yy += 12 * s;
         zs.tiles.forEach(function (t, i) {
-          var x = ix + i * tw;
-          txt(clean(t.value), x, yy + vs * 0.86, 'display', vs, INK);
-          labels[i].forEach(function (l, j) { txt(l, x, yy + vs + 5 * s + (j + 0.8) * lbs * 1.3, 'mono', lbs, FOREST); });
+          var x = ix + i * (tw + gap);
+          if (draw) { doc.setFillColor.apply(doc, C.mint); doc.setDrawColor.apply(doc, C.ink); doc.setLineWidth(1.2); doc.roundedRect(x, yy, tw, th, 6, 6, 'FD'); }
+          txt(clean(t.value), x + 8, yy + 12 * s + vz * 0.86, 'gravity', vz, C.ink);
+          labels[i].forEach(function (l, j) { txt(l, x + 8, yy + 12 * s + vz + 6 * s + (j + 0.8) * lbz * 1.3, 'alpes', lbz, C.forest); });
         });
-        yy += tilesH + 12 * s;
-        zl.forEach(function (l) { txt(l[0], ix, yy + size * 0.9, l[1], size, INK); yy += lh; });
-        yy += 5 * s;
-        src.forEach(function (l) { txt(l, ix, yy + 5.6 * s, 'mono', 5.6 * s, GREY); yy += 7.2 * s; });
-        y += zh + 12 * s;
+        yy += th + 14 * s;
+        zl.forEach(function (l) { txt(l[0], ix, yy + lz2 * 0.85, l[1], lz2, C.ink); yy += llh; });
+        yy += 6 * s;
+        src.forEach(function (l) { txt(l, ix, yy + 5.8 * s, 'alpes', 5.8 * s, C.mute); yy += 7.4 * s; });
+        y += zh + 16 * s;
       }
 
-      // book band
-      var ph = 88 * s;
-      box(M, y, CW, ph, 9, MINT, INK, 1.5);
-      var px = M + 18, pw = CW - 36;
-      txt('Feeling broke is temporary.', px, y + 24 * s, 'bold', 14 * s, INK);
-      txt('What you learn in the book shouldn’t be.', px, y + 39 * s, 'sans', 10.5 * s, INK);
-      wrap(BOOK_LINE, 'sans', 7.6 * s, pw).forEach(function (l, i) { txt(l, px, y + 54 * s + i * 9.6 * s, 'sans', 7.6 * s, INK); });
-      txt('Follow along: ' + FOLLOW_HANDLE, px, y + ph - 11 * s, 'mono', 8 * s, FOREST);
-      y += ph + 12 * s;
+      // the book, with an ink CTA pill
+      var bh = 92 * s, bx = M + 18, bw = CW - 36;
+      card(M, y, CW, bh, C.mint, 4, 10);
+      txt('FEELING BROKE IS TEMPORARY.', bx, y + 30 * s, 'gravity', 22 * s, C.ink);
+      txt('What you learn in the book shouldn’t be.', bx, y + 48 * s, 'lastik', 14 * s, C.forest);
+      wrap(BOOK_LINE, 'alpes', 7.6 * s, bw * 0.62).forEach(function (l, i) { txt(l, bx, y + 63 * s + i * 9.6 * s, 'alpes', 7.6 * s, C.ink); });
+      var cta = ('Follow ' + FOLLOW_HANDLE).toUpperCase(), cz = 8.5 * s, cw = width(cta, 'alpesX', cz) + 54, ch = 24 * s, cx = M + CW - 18 - cw, cy = y + bh - 18 * s - ch;
+      pill(cx, cy, cw, ch, C.ink);
+      txt(cta, cx + 16, cy + ch / 2 + cz * 0.36, 'alpesX', cz, C.paper);
+      if (draw) {   // the arrow
+        var ax = cx + cw - 20, ay = cy + ch / 2;
+        doc.setDrawColor.apply(doc, C.mint); doc.setLineWidth(1.6); doc.setLineCap('round'); doc.setLineJoin('round');
+        doc.line(ax - 5, ay, ax + 5, ay); doc.line(ax + 1, ay - 4, ax + 5, ay); doc.line(ax + 5, ay, ax + 1, ay + 4);
+      }
+      y += bh + 14 * s;
 
-      wrap(PDF_DISCLAIMER, 'mono', 5.4 * s, CW).forEach(function (l) { txt(l, M, y + 4.5 * s, 'mono', 5.4 * s, GREY); y += 7 * s; });
+      wrap(PDF_DISCLAIMER, 'alpes', 5.4 * s, CW).forEach(function (l) { txt(l, M, y + 4.5 * s, 'alpes', 5.4 * s, C.mute); y += 7 * s; });
       return y;
     }
 
     // measure, shrinking the type until it all fits on one page
-    var SCALES = [1, 0.96, 0.92, 0.88, 0.84, 0.8, 0.76, 0.72], s = SCALES[SCALES.length - 1];
-    for (var i = 0; i < SCALES.length; i++) if (body(SCALES[i]) <= BOTTOM) { s = SCALES[i]; break; }
+    var SCALES = [1, 0.96, 0.92, 0.88, 0.84, 0.8, 0.76, 0.72], s = SCALES[SCALES.length - 1], HB = top();
+    for (var i = 0; i < SCALES.length; i++) if (body(SCALES[i], HB) <= BOTTOM) { s = SCALES[i]; break; }
     draw = true;
-    banner();
-    body(s);
+    dots(HB);
+    top();
+    body(s, HB);
 
     doc.setProperties({ title: 'How broke are you? ' + r.name, author: 'Unbroke', subject: mode });
     doc.save('unbroke-report-' + r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.pdf');
